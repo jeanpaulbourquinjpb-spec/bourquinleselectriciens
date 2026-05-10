@@ -86,7 +86,7 @@ export function GoogleReviewsSection() {
           <div className="rounded-2xl overflow-hidden border border-[color:var(--line)] aspect-[4/3] lg:aspect-auto lg:min-h-[420px] shadow-md">
             <iframe
               title="Localisation bourquin les électriciens"
-              src={mapSrcFallback}
+              src={mapSrc}
               className="w-full h-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
