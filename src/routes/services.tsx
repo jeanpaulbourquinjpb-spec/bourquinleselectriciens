@@ -56,7 +56,7 @@ const services = [
   {
     icon: Zap,
     title: "Efficience énergétique",
-    text: "Solutions durables alliant sécurité, confort et efficience énergétique — partenaire éco21 engagé.",
+    text: "Solutions électriques durables pour votre sécurité, votre confort et votre efficience énergétique. Partenaire éco21 certifié.",
   },
 ];
 
