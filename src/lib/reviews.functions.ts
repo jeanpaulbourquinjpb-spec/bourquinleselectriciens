@@ -108,14 +108,22 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
           profile_photo_url: r.authorAttribution?.photoUri,
         }));
 
-      return {
+      if ((json.reviews ?? []).length === 0) {
+        console.log("[GoogleReviews] empty reviews — full raw response:", JSON.stringify(json, null, 2));
+      }
+
+      const result: GoogleReviewsData = {
         rating: json.rating ?? 0,
         user_ratings_total: json.userRatingCount ?? 0,
         reviews,
-        url: `https://search.google.com/local/writereview?placeid=${placeId}`,
+        url: json && (json as { googleMapsUri?: string }).googleMapsUri
+          ? (json as { googleMapsUri?: string }).googleMapsUri!
+          : `https://search.google.com/local/writereview?placeid=${placeId}`,
         place_id: placeId,
         raw: JSON.stringify(json),
       };
+      cache = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
+      return result;
     } catch (err) {
       return {
         ...fallback,
