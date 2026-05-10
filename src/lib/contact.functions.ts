@@ -122,3 +122,12 @@ function escape(s: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+
+// Convert a phone number to E.164, defaulting to Switzerland (+41).
+function toE164CH(input: string): string | null {
+  const raw = input.replace(/[\s().-]/g, "");
+  if (/^\+[1-9]\d{6,14}$/.test(raw)) return raw;
+  if (/^00[1-9]\d{6,14}$/.test(raw)) return "+" + raw.slice(2);
+  if (/^0\d{8,9}$/.test(raw)) return "+41" + raw.slice(1);
+  return null;
+}
