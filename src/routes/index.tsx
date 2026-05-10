@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { ArrowRight, Lightbulb, Shield, Tv, Wrench, Zap, Network } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import sloganImg from "@/assets/slogan-bourquin.png";
@@ -190,6 +191,8 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      <GoogleReviewsSection />
 
       <SiteFooter />
     </div>
