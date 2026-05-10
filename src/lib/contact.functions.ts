@@ -92,15 +92,24 @@ export const submitContactForm = createServerFn({ method: "POST" })
       }),
     }).catch((e) => console.error("Brevo notify failed", e));
 
-    // 3. Send confirmation to client
+    // 3. Send confirmation to client via Brevo template
     const confirmRes = await fetch(`${GATEWAY}/smtp/email`, {
       method: "POST",
       headers,
       body: JSON.stringify({
-        sender,
         to: [{ email: data.email, name: `${data.prenom} ${data.nom}` }],
-        subject: "Merci pour votre message",
-        htmlContent: `<p>Bonjour ${escape(data.prenom)},</p><p>Merci pour votre message. Notre équipe vous répondra dans les plus brefs délais.</p><p>— Bourquin Électricité</p>`,
+        templateId: 1,
+        params: {
+          NOM: data.nom,
+          PRENOM: data.prenom,
+          EMAIL: data.email,
+          TELEPHONE: data.telephone,
+          ADRESSE: data.adresse,
+          CODE_POSTAL: data.codePostal,
+          ETAGE: data.etage,
+          ADRESSE_CORRESPONDANCE: data.adresseCorrespondance || "",
+          MESSAGE: data.message,
+        },
       }),
     });
     if (!confirmRes.ok) {
