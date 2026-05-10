@@ -42,7 +42,7 @@ type PlacesV1Response = {
 };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
-let cache: { data: GoogleReviewsData; expiresAt: number } | null = null;
+let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { data: GoogleReviewsData; expiresAt: number } | null;
 
 export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
   async (): Promise<GoogleReviewsData> => {
