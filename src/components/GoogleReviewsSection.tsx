@@ -27,14 +27,29 @@ export function GoogleReviewsSection() {
   const fetchReviews = useServerFn(getGoogleReviews);
   const [data, setData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetchReviews()
       .then((d) => {
-        if (!cancelled) setData(d);
+        if (cancelled) return;
+        // Debug: log raw Google Places API response
+        console.log("[GoogleReviews] server response:", d);
+        if (d.raw) {
+          try {
+            console.log("[GoogleReviews] raw Places API:", JSON.parse(d.raw));
+          } catch {
+            console.log("[GoogleReviews] raw (string):", d.raw);
+          }
+        }
+        setData(d);
+        if (d.error) setError(d.error);
       })
-      .catch(() => {})
+      .catch((e) => {
+        console.error("[GoogleReviews] fetch failed:", e);
+        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
