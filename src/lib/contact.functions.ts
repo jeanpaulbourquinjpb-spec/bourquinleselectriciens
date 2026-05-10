@@ -36,6 +36,9 @@ export const submitContactForm = createServerFn({ method: "POST" })
       "X-Connection-Api-Key": BREVO_API_KEY,
     };
 
+    // Normalize Swiss phone to E.164 for Brevo SMS attribute
+    const smsE164 = toE164CH(data.telephone);
+
     // 1. Save contact in Brevo (upsert)
     const contactRes = await fetch(`${GATEWAY}/contacts`, {
       method: "POST",
@@ -47,7 +50,8 @@ export const submitContactForm = createServerFn({ method: "POST" })
         attributes: {
           NOM: data.nom,
           PRENOM: data.prenom,
-          SMS: data.telephone,
+          ...(smsE164 ? { SMS: smsE164 } : {}),
+          TELEPHONE: data.telephone,
           ADRESSE: data.adresse,
           CODE_POSTAL: data.codePostal,
           ETAGE: data.etage,
@@ -117,4 +121,13 @@ function escape(s: string) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// Convert a phone number to E.164, defaulting to Switzerland (+41).
+function toE164CH(input: string): string | null {
+  const raw = input.replace(/[\s().-]/g, "");
+  if (/^\+[1-9]\d{6,14}$/.test(raw)) return raw;
+  if (/^00[1-9]\d{6,14}$/.test(raw)) return "+" + raw.slice(2);
+  if (/^0\d{8,9}$/.test(raw)) return "+41" + raw.slice(1);
+  return null;
 }
