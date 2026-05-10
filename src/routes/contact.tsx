@@ -24,7 +24,15 @@ function ContactPage() {
         <h1 className="mt-3 text-4xl md:text-5xl">Contact</h1>
         <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto" />
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-2">
+        <div className="mt-12 max-w-3xl">
+          <p className="eyebrow">Écrivez-nous</p>
+          <h2 className="mt-3 text-3xl md:text-4xl">Formulaire de contact</h2>
+          <div className="mt-8">
+            <ContactForm />
+          </div>
+        </div>
+
+        <div className="mt-20 grid gap-10 lg:grid-cols-2">
           <div className="space-y-8">
             <div className="card-soft">
               <div className="flex gap-4">
