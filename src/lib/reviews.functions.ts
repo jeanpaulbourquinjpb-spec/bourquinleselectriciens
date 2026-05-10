@@ -41,8 +41,14 @@ type PlacesV1Response = {
   error?: { message?: string; status?: string; code?: number };
 };
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+let cache: { data: GoogleReviewsData; expiresAt: number } | null = null;
+
 export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
   async (): Promise<GoogleReviewsData> => {
+    if (cache && cache.expiresAt > Date.now()) {
+      return cache.data;
+    }
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = process.env.GOOGLE_PLACE_ID;
 
