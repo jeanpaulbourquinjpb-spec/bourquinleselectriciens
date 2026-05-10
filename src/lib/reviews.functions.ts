@@ -77,7 +77,7 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       if (!res.ok) {
         return {
           ...fallback,
-          raw: json,
+          raw: JSON.stringify(json),
           error: `HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
         };
       }
@@ -105,7 +105,7 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
         reviews,
         url: `https://search.google.com/local/writereview?placeid=${placeId}`,
         place_id: placeId,
-        raw: json,
+        raw: JSON.stringify(json),
       };
     } catch (err) {
       return {
