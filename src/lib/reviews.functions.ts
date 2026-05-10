@@ -15,7 +15,7 @@ export type GoogleReviewsData = {
   reviews: GoogleReview[];
   url: string;
   place_id: string;
-  raw?: unknown;
+  raw?: string;
   error?: string;
 };
 
