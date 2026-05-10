@@ -25,16 +25,19 @@ function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
 
 export function GoogleReviewsSection() {
   const fetchReviews = useServerFn(getGoogleReviews);
+  const fetchMapUrl = useServerFn(getGoogleMapsEmbedUrl);
   const [data, setData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapSrc, setMapSrc] = useState<string>(
+    "https://www.google.com/maps?q=Rue+Henri-Blanvalet+21,+1207+Gen%C3%A8ve&output=embed",
+  );
 
   useEffect(() => {
     let cancelled = false;
     fetchReviews()
       .then((d) => {
         if (cancelled) return;
-        // Debug: log raw Google Places API response
         console.log("[GoogleReviews] server response:", JSON.stringify(d));
         if (d.raw) {
           console.log("[GoogleReviews] raw Places API:", JSON.stringify(d.raw));
@@ -49,20 +52,19 @@ export function GoogleReviewsSection() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+    fetchMapUrl()
+      .then((m) => {
+        if (!cancelled && m.url) setMapSrc(m.url);
+      })
+      .catch((e) => console.error("[GoogleReviews] map url fetch failed:", e));
     return () => {
       cancelled = true;
     };
-  }, [fetchReviews]);
+  }, [fetchReviews, fetchMapUrl]);
 
   const rating = data?.rating ?? 4.9;
   const total = data?.user_ratings_total ?? 154;
   const reviews = data?.reviews ?? [];
-
-  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${
-    import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY ?? ""
-  }&q=place_id:${PLACE_ID}`;
-  // Fallback to keyless iframe embed (no API key needed) for reliability:
-  const mapSrcFallback = `https://www.google.com/maps?q=Rue+Henri-Blanvalet+21,+1207+Gen%C3%A8ve&output=embed`;
 
   return (
     <section className="py-24 bg-[color:var(--surface-muted)]">
