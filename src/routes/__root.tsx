@@ -76,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Entreprise d'électricité générale à Genève depuis 1968. Électricité, télécom, sécurité, dépannage." },
       { name: "author", content: "Bourquin Jean-Yves SA" },
       { property: "og:title", content: "bourquin les électriciens — Genève" },
-      { property: "og:description", content: "Électricité, télécom, sécurité, dépannage à Genève." },
+      { property: "og:description", content: "Entreprise d'électricité générale à Genève depuis 1968. Électricité, télécom, sécurité, dépannage." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "bourquin les électriciens — Genève" },
+      { name: "twitter:description", content: "Entreprise d'électricité générale à Genève depuis 1968. Électricité, télécom, sécurité, dépannage." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0bfbe39b-963a-4094-a095-fa7a86a67d81/id-preview-41d8b757--bf59d358-5ca3-4eee-9c82-0af41e7cb08a.lovable.app-1778434027468.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0bfbe39b-963a-4094-a095-fa7a86a67d81/id-preview-41d8b757--bf59d358-5ca3-4eee-9c82-0af41e7cb08a.lovable.app-1778434027468.png" },
     ],
     links: [
       {
