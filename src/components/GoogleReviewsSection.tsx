@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Star, ExternalLink } from "lucide-react";
-import { getGoogleReviews, type GoogleReviewsData } from "@/lib/reviews.functions";
+import { getGoogleReviews, getGoogleMapsEmbedUrl, type GoogleReviewsData } from "@/lib/reviews.functions";
 
-const PLACE_ID = "ChIJuThs3TZljEcRZQMSVoTiA_A";
+const PLACE_ID = "ChIJfS2J5zZljEcREXY9RXGNl_I";
 const WRITE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${PLACE_ID}`;
 
 function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
@@ -25,16 +25,19 @@ function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
 
 export function GoogleReviewsSection() {
   const fetchReviews = useServerFn(getGoogleReviews);
+  const fetchMapUrl = useServerFn(getGoogleMapsEmbedUrl);
   const [data, setData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapSrc, setMapSrc] = useState<string>(
+    "https://www.google.com/maps?q=Rue+Henri-Blanvalet+21,+1207+Gen%C3%A8ve&output=embed",
+  );
 
   useEffect(() => {
     let cancelled = false;
     fetchReviews()
       .then((d) => {
         if (cancelled) return;
-        // Debug: log raw Google Places API response
         console.log("[GoogleReviews] server response:", JSON.stringify(d));
         if (d.raw) {
           console.log("[GoogleReviews] raw Places API:", JSON.stringify(d.raw));
@@ -49,20 +52,19 @@ export function GoogleReviewsSection() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+    fetchMapUrl()
+      .then((m) => {
+        if (!cancelled && m.url) setMapSrc(m.url);
+      })
+      .catch((e) => console.error("[GoogleReviews] map url fetch failed:", e));
     return () => {
       cancelled = true;
     };
-  }, [fetchReviews]);
+  }, [fetchReviews, fetchMapUrl]);
 
   const rating = data?.rating ?? 4.9;
   const total = data?.user_ratings_total ?? 154;
   const reviews = data?.reviews ?? [];
-
-  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${
-    import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY ?? ""
-  }&q=place_id:${PLACE_ID}`;
-  // Fallback to keyless iframe embed (no API key needed) for reliability:
-  const mapSrcFallback = `https://www.google.com/maps?q=Rue+Henri-Blanvalet+21,+1207+Gen%C3%A8ve&output=embed`;
 
   return (
     <section className="py-24 bg-[color:var(--surface-muted)]">
@@ -84,7 +86,7 @@ export function GoogleReviewsSection() {
           <div className="rounded-2xl overflow-hidden border border-[color:var(--line)] aspect-[4/3] lg:aspect-auto lg:min-h-[420px] shadow-md">
             <iframe
               title="Localisation bourquin les électriciens"
-              src={mapSrcFallback}
+              src={mapSrc}
               className="w-full h-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
