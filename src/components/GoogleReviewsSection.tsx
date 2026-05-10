@@ -27,14 +27,29 @@ export function GoogleReviewsSection() {
   const fetchReviews = useServerFn(getGoogleReviews);
   const [data, setData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetchReviews()
       .then((d) => {
-        if (!cancelled) setData(d);
+        if (cancelled) return;
+        // Debug: log raw Google Places API response
+        console.log("[GoogleReviews] server response:", d);
+        if (d.raw) {
+          try {
+            console.log("[GoogleReviews] raw Places API:", JSON.parse(d.raw));
+          } catch {
+            console.log("[GoogleReviews] raw (string):", d.raw);
+          }
+        }
+        setData(d);
+        if (d.error) setError(d.error);
       })
-      .catch(() => {})
+      .catch((e) => {
+        console.error("[GoogleReviews] fetch failed:", e);
+        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -81,12 +96,21 @@ export function GoogleReviewsSection() {
           </div>
 
           <div className="space-y-4">
+            {error && (
+              <div
+                className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700"
+                role="alert"
+              >
+                <p className="font-semibold">Erreur de chargement des avis Google</p>
+                <p className="mt-1 break-words">{error}</p>
+              </div>
+            )}
             {loading && (
               <div className="card-soft text-sm text-[color:var(--muted-foreground,#666)]">
                 Chargement des avis…
               </div>
             )}
-            {!loading && reviews.length === 0 && (
+            {!loading && !error && reviews.length === 0 && (
               <div className="card-soft text-sm">
                 Les avis ne sont pas disponibles pour le moment.
               </div>

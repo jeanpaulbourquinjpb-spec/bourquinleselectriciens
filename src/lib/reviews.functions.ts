@@ -15,7 +15,30 @@ export type GoogleReviewsData = {
   reviews: GoogleReview[];
   url: string;
   place_id: string;
+  raw?: string;
   error?: string;
+};
+
+type PlacesV1Review = {
+  name?: string;
+  rating?: number;
+  text?: { text?: string; languageCode?: string };
+  originalText?: { text?: string; languageCode?: string };
+  relativePublishTimeDescription?: string;
+  publishTime?: string;
+  authorAttribution?: {
+    displayName?: string;
+    uri?: string;
+    photoUri?: string;
+  };
+};
+
+type PlacesV1Response = {
+  displayName?: { text?: string };
+  rating?: number;
+  userRatingCount?: number;
+  reviews?: PlacesV1Review[];
+  error?: { message?: string; status?: string; code?: number };
 };
 
 export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
@@ -34,52 +57,61 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     };
 
     if (!apiKey || !placeId) {
-      return { ...fallback, error: "Missing GOOGLE_MAPS_API_KEY or GOOGLE_PLACE_ID" };
+      return {
+        ...fallback,
+        error: `Missing env var: ${!apiKey ? "GOOGLE_MAPS_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
+      };
     }
 
     try {
-      const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
-      url.searchParams.set("place_id", placeId);
-      url.searchParams.set("fields", "rating,user_ratings_total,reviews,url");
-      url.searchParams.set("language", "fr");
-      url.searchParams.set("reviews_sort", "newest");
-      url.searchParams.set("key", apiKey);
+      const url = `https://places.googleapis.com/v1/places/${placeId}?languageCode=fr`;
+      const res = await fetch(url, {
+        headers: {
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews",
+        },
+      });
 
-      const res = await fetch(url.toString());
+      const json = (await res.json()) as PlacesV1Response;
+
       if (!res.ok) {
-        return { ...fallback, error: `HTTP ${res.status}` };
-      }
-      const json = (await res.json()) as {
-        status: string;
-        error_message?: string;
-        result?: {
-          rating?: number;
-          user_ratings_total?: number;
-          reviews?: GoogleReview[];
-          url?: string;
+        return {
+          ...fallback,
+          raw: JSON.stringify(json),
+          error: `HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
         };
-      };
-
-      if (json.status !== "OK" || !json.result) {
-        return { ...fallback, error: json.error_message ?? json.status };
       }
 
-      const reviews = (json.result.reviews ?? [])
+      const reviews: GoogleReview[] = (json.reviews ?? [])
         .slice()
-        .sort((a, b) => b.time - a.time)
-        .slice(0, 5);
+        .sort((a, b) => {
+          const ta = a.publishTime ? new Date(a.publishTime).getTime() : 0;
+          const tb = b.publishTime ? new Date(b.publishTime).getTime() : 0;
+          return tb - ta;
+        })
+        .slice(0, 5)
+        .map((r) => ({
+          author_name: r.authorAttribution?.displayName ?? "Anonyme",
+          rating: r.rating ?? 0,
+          text: r.text?.text ?? r.originalText?.text ?? "",
+          relative_time_description: r.relativePublishTimeDescription ?? "",
+          time: r.publishTime ? new Date(r.publishTime).getTime() : 0,
+          profile_photo_url: r.authorAttribution?.photoUri,
+        }));
 
       return {
-        rating: json.result.rating ?? 0,
-        user_ratings_total: json.result.user_ratings_total ?? 0,
+        rating: json.rating ?? 0,
+        user_ratings_total: json.userRatingCount ?? 0,
         reviews,
-        url:
-          json.result.url ??
-          `https://search.google.com/local/writereview?placeid=${placeId}`,
+        url: `https://search.google.com/local/writereview?placeid=${placeId}`,
         place_id: placeId,
+        raw: JSON.stringify(json),
       };
     } catch (err) {
-      return { ...fallback, error: err instanceof Error ? err.message : "Unknown error" };
+      return {
+        ...fallback,
+        error: err instanceof Error ? err.message : "Unknown error",
+      };
     }
   },
 );
