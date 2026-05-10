@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, FileText } from "lucide-react";
 import sloganImg from "@/assets/slogan-bourquin.png";
+import { ContactForm } from "@/components/ContactForm";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
