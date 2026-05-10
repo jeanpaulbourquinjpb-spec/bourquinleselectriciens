@@ -44,6 +44,19 @@ type PlacesV1Response = {
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { data: GoogleReviewsData; expiresAt: number } | null;
 
+export const getGoogleMapsEmbedUrl = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ url: string; error?: string }> => {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const placeId = "ChIJfS2J5zZljEcREXY9RXGNl_I";
+    if (!apiKey) {
+      return { url: "", error: "Missing GOOGLE_MAPS_API_KEY" };
+    }
+    return {
+      url: `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=place_id:${placeId}&language=fr`,
+    };
+  },
+);
+
 export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
   async (): Promise<GoogleReviewsData> => {
     if (cache && cache.expiresAt > Date.now()) {
