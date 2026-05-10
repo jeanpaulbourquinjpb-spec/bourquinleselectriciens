@@ -43,6 +43,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
       body: JSON.stringify({
         email: data.email,
         updateEnabled: true,
+        listIds: [2],
         attributes: {
           NOM: data.nom,
           PRENOM: data.prenom,
