@@ -70,18 +70,35 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     }
 
     try {
-      const url = `https://places.googleapis.com/v1/places/${placeId}`;
+      const debugPlaceId = "ChIJuThs3TZljEcRZQMSVoTiA_A";
+      const url = `https://places.googleapis.com/v1/places/${debugPlaceId}`;
+
+      console.log("[DEBUG] API Key first 8 chars:", apiKey?.substring(0, 8));
+      console.log("[DEBUG] URL:", url);
+
       const res = await fetch(url, {
-        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           "X-Goog-Api-Key": apiKey,
-          "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews,googleMapsUri",
+          "X-Goog-FieldMask": "rating,userRatingCount,reviews,displayName,googleMapsUri",
+          "Content-Type": "application/json",
         },
       });
 
-      const json = (await res.json()) as PlacesV1Response;
-      console.log("[GoogleReviews] raw Places API response:", JSON.stringify(json, null, 2));
+      const statusCode = res.status;
+      const rawText = await res.text();
+      console.log("[DEBUG] Status:", statusCode);
+      console.log("[DEBUG] Raw response:", rawText);
+
+      let json: PlacesV1Response = {};
+      try {
+        json = JSON.parse(rawText) as PlacesV1Response;
+      } catch {
+        return {
+          ...fallback,
+          raw: rawText,
+          error: `HTTP ${statusCode}: non-JSON response`,
+        };
+      }
 
       if (!res.ok) {
         return {
