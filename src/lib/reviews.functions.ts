@@ -41,8 +41,14 @@ type PlacesV1Response = {
   error?: { message?: string; status?: string; code?: number };
 };
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { data: GoogleReviewsData; expiresAt: number } | null;
+
 export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
   async (): Promise<GoogleReviewsData> => {
+    if (cache && cache.expiresAt > Date.now()) {
+      return cache.data;
+    }
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = process.env.GOOGLE_PLACE_ID;
 
@@ -102,14 +108,22 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
           profile_photo_url: r.authorAttribution?.photoUri,
         }));
 
-      return {
+      if ((json.reviews ?? []).length === 0) {
+        console.log("[GoogleReviews] empty reviews — full raw response:", JSON.stringify(json, null, 2));
+      }
+
+      const result: GoogleReviewsData = {
         rating: json.rating ?? 0,
         user_ratings_total: json.userRatingCount ?? 0,
         reviews,
-        url: `https://search.google.com/local/writereview?placeid=${placeId}`,
+        url: json && (json as { googleMapsUri?: string }).googleMapsUri
+          ? (json as { googleMapsUri?: string }).googleMapsUri!
+          : `https://search.google.com/local/writereview?placeid=${placeId}`,
         place_id: placeId,
         raw: JSON.stringify(json),
       };
+      cache = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
+      return result;
     } catch (err) {
       return {
         ...fallback,
