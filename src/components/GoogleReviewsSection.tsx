@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Star, ExternalLink } from "lucide-react";
-import { getGoogleReviews, type GoogleReviewsData } from "@/lib/reviews.functions";
+import { getGoogleReviews, getGoogleMapsEmbedUrl, type GoogleReviewsData } from "@/lib/reviews.functions";
 
-const PLACE_ID = "ChIJuThs3TZljEcRZQMSVoTiA_A";
+const PLACE_ID = "ChIJfS2J5zZljEcREXY9RXGNl_I";
 const WRITE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${PLACE_ID}`;
 
 function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
