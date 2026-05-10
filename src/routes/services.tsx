@@ -24,6 +24,11 @@ const services = [
     text: "Analyse, conception et contrôle de vos installations électriques par notre équipe d'experts certifiés.",
   },
   {
+    icon: HeadphonesIcon,
+    title: "Maintenance & dépannage",
+    text: "Intervention rapide et entretien régulier de tous types d'installations électriques.",
+  },
+  {
     icon: Wrench,
     title: "Rénovation",
     text: "Modernisation de vos installations existantes, mise aux normes et rénovation complète d'appartements et bâtiments.",
@@ -52,11 +57,6 @@ const services = [
     icon: Zap,
     title: "Efficience énergétique",
     text: "Solutions durables alliant sécurité, confort et efficience énergétique — partenaire éco21 engagé.",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "Maintenance & dépannage",
-    text: "Intervention rapide et entretien régulier de tous types d'installations électriques.",
   },
 ];
 
