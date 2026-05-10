@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
+import logo from "@/assets/logo-bourquin.png";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -14,13 +15,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-[color:var(--line)]">
       <div className="container-x flex items-center justify-between h-20">
-        <Link to="/" className="flex flex-col leading-tight">
-          <span className="text-brand font-extrabold text-xl tracking-tight">
-            bourquin <span className="text-[color:var(--body)] font-medium">les électriciens</span>
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--body)]/70">
-            Électricité · Télécom · Sécurité · Dépannage · Genève
-          </span>
+        <Link to="/" className="flex items-center" aria-label="bourquin les électriciens">
+          <img src={logo} alt="bourquin les électriciens" className="h-12 md:h-14 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">

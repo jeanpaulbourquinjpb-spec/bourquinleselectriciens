@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, FileText } from "lucide-react";
+import sloganImg from "@/assets/slogan-bourquin.png";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -20,7 +21,7 @@ function ContactPage() {
       <section className="container-x py-20">
         <p className="eyebrow">Infos pratiques</p>
         <h1 className="mt-3 text-4xl md:text-5xl">Contact</h1>
-        <p className="mt-4 italic">« entre nous le courant passe »</p>
+        <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto" />
 
         <div className="mt-16 grid gap-10 lg:grid-cols-2">
           <div className="space-y-8">

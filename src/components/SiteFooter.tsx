@@ -1,13 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, Linkedin, Facebook, Instagram } from "lucide-react";
+import logomark from "@/assets/logomark-bourquin.png";
+import slogan from "@/assets/slogan-bourquin.png";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-[color:var(--line)] bg-[color:var(--surface-muted)]">
-      <div className="container-x py-16 grid gap-12 md:grid-cols-4">
+      <div className="container-x pt-12 pb-4 flex justify-center">
+        <img src={logomark} alt="" aria-hidden="true" className="h-10 w-auto opacity-80" />
+      </div>
+      <div className="container-x pb-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <h3 className="text-2xl font-bold mb-3">bourquin les électriciens</h3>
-          <p className="italic text-sm">« entre nous le courant passe »</p>
+          <img src={slogan} alt="entre nous, le courant passe…" className="h-5 w-auto" />
           <p className="mt-4 max-w-md text-sm">
             Entreprise d'électricité générale active depuis 60 ans à Genève.
             Solutions innovantes et durables alliant sécurité, confort et efficience énergétique.
