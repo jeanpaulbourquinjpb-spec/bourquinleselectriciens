@@ -64,15 +64,18 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     }
 
     try {
-      const url = `https://places.googleapis.com/v1/places/${placeId}?languageCode=fr`;
+      const url = `https://places.googleapis.com/v1/places/${placeId}`;
       const res = await fetch(url, {
+        method: "GET",
         headers: {
+          "Content-Type": "application/json",
           "X-Goog-Api-Key": apiKey,
-          "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews",
+          "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews,googleMapsUri",
         },
       });
 
       const json = (await res.json()) as PlacesV1Response;
+      console.log("[GoogleReviews] raw Places API response:", JSON.stringify(json, null, 2));
 
       if (!res.ok) {
         return {
