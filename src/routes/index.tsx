@@ -111,7 +111,7 @@ function HomePage() {
           <h1 className="mt-4 text-4xl md:text-6xl text-white">
             <span className="text-brand">bourquin</span> les électriciens
           </h1>
-          <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto brightness-0 invert opacity-90" style={{ filter: "none" }} />
+          <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto" />
           <p className="mt-6 text-white/80 text-lg max-w-xl">
             Électricité · Télécom · Sécurité · Dépannage. Une entreprise familiale,
             trois générations de savoir-faire au service de votre confort et de votre sécurité.
