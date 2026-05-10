@@ -35,13 +35,9 @@ export function GoogleReviewsSection() {
       .then((d) => {
         if (cancelled) return;
         // Debug: log raw Google Places API response
-        console.log("[GoogleReviews] server response:", d);
+        console.log("[GoogleReviews] server response:", JSON.stringify(d));
         if (d.raw) {
-          try {
-            console.log("[GoogleReviews] raw Places API:", JSON.parse(d.raw));
-          } catch {
-            console.log("[GoogleReviews] raw (string):", d.raw);
-          }
+          console.log("[GoogleReviews] raw Places API:", JSON.stringify(d.raw));
         }
         setData(d);
         if (d.error) setError(d.error);
