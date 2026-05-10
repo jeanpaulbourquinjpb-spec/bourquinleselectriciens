@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ArrowRight, Lightbulb, Shield, Tv, Wrench, Zap, Network } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
+import sloganImg from "@/assets/slogan-bourquin.png";
 import elecImg from "@/assets/service-electricity.jpg";
 import secImg from "@/assets/service-security.jpg";
 import avImg from "@/assets/service-av.jpg";
@@ -110,7 +111,7 @@ function HomePage() {
           <h1 className="mt-4 text-4xl md:text-6xl text-white">
             <span className="text-brand">bourquin</span> les électriciens
           </h1>
-          <p className="mt-4 text-white/85 italic text-lg">« entre nous le courant passe »</p>
+          <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto brightness-0 invert opacity-90" style={{ filter: "none" }} />
           <p className="mt-6 text-white/80 text-lg max-w-xl">
             Électricité · Télécom · Sécurité · Dépannage. Une entreprise familiale,
             trois générations de savoir-faire au service de votre confort et de votre sécurité.
