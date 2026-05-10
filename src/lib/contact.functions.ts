@@ -36,9 +36,6 @@ export const submitContactForm = createServerFn({ method: "POST" })
       "X-Connection-Api-Key": BREVO_API_KEY,
     };
 
-    // Normalize Swiss phone to E.164 for Brevo SMS attribute
-    const smsE164 = toE164CH(data.telephone);
-
     // 1. Save contact in Brevo (upsert)
     const contactRes = await fetch(`${GATEWAY}/contacts`, {
       method: "POST",
@@ -50,7 +47,6 @@ export const submitContactForm = createServerFn({ method: "POST" })
         attributes: {
           NOM: data.nom,
           PRENOM: data.prenom,
-          ...(smsE164 ? { SMS: smsE164 } : {}),
           TELEPHONE: data.telephone,
           ADRESSE: data.adresse,
           CODE_POSTAL: data.codePostal,
