@@ -70,8 +70,7 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     }
 
     try {
-      const debugPlaceId = "ChIJuThs3TZljEcRZQMSVoTiA_A";
-      const url = `https://places.googleapis.com/v1/places/${debugPlaceId}`;
+      const url = `https://places.googleapis.com/v1/places/${placeId}`;
 
       console.log("[DEBUG] API Key first 8 chars:", apiKey?.substring(0, 8));
       console.log("[DEBUG] URL:", url);
