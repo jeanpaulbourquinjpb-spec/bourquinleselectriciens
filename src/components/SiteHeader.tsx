@@ -10,6 +10,7 @@ export function SiteHeader() {
     { to: "/presentation", label: "Présentation" },
     { to: "/services", label: "Services" },
     { to: "/actualite", label: "Actualité" },
+    { to: "/nos-projets", label: "Nos Projets" },
     { to: "/contact", label: "Contact" },
   ] as const;
 
