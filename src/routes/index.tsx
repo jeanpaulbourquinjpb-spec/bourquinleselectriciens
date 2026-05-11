@@ -33,11 +33,6 @@ const slides = [
     img: heroImg,
   },
   {
-    title: "Entreprise d'électricité générale à Genève",
-    text: "Entre nous le courant passe...",
-    img: elecImg,
-  },
-  {
     title: "Sécurité, confort et efficience énergétique",
     text: "Grâce à notre équipe d'électriciens, de télématiciens, de contrôleurs, de conseillers en sécurité et de formateurs.",
     img: secImg,
