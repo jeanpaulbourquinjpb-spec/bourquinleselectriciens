@@ -9,6 +9,7 @@ export function SiteHeader() {
     { to: "/", label: "Accueil" },
     { to: "/presentation", label: "Présentation" },
     { to: "/services", label: "Services" },
+    { to: "/actualite", label: "Actualité" },
     { to: "/contact", label: "Contact" },
   ] as const;
 
