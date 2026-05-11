@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { ArrowRight, Lightbulb, Shield, Tv, Wrench, Zap, Network } from "lucide-react";
-import heroImg from "@/assets/hero.jpg";
+import heroImg from "@/assets/hero.png";
 import sloganImg from "@/assets/slogan-bourquin.png";
 import elecImg from "@/assets/service-electricity.jpg";
 import secImg from "@/assets/service-security.jpg";
