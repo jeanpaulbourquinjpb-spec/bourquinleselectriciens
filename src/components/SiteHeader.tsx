@@ -7,7 +7,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const nav = [
     { to: "/", label: "Accueil" },
-    { to: "/presentation", label: "Présentation" },
+    { to: "/presentation", label: "À propos" },
     { to: "/services", label: "Services" },
     { to: "/actualite", label: "Actualité" },
     { to: "/nos-projets", label: "Nos Projets" },

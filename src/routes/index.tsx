@@ -71,13 +71,13 @@ function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/30" />
         </div>
         <div className="relative container-x py-28 md:py-40 max-w-3xl">
-          <p className="eyebrow text-[color:var(--brand)]">Genève · depuis 1968</p>
+          <p className="eyebrow text-[color:var(--brand)]">Genève  depuis 1968</p>
           <h1 className="mt-4 text-4xl md:text-6xl text-white">
             <span className="text-brand">bourquin</span> les électriciens
           </h1>
           <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto" />
           <p className="mt-6 text-white/80 max-w-xl mt-5 text-xl whitespace-pre-line">
-            Électricité · Télécom · Sécurité · Dépannage{"\n\n"}
+            Électricité · Télécom · Sécurité · Domotique · Dépannage{"\n\n"}
             Une entreprise familiale, trois générations de savoir-faire au service de votre confort et de votre sécurité.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
