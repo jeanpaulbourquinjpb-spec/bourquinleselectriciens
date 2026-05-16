@@ -60,7 +60,8 @@ export function GoogleReviewsSection() {
     return () => {
       cancelled = true;
     };
-  }, [fetchReviews, fetchMapUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const rating = data?.rating ?? 4.9;
   const total = data?.user_ratings_total ?? 154;
