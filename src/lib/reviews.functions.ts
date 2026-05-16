@@ -46,10 +46,10 @@ let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { dat
 
 export const getGoogleMapsEmbedUrl = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ url: string; error?: string }> => {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     const placeId = "ChIJfS2J5zZljEcREXY9RXGNl_I";
     if (!apiKey) {
-      return { url: "", error: "Missing GOOGLE_MAPS_API_KEY" };
+      return { url: "", error: "Missing GOOGLE_PLACES_API_KEY" };
     }
     return {
       url: `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=place_id:${placeId}&language=fr`,
@@ -62,7 +62,7 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     if (cache && cache.expiresAt > Date.now()) {
       return cache.data;
     }
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     const placeId = process.env.GOOGLE_PLACE_ID;
 
     const fallback: GoogleReviewsData = {
@@ -78,7 +78,7 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     if (!apiKey || !placeId) {
       return {
         ...fallback,
-        error: `Missing env var: ${!apiKey ? "GOOGLE_MAPS_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
+        error: `Missing env var: ${!apiKey ? "GOOGLE_PLACES_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
       };
     }
 
