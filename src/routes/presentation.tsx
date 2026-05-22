@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SponsoringTimeline } from "@/components/SponsoringTimeline";
 import { ExternalLink, FileText, Award } from "lucide-react";
 
 export const Route = createFileRoute("/presentation")({
