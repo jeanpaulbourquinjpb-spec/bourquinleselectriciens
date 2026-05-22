@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SponsoringTimeline } from "@/components/SponsoringTimeline";
 import { ExternalLink, FileText, Award } from "lucide-react";
 
 export const Route = createFileRoute("/presentation")({
@@ -155,17 +156,18 @@ function PresentationPage() {
         </ul>
       </section>
 
-      <section id="scroll_to_bottom" className="py-20 bg-[color:var(--surface-muted)]">
+      <section id="scroll_to_bottom" className="py-20 bg-[color:var(--surface-muted)] overflow-hidden">
         <div className="container-x">
           <p className="eyebrow">Engagement</p>
           <h2 className="mt-3 text-3xl md:text-4xl">Sponsoring</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-2">
-            {sponsoring.map((s, i) => (
-              <li key={i} className="card-soft text-sm">
-                {s.text}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 max-w-2xl text-sm">
+            Une chronologie de nos engagements sportifs, culturels et associatifs.
+          </p>
+        </div>
+
+        <SponsoringTimeline items={sponsoring} />
+
+        <div className="container-x">
           <p className="mt-10 text-sm">
             Toute l'actualité sur nos pages{" "}
             <a className="link-brand" href="https://www.facebook.com/bourquinelectricite/" target="_blank" rel="noreferrer">Facebook</a>,{" "}
