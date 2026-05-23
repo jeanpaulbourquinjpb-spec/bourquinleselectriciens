@@ -228,9 +228,13 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
   );
 }
 
-type CreateFn = ReturnType<typeof useServerFn<typeof createProject>>;
-
-function UploadCard({ onCreated, create }: { onCreated: () => void; create: CreateFn }) {
+function UploadCard({
+  onCreated,
+  create,
+}: {
+  onCreated: () => void;
+  create: typeof createProject;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Résidentiel");
