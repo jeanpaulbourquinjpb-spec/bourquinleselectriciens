@@ -17,6 +17,7 @@ import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ActualiteRouteImport } from './routes/actualite'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicHooksScrapeArticlesRouteImport } from './routes/api/public/hooks/scrape-articles'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -58,6 +59,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksScrapeArticlesRoute =
+  ApiPublicHooksScrapeArticlesRouteImport.update({
+    id: '/api/public/hooks/scrape-articles',
+    path: '/api/public/hooks/scrape-articles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +86,7 @@ export interface FileRoutesByTo {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +98,7 @@ export interface FileRoutesById {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/api/public/hooks/scrape-articles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/api/public/hooks/scrape-articles'
   id:
     | '__root__'
     | '/'
@@ -121,6 +133,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/api/public/hooks/scrape-articles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +145,7 @@ export interface RootRouteChildren {
   PresentationRoute: typeof PresentationRoute
   PrivacyRoute: typeof PrivacyRoute
   ServicesRoute: typeof ServicesRoute
+  ApiPublicHooksScrapeArticlesRoute: typeof ApiPublicHooksScrapeArticlesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/scrape-articles': {
+      id: '/api/public/hooks/scrape-articles'
+      path: '/api/public/hooks/scrape-articles'
+      fullPath: '/api/public/hooks/scrape-articles'
+      preLoaderRoute: typeof ApiPublicHooksScrapeArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   PresentationRoute: PresentationRoute,
   PrivacyRoute: PrivacyRoute,
   ServicesRoute: ServicesRoute,
+  ApiPublicHooksScrapeArticlesRoute: ApiPublicHooksScrapeArticlesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
