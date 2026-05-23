@@ -44,7 +44,6 @@ function AdminProjetsPage() {
 
   const list = useServerFn(listProjects);
   const checkAdmin = useServerFn(isCurrentUserAdmin);
-  const create = useServerFn(createProject);
   const remove = useServerFn(deleteProject);
   const scrape = useServerFn(scrapeInstagramPosts);
 
