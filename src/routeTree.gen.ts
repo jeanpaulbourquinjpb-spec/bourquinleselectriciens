@@ -14,9 +14,11 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PresentationRouteImport } from './routes/presentation'
 import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ActualiteRouteImport } from './routes/actualite'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminProjetsRouteImport } from './routes/admin/projets'
 import { Route as ApiPublicHooksScrapeArticlesRouteImport } from './routes/api/public/hooks/scrape-articles'
 
 const ServicesRoute = ServicesRouteImport.update({
@@ -44,6 +46,11 @@ const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
   path: '/mentions-legales',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -59,6 +66,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProjetsRoute = AdminProjetsRouteImport.update({
+  id: '/admin/projets',
+  path: '/admin/projets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksScrapeArticlesRoute =
   ApiPublicHooksScrapeArticlesRouteImport.update({
     id: '/api/public/hooks/scrape-articles',
@@ -70,22 +82,26 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/admin/projets': typeof AdminProjetsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/admin/projets': typeof AdminProjetsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesById {
@@ -93,11 +109,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
+  '/admin/projets': typeof AdminProjetsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRouteTypes {
@@ -106,33 +124,39 @@ export interface FileRouteTypes {
     | '/'
     | '/actualite'
     | '/contact'
+    | '/login'
     | '/mentions-legales'
     | '/nos-projets'
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/admin/projets'
     | '/api/public/hooks/scrape-articles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/actualite'
     | '/contact'
+    | '/login'
     | '/mentions-legales'
     | '/nos-projets'
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/admin/projets'
     | '/api/public/hooks/scrape-articles'
   id:
     | '__root__'
     | '/'
     | '/actualite'
     | '/contact'
+    | '/login'
     | '/mentions-legales'
     | '/nos-projets'
     | '/presentation'
     | '/privacy'
     | '/services'
+    | '/admin/projets'
     | '/api/public/hooks/scrape-articles'
   fileRoutesById: FileRoutesById
 }
@@ -140,11 +164,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActualiteRoute: typeof ActualiteRoute
   ContactRoute: typeof ContactRoute
+  LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   NosProjetsRoute: typeof NosProjetsRoute
   PresentationRoute: typeof PresentationRoute
   PrivacyRoute: typeof PrivacyRoute
   ServicesRoute: typeof ServicesRoute
+  AdminProjetsRoute: typeof AdminProjetsRoute
   ApiPublicHooksScrapeArticlesRoute: typeof ApiPublicHooksScrapeArticlesRoute
 }
 
@@ -185,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MentionsLegalesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -206,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/projets': {
+      id: '/admin/projets'
+      path: '/admin/projets'
+      fullPath: '/admin/projets'
+      preLoaderRoute: typeof AdminProjetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/scrape-articles': {
       id: '/api/public/hooks/scrape-articles'
       path: '/api/public/hooks/scrape-articles'
@@ -220,23 +260,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActualiteRoute: ActualiteRoute,
   ContactRoute: ContactRoute,
+  LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   NosProjetsRoute: NosProjetsRoute,
   PresentationRoute: PresentationRoute,
   PrivacyRoute: PrivacyRoute,
   ServicesRoute: ServicesRoute,
+  AdminProjetsRoute: AdminProjetsRoute,
   ApiPublicHooksScrapeArticlesRoute: ApiPublicHooksScrapeArticlesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
