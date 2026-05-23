@@ -1,11 +1,19 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
+
+const projectsQueryOptions = queryOptions({
+  queryKey: ["projects"],
+  queryFn: () => listProjects(),
+});
 
 export const Route = createFileRoute("/nos-projets")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(projectsQueryOptions),
   component: NosProjetsPage,
   head: () => ({
     meta: [
@@ -24,87 +32,21 @@ export const Route = createFileRoute("/nos-projets")({
   }),
 });
 
-type Category = "Résidentiel" | "Commercial" | "Industriel" | "Rénovation";
-
-const categories: Category[] = ["Résidentiel", "Commercial", "Industriel", "Rénovation"];
-
-const projects: { title: string; description: string; category: Category }[] = [
-  {
-    title: "Villa connectée",
-    description:
-      "Domotique complète : éclairage automatisé, stores, audio multipièces et gestion énergétique.",
-    category: "Résidentiel",
-  },
-  {
-    title: "Appartement haut standing",
-    description:
-      "Installation électrique complète et éclairage sur mesure pour un appartement à Champel.",
-    category: "Résidentiel",
-  },
-  {
-    title: "Maison familiale",
-    description:
-      "Câblage, tableau électrique et bornes de recharge pour véhicules électriques.",
-    category: "Résidentiel",
-  },
-  {
-    title: "Éclairage architectural",
-    description:
-      "Conception et installation d'un éclairage LED scénographique pour un espace commercial haut de gamme.",
-    category: "Commercial",
-  },
-  {
-    title: "Système de sécurité bureau",
-    description:
-      "Contrôle d'accès, vidéosurveillance et interphonie pour un immeuble de bureaux à Plan-les-Ouates.",
-    category: "Commercial",
-  },
-  {
-    title: "Réseau télécom entreprise",
-    description:
-      "Câblage structuré et déploiement réseau pour les nouveaux locaux d'une PME genevoise.",
-    category: "Commercial",
-  },
-  {
-    title: "Atelier de production",
-    description:
-      "Installation électrique force et lumière pour un atelier industriel aux Acacias.",
-    category: "Industriel",
-  },
-  {
-    title: "Entrepôt logistique",
-    description:
-      "Mise en place d'un éclairage LED haute performance et d'un système de détection.",
-    category: "Industriel",
-  },
-  {
-    title: "Rénovation immeuble résidentiel",
-    description:
-      "Mise aux normes complète de l'installation électrique d'un immeuble de 24 appartements en centre-ville.",
-    category: "Rénovation",
-  },
-  {
-    title: "Rénovation bâtiment historique",
-    description:
-      "Remise à neuf des installations en respectant les contraintes patrimoniales du bâtiment.",
-    category: "Rénovation",
-  },
-  {
-    title: "Modernisation tableau électrique",
-    description:
-      "Remplacement et mise en conformité des tableaux électriques d'une copropriété.",
-    category: "Rénovation",
-  },
-];
+type Filter = (typeof CATEGORIES)[number] | "all";
 
 function NosProjetsPage() {
-  const [filter, setFilter] = useState<Category | "all">("all");
+  const [filter, setFilter] = useState<Filter>("all");
+  const { data } = useSuspenseQuery(projectsQueryOptions);
+  const projects = data.projects;
 
-  const filtered = filter === "all" ? projects : projects.filter((p) => p.category === filter);
+  const filtered = useMemo(
+    () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
+    [filter, projects],
+  );
 
-  const filters: { label: string; value: Category | "all" }[] = [
+  const filters: { label: string; value: Filter }[] = [
     { label: "Tous les projets", value: "all" },
-    ...categories.map((c) => ({ label: c, value: c })),
+    ...CATEGORIES.map((c) => ({ label: c, value: c })),
   ];
 
   return (
@@ -139,23 +81,64 @@ function NosProjetsPage() {
             })}
           </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => (
-              <article key={p.title} className="card-soft overflow-hidden p-0 flex flex-col">
-                <div className="aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center">
-                  <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
-                </div>
-                <div className="p-7 flex flex-col flex-1">
-                  <p className="eyebrow">{p.category}</p>
-                  <h3 className="mt-2 text-lg">{p.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed flex-1">{p.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          {filtered.length === 0 ? (
+            <div className="mt-16 text-center text-[color:var(--muted-foreground)]">
+              <p>Aucun projet à afficher pour le moment.</p>
+              <p className="mt-2 text-sm">
+                <Link to="/admin/projets" className="underline">
+                  Espace administrateur
+                </Link>
+              </p>
+            </div>
+          ) : (
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((p) => (
+                <ProjectCard key={p.id} p={p} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
       <SiteFooter />
     </div>
+  );
+}
+
+function ProjectCard({ p }: { p: ProjectDTO }) {
+  return (
+    <article className="card-soft overflow-hidden p-0 flex flex-col">
+      <div className="aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center overflow-hidden">
+        {p.image_url ? (
+          <img
+            src={p.image_url}
+            alt={p.title}
+            loading="lazy"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
+        )}
+      </div>
+      <div className="p-7 flex flex-col flex-1">
+        {p.category && <p className="eyebrow">{p.category}</p>}
+        <h3 className="mt-2 text-lg">{p.title}</h3>
+        {p.description && (
+          <p className="mt-3 text-sm leading-relaxed flex-1 whitespace-pre-line line-clamp-5">
+            {p.description}
+          </p>
+        )}
+        {p.instagram_url && (
+          <a
+            href={p.instagram_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 text-xs text-[color:var(--muted-foreground)] hover:text-foreground"
+          >
+            <Instagram className="w-3.5 h-3.5" />
+            Voir sur Instagram
+          </a>
+        )}
+      </div>
+    </article>
   );
 }
