@@ -52,6 +52,7 @@ export function ContactForm() {
           email: String(fd.get("email") || ""),
           telephone: String(fd.get("telephone") || ""),
           message: String(fd.get("message") || ""),
+          numeroCompteur: String(fd.get("numeroCompteur") || ""),
           gdpr: true as const,
           attachments,
         },
@@ -157,15 +158,27 @@ export function ContactForm() {
       </div>
 
       <div>
+        <label className={labelCls} htmlFor="numeroCompteur">Numéro de compteur</label>
+        <input id="numeroCompteur" name="numeroCompteur" maxLength={100} className={inputCls} />
+        <p className="text-xs mt-2 text-[color:var(--muted)]">
+          Vous pouvez aussi envoyer une photo de votre compteur ou une facture d'électricité en pièce jointe
+        </p>
+      </div>
+
+      <div>
         <label className={labelCls} htmlFor="files">Pièces jointes</label>
         <input
           id="files"
           name="files"
           type="file"
           multiple
+          accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
           onChange={(e) => setFiles(Array.from(e.target.files || []).slice(0, 10))}
           className="block w-full text-sm"
         />
+        <p className="text-xs mt-2 text-[color:var(--muted)]">
+          Photo du problème, compteur ou facture d'électricité
+        </p>
         {files.length > 0 && (
           <p className="text-xs mt-2">{files.length} fichier(s) sélectionné(s)</p>
         )}

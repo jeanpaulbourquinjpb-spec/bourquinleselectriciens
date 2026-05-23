@@ -18,6 +18,7 @@ const inputSchema = z.object({
   email: z.string().trim().email().max(255),
   telephone: z.string().trim().min(1).max(50),
   message: z.string().trim().min(1).max(5000),
+  numeroCompteur: z.string().trim().max(100).optional().default(""),
   gdpr: z.literal(true),
   attachments: z.array(attachmentSchema).max(10).optional().default([]),
 });
@@ -73,6 +74,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
       ${data.adresseCorrespondance ? `<p><strong>Adresse de correspondance :</strong> ${escape(data.adresseCorrespondance)}</p>` : ""}
       <p><strong>Email :</strong> ${escape(data.email)}</p>
       <p><strong>Téléphone :</strong> ${escape(data.telephone)}</p>
+      ${data.numeroCompteur ? `<p><strong>Numéro de compteur :</strong> ${escape(data.numeroCompteur)}</p>` : ""}
       <p><strong>Message :</strong></p>
       <p>${escape(data.message).replace(/\n/g, "<br>")}</p>
     `;
@@ -108,6 +110,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
           CODE_POSTAL: data.codePostal,
           ETAGE: data.etage,
           ADRESSE_CORRESPONDANCE: data.adresseCorrespondance || "",
+          NUMERO_COMPTEUR: data.numeroCompteur || "",
           MESSAGE: data.message,
         },
       }),
