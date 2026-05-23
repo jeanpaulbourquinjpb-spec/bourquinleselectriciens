@@ -110,6 +110,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
           CODE_POSTAL: data.codePostal,
           ETAGE: data.etage,
           ADRESSE_CORRESPONDANCE: data.adresseCorrespondance || "",
+          NUMERO_COMPTEUR: data.numeroCompteur || "",
           MESSAGE: data.message,
         },
       }),
