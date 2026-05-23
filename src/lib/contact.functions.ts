@@ -18,6 +18,7 @@ const inputSchema = z.object({
   email: z.string().trim().email().max(255),
   telephone: z.string().trim().min(1).max(50),
   message: z.string().trim().min(1).max(5000),
+  numeroCompteur: z.string().trim().max(100).optional().default(""),
   gdpr: z.literal(true),
   attachments: z.array(attachmentSchema).max(10).optional().default([]),
 });
