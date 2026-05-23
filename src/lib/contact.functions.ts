@@ -74,6 +74,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
       ${data.adresseCorrespondance ? `<p><strong>Adresse de correspondance :</strong> ${escape(data.adresseCorrespondance)}</p>` : ""}
       <p><strong>Email :</strong> ${escape(data.email)}</p>
       <p><strong>Téléphone :</strong> ${escape(data.telephone)}</p>
+      ${data.numeroCompteur ? `<p><strong>Numéro de compteur :</strong> ${escape(data.numeroCompteur)}</p>` : ""}
       <p><strong>Message :</strong></p>
       <p>${escape(data.message).replace(/\n/g, "<br>")}</p>
     `;
