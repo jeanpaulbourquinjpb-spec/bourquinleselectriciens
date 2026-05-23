@@ -129,7 +129,8 @@ export async function scrapeAndStoreArticles(maxPages = 40): Promise<ScrapeResul
   ).slice(0, maxPages);
   result.discovered = articleUrls.length;
 
-  // 2. Filter against DB
+  // 2. Filter against DB — URLs are stored canonically with ?member=1108 appended.
+  // Also check legacy URLs (without member) so we don't re-insert old entries.
   const urlsNoMember = articleUrls.map((u) => {
     const x = new URL(u);
     x.searchParams.delete("member");
@@ -139,13 +140,16 @@ export async function scrapeAndStoreArticles(maxPages = 40): Promise<ScrapeResul
   const { data: existing } = await supabaseAdmin
     .from("articles")
     .select("url")
-    .in("url", urlsNoMember);
+    .in("url", [...articleUrls, ...urlsNoMember]);
   const have = new Set((existing ?? []).map((r) => r.url));
 
   const toScrape = articleUrls.filter((u) => {
-    const x = new URL(u);
-    x.searchParams.delete("member");
-    return !have.has(x.toString());
+    const noMember = (() => {
+      const x = new URL(u);
+      x.searchParams.delete("member");
+      return x.toString();
+    })();
+    return !have.has(u) && !have.has(noMember);
   });
 
   // 3. Scrape and insert
@@ -160,11 +164,7 @@ export async function scrapeAndStoreArticles(maxPages = 40): Promise<ScrapeResul
         continue;
       }
 
-      const canonicalUrl = (() => {
-        const x = new URL(url);
-        x.searchParams.delete("member");
-        return x.toString();
-      })();
+      const canonicalUrl = withMember(url);
 
       const publishedAt = extracted.published_at
         ? new Date(extracted.published_at).toISOString()
