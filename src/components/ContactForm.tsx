@@ -52,6 +52,7 @@ export function ContactForm() {
           email: String(fd.get("email") || ""),
           telephone: String(fd.get("telephone") || ""),
           message: String(fd.get("message") || ""),
+          numeroCompteur: String(fd.get("numeroCompteur") || ""),
           gdpr: true as const,
           attachments,
         },
