@@ -169,8 +169,8 @@ function AdminProjetsPage() {
           <div className="mt-10 grid lg:grid-cols-[1fr_2fr] gap-10">
             <UploadCard
               onCreated={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
-              create={create}
             />
+
 
             <div>
               <h2 className="text-xl mb-4">
@@ -228,13 +228,8 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
   );
 }
 
-function UploadCard({
-  onCreated,
-  create,
-}: {
-  onCreated: () => void;
-  create: typeof createProject;
-}) {
+function UploadCard({ onCreated }: { onCreated: () => void }) {
+  const create = useServerFn(createProject);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Résidentiel");
