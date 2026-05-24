@@ -460,24 +460,7 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
-            <Link
-              key={p.id}
-              to="/nos-projets/$projectId"
-              params={{ projectId: p.id }}
-              className="card-soft overflow-hidden p-0 flex flex-col group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <div className="relative aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center overflow-hidden">
-                {p.image_url ? (
-                  <img src={p.image_url} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                ) : (
-                  <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                  {p.category && <p className="text-[11px] uppercase tracking-[0.18em] text-white/80">{p.category}</p>}
-                  <p className="mt-1 text-white text-base font-medium leading-snug line-clamp-2">{p.title}</p>
-                </div>
-              </div>
-            </Link>
+            <ProjectGalleryCard key={p.id} p={p} />
           ))}
         </div>
       )}
