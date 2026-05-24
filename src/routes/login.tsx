@@ -22,18 +22,22 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
 
   async function handleForgotPassword() {
-    if (!email) {
+    const emailAddress = email.trim();
+    setResetMessage(null);
+    if (!emailAddress) {
       toast.error("Entrez votre email d'abord.");
       return;
     }
     setResetting(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailAddress, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
+      setResetMessage("Un email de réinitialisation vous a été envoyé.");
       toast.success("Un email de réinitialisation vous a été envoyé.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
@@ -112,16 +116,21 @@ function LoginPage() {
             </Button>
           </form>
           {mode === "signin" && (
-            <p className="mt-4 text-sm">
+            <div className="mt-4 text-sm">
               <button
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={resetting}
-                className="underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] disabled:opacity-60"
+                className="underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {resetting ? "Envoi…" : "Mot de passe oublié ?"}
               </button>
-            </p>
+              {resetMessage && (
+                <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">
+                  {resetMessage}
+                </p>
+              )}
+            </div>
           )}
           <p className="mt-6 text-sm text-[color:var(--muted-foreground)]">
             {mode === "signin" ? (
