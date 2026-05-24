@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringTimeline } from "@/components/SponsoringTimeline";
+import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { ContactForm } from "@/components/ContactForm";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
