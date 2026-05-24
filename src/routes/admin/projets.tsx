@@ -65,10 +65,19 @@ function AdminProjetsPage() {
         setAuthChecked(true);
       }
     })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate({ to: "/login" });
+      }
+    });
+
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
   }, [navigate, checkAdmin]);
+
 
   const projectsQuery = useQuery({
     queryKey: ["projects"],
