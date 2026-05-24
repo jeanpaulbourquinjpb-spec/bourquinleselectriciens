@@ -15,11 +15,15 @@ export type PartnerDTO = {
 const ADMIN_EMAIL = "jean-paul@bourquinelectricite.ch";
 
 async function assertAdmin(userId: string) {
-  const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(userId);
-  if (userRes?.user?.email !== ADMIN_EMAIL) {
-    throw new Error("Forbidden: admin only");
-  }
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (!data) throw new Error("Forbidden: admin role required");
 }
+
 
 export const listPartners = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
