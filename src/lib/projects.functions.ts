@@ -209,6 +209,53 @@ export const addProjectPhoto = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const reorderProjects = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    for (let i = 0; i < data.ids.length; i++) {
+      await supabaseAdmin.from("projects").update({ sort_order: i }).eq("id", data.ids[i]);
+    }
+    return { ok: true };
+  });
+
+export const reorderProjectPhotos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        project_id: z.string().uuid(),
+        photo_ids: z.array(z.string().uuid()).min(1).max(100),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    // Update sort_order and set first as cover
+    for (let i = 0; i < data.photo_ids.length; i++) {
+      await supabaseAdmin
+        .from("project_photos")
+        .update({ sort_order: i, is_cover: i === 0 })
+        .eq("id", data.photo_ids[i]);
+    }
+    // Sync project.image_url to the new cover
+    const { data: cover } = await supabaseAdmin
+      .from("project_photos")
+      .select("url")
+      .eq("id", data.photo_ids[0])
+      .maybeSingle();
+    if (cover?.url) {
+      await supabaseAdmin
+        .from("projects")
+        .update({ image_url: cover.url })
+        .eq("id", data.project_id);
+    }
+    return { ok: true };
+  });
+
 export const deleteProjectPhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
