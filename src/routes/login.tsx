@@ -107,33 +107,33 @@ function LoginPage() {
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
               />
             </div>
-            {mode === "signin" && (
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  disabled={resetting}
-                  className="text-sm underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]"
-                >
-                  {resetting ? "Envoi…" : "Mot de passe oublié ?"}
-                </button>
-              </div>
-            )}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Patientez…" : mode === "signin" ? "Se connecter" : "Créer le compte"}
             </Button>
           </form>
+          {mode === "signin" && (
+            <p className="mt-4 text-sm">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={resetting}
+                className="underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] disabled:opacity-60"
+              >
+                {resetting ? "Envoi…" : "Mot de passe oublié ?"}
+              </button>
+            </p>
+          )}
           <p className="mt-6 text-sm text-[color:var(--muted-foreground)]">
             {mode === "signin" ? (
               <>
                 Premier accès ?{" "}
-                <button onClick={() => setMode("signup")} className="underline">
+                <button type="button" onClick={() => setMode("signup")} className="underline">
                   Créer un compte
                 </button>{" "}
                 (le premier compte créé devient administrateur).
               </>
             ) : (
-              <button onClick={() => setMode("signin")} className="underline">
+              <button type="button" onClick={() => setMode("signin")} className="underline">
                 J'ai déjà un compte
               </button>
             )}
@@ -141,6 +141,7 @@ function LoginPage() {
           <p className="mt-8 text-xs text-[color:var(--muted-foreground)]">
             <Link to="/">Retour au site</Link>
           </p>
+
         </div>
       </section>
       <SiteFooter />
