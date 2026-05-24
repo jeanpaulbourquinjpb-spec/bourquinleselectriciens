@@ -8,6 +8,7 @@ import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringTimeline } from "@/components/SponsoringTimeline";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { ContactForm } from "@/components/ContactForm";
+import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
   ArrowRight, FileText, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
