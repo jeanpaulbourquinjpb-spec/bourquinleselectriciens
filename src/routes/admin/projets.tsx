@@ -57,6 +57,15 @@ import {
   type SponsoringEntryDTO,
   type SponsoringPhotoDTO,
 } from "@/lib/sponsoring.functions";
+import {
+  listPartners,
+  createPartner,
+  updatePartner,
+  deletePartner,
+  reorderPartners,
+  type PartnerDTO,
+} from "@/lib/partners.functions";
+
 
 export const Route = createFileRoute("/admin/projets")({
   component: AdminProjetsPage,
