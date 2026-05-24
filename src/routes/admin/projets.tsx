@@ -322,9 +322,31 @@ function ProjectsList({
     }
   }
 
+  async function persistOrder(ids: string[]) {
+    try {
+      await reorder({ data: { ids } });
+      toast.success("Ordre des projets enregistré");
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  function move(id: string, dir: -1 | 1) {
+    setOrder((prev) => {
+      const i = prev.indexOf(id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      persistOrder(next);
+      return next;
+    });
+  }
+
   return (
     <div className="grid sm:grid-cols-2 gap-4">
-      {ordered.map((p) => (
+      {ordered.map((p, i) => (
         <div
           key={p.id}
           draggable
@@ -332,10 +354,30 @@ function ProjectsList({
           onDragOver={(e) => onDragOver(e, p.id)}
           onDragEnd={onDragEnd}
           className={cn(
-            "transition-opacity",
+            "transition-opacity relative",
             dragId === p.id ? "opacity-50" : "opacity-100",
           )}
         >
+          <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+            <button
+              type="button"
+              aria-label="Monter"
+              disabled={i === 0}
+              onClick={() => move(p.id, -1)}
+              className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+            >
+              <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              aria-label="Descendre"
+              disabled={i === ordered.length - 1}
+              onClick={() => move(p.id, 1)}
+              className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+            >
+              <ArrowDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <AdminProjectCard p={p} onDelete={() => onDelete(p.id)} />
         </div>
       ))}
