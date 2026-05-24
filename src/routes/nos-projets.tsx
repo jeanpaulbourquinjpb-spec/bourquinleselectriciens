@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ImageIcon } from "lucide-react";
+import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { cn } from "@/lib/utils";
-import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
+import { listProjects, CATEGORIES } from "@/lib/projects.functions";
 
 const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
