@@ -251,6 +251,11 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       toast.error("Veuillez sélectionner une photo");
       return;
     }
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error("Fichier trop volumineux. Taille maximale : 10 Mo.");
+      return;
+    }
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
     const allowedTypes: Record<string, string> = {
       jpg: "image/jpeg",
@@ -260,13 +265,14 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
     };
     const contentType = file.type || allowedTypes[ext];
     if (!contentType || !Object.values(allowedTypes).includes(contentType) || !(ext in allowedTypes)) {
-      toast.error("Format accepté : jpg, png ou webp");
+      toast.error("Format non supporté. Formats acceptés : JPG, PNG ou WEBP.");
       return;
     }
     if (!title.trim()) {
-      toast.error("Titre requis");
+      toast.error("Le titre est requis.");
       return;
     }
+
     setUploading(true);
     try {
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
