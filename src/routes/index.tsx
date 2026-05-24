@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import sloganImg from "@/assets/slogan-bourquin.png";
+import heroImg from "@/assets/hero.png";
 import { getArticles, type ArticleDTO } from "@/lib/articles.functions";
 import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
 
