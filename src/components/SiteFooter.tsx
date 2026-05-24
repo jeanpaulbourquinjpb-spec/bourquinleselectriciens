@@ -14,7 +14,7 @@ export function SiteFooter() {
           <h3 className="text-2xl font-bold mb-3">bourquin les électriciens</h3>
           <img src={slogan} alt="entre nous, le courant passe…" className="h-5 w-auto" />
           <p className="mt-4 max-w-md text-sm">
-            Entreprise d'électricité générale active depuis 60 ans à Genève.
+            Entreprise d'électricité générale fondée en 1968 à Genève.
             Solutions innovantes et durables alliant sécurité, confort et efficience énergétique.
           </p>
           <div className="flex items-center gap-3 mt-6">
@@ -47,9 +47,15 @@ export function SiteFooter() {
       <div className="border-t border-[color:var(--line)]">
         <div className="container-x py-6 flex flex-col md:flex-row gap-3 items-center justify-between text-xs">
           <p>© {new Date().getFullYear()} Bourquin Jean-Yves SA — Tous droits réservés.</p>
-          <div className="flex gap-5">
+          <div className="flex gap-5 items-center">
             <Link to="/mentions-legales" className="hover:text-brand">Mentions légales</Link>
             <Link to="/privacy" className="hover:text-brand">Protection des données</Link>
+            <Link
+              to="/login"
+              className="text-[color:var(--muted-foreground)] hover:text-foreground text-[11px]"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </div>

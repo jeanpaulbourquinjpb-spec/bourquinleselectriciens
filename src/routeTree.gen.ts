@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ActualiteRouteImport } from './routes/actualite'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NosProjetsProjectIdRouteImport } from './routes/nos-projets.$projectId'
 import { Route as AdminProjetsRouteImport } from './routes/admin/projets'
 import { Route as ApiPublicHooksScrapeArticlesRouteImport } from './routes/api/public/hooks/scrape-articles'
 
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NosProjetsProjectIdRoute = NosProjetsProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => NosProjetsRoute,
+} as any)
 const AdminProjetsRoute = AdminProjetsRouteImport.update({
   id: '/admin/projets',
   path: '/admin/projets',
@@ -84,11 +90,12 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
-  '/nos-projets': typeof NosProjetsRoute
+  '/nos-projets': typeof NosProjetsRouteWithChildren
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
   '/admin/projets': typeof AdminProjetsRoute
+  '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesByTo {
@@ -97,11 +104,12 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
-  '/nos-projets': typeof NosProjetsRoute
+  '/nos-projets': typeof NosProjetsRouteWithChildren
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
   '/admin/projets': typeof AdminProjetsRoute
+  '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesById {
@@ -111,11 +119,12 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
-  '/nos-projets': typeof NosProjetsRoute
+  '/nos-projets': typeof NosProjetsRouteWithChildren
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRoute
   '/admin/projets': typeof AdminProjetsRoute
+  '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRouteTypes {
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/admin/projets'
+    | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/admin/projets'
+    | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
   id:
     | '__root__'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/admin/projets'
+    | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
   fileRoutesById: FileRoutesById
 }
@@ -166,7 +178,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
-  NosProjetsRoute: typeof NosProjetsRoute
+  NosProjetsRoute: typeof NosProjetsRouteWithChildren
   PresentationRoute: typeof PresentationRoute
   PrivacyRoute: typeof PrivacyRoute
   ServicesRoute: typeof ServicesRoute
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nos-projets/$projectId': {
+      id: '/nos-projets/$projectId'
+      path: '/$projectId'
+      fullPath: '/nos-projets/$projectId'
+      preLoaderRoute: typeof NosProjetsProjectIdRouteImport
+      parentRoute: typeof NosProjetsRoute
+    }
     '/admin/projets': {
       id: '/admin/projets'
       path: '/admin/projets'
@@ -256,13 +275,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface NosProjetsRouteChildren {
+  NosProjetsProjectIdRoute: typeof NosProjetsProjectIdRoute
+}
+
+const NosProjetsRouteChildren: NosProjetsRouteChildren = {
+  NosProjetsProjectIdRoute: NosProjetsProjectIdRoute,
+}
+
+const NosProjetsRouteWithChildren = NosProjetsRoute._addFileChildren(
+  NosProjetsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActualiteRoute: ActualiteRoute,
   ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
-  NosProjetsRoute: NosProjetsRoute,
+  NosProjetsRoute: NosProjetsRouteWithChildren,
   PresentationRoute: PresentationRoute,
   PrivacyRoute: PrivacyRoute,
   ServicesRoute: ServicesRoute,

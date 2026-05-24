@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ImageIcon, Instagram } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
 
@@ -15,13 +15,22 @@ const projectsQueryOptions = queryOptions({
 export const Route = createFileRoute("/nos-projets")({
   loader: ({ context }) => context.queryClient.ensureQueryData(projectsQueryOptions),
   component: NosProjetsPage,
+  errorComponent: ({ error }) => (
+    <div className="container-x py-24 text-center text-[color:var(--muted-foreground)]">
+      <p>Impossible de charger les projets pour le moment.</p>
+      <p className="mt-2 text-xs">{error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="container-x py-24 text-center">Page introuvable.</div>
+  ),
   head: () => ({
     meta: [
       { title: "Nos projets — bourquin les électriciens" },
       {
         name: "description",
         content:
-          "Découvrez une sélection de projets réalisés par bourquin les électriciens à Genève : résidentiel, commercial, industriel et rénovation.",
+          "Découvrez une sélection de projets réalisés par bourquin les électriciens à Genève : éclairage, sécurité, rénovation, grands projets, résidentiel et commercial.",
       },
       { property: "og:title", content: "Nos projets — bourquin les électriciens" },
       {
@@ -84,11 +93,6 @@ function NosProjetsPage() {
           {filtered.length === 0 ? (
             <div className="mt-16 text-center text-[color:var(--muted-foreground)]">
               <p>Aucun projet à afficher pour le moment.</p>
-              <p className="mt-2 text-sm">
-                <Link to="/admin/projets" className="underline">
-                  Espace administrateur
-                </Link>
-              </p>
             </div>
           ) : (
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,39 +110,31 @@ function NosProjetsPage() {
 
 function ProjectCard({ p }: { p: ProjectDTO }) {
   return (
-    <article className="card-soft overflow-hidden p-0 flex flex-col">
-      <div className="aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center overflow-hidden">
+    <Link
+      to="/nos-projets/$projectId"
+      params={{ projectId: p.id }}
+      className="card-soft overflow-hidden p-0 flex flex-col group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <div className="relative aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center overflow-hidden">
         {p.image_url ? (
           <img
             src={p.image_url}
             alt={p.title}
             loading="lazy"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
         )}
-      </div>
-      <div className="p-7 flex flex-col flex-1">
-        {p.category && <p className="eyebrow">{p.category}</p>}
-        <h3 className="mt-2 text-lg">{p.title}</h3>
-        {p.description && (
-          <p className="mt-3 text-sm leading-relaxed flex-1 whitespace-pre-line line-clamp-5">
-            {p.description}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+          {p.category && (
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/80">{p.category}</p>
+          )}
+          <p className="mt-1 text-white text-base font-medium leading-snug line-clamp-2">
+            {p.title}
           </p>
-        )}
-        {p.instagram_url && (
-          <a
-            href={p.instagram_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 text-xs text-[color:var(--muted-foreground)] hover:text-foreground"
-          >
-            <Instagram className="w-3.5 h-3.5" />
-            Voir sur Instagram
-          </a>
-        )}
+        </div>
       </div>
-    </article>
+    </Link>
   );
 }
