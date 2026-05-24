@@ -54,7 +54,40 @@ export const listProjects = createServerFn({ method: "GET" }).handler(async () =
     console.error("listProjects error:", error);
     return { projects: [] as ProjectDTO[] };
   }
-  return { projects: (data ?? []) as ProjectDTO[] };
+  const projects = (data ?? []) as Omit<ProjectDTO, "photos">[];
+  const ids = projects.map((p) => p.id);
+  let photosByProject = new Map<string, ProjectPhotoDTO[]>();
+  if (ids.length > 0) {
+    const { data: photos } = await supabaseAdmin
+      .from("project_photos")
+      .select("id, project_id, url, is_cover, sort_order")
+      .in("project_id", ids)
+      .order("is_cover", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    for (const row of photos ?? []) {
+      const arr = photosByProject.get(row.project_id) ?? [];
+      arr.push({
+        id: row.id,
+        url: row.url,
+        is_cover: row.is_cover,
+        sort_order: row.sort_order,
+      });
+      photosByProject.set(row.project_id, arr);
+    }
+  }
+  const result: ProjectDTO[] = projects.map((p) => {
+    const photos = photosByProject.get(p.id) ?? [];
+    // Fallback: if no photos rows yet (legacy), synthesize from image_url
+    const finalPhotos =
+      photos.length > 0
+        ? photos
+        : p.image_url
+          ? [{ id: `legacy-${p.id}`, url: p.image_url, is_cover: true, sort_order: 0 }]
+          : [];
+    return { ...p, photos: finalPhotos };
+  });
+  return { projects: result };
 });
 
 const createSchema = z.object({
