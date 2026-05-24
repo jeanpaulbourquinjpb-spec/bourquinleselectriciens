@@ -20,14 +20,46 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
+
+    async function prepareRecoverySession() {
+      try {
+        const url = new URL(window.location.href);
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const code = url.searchParams.get("code");
+
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
+          setReady(true);
+          return;
+        }
+
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          setReady(true);
+          return;
+        }
+
+        const { data } = await supabase.auth.getSession();
+        if (data.session) setReady(true);
+      } catch (err) {
+        setSessionError(err instanceof Error ? err.message : "Lien de réinitialisation invalide.");
+      }
+    }
+
+    prepareRecoverySession();
     return () => subscription.unsubscribe();
   }, []);
 
@@ -53,7 +85,9 @@ function ResetPasswordPage() {
         <div className="container-x max-w-md">
           <p className="eyebrow">Espace administrateur</p>
           <h1 className="mt-2 text-3xl">Nouveau mot de passe</h1>
-          {!ready ? (
+          {sessionError ? (
+            <p className="mt-6 text-sm text-[color:var(--muted-foreground)]">{sessionError}</p>
+          ) : !ready ? (
             <p className="mt-6 text-sm text-[color:var(--muted-foreground)]">
               Ouvrez le lien reçu par email pour réinitialiser votre mot de passe.
             </p>

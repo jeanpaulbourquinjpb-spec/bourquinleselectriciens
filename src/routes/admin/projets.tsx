@@ -242,17 +242,28 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       toast.error("Veuillez sélectionner une photo");
       return;
     }
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const allowedTypes: Record<string, string> = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp",
+    };
+    const contentType = file.type || allowedTypes[ext];
+    if (!contentType || !Object.values(allowedTypes).includes(contentType) || !(ext in allowedTypes)) {
+      toast.error("Format accepté : jpg, png ou webp");
+      return;
+    }
     if (!title.trim()) {
       toast.error("Titre requis");
       return;
     }
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("project-photos")
-        .upload(path, file, { contentType: file.type, upsert: false });
+        .upload(path, file, { contentType, cacheControl: "3600", upsert: false });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("project-photos").getPublicUrl(path);
       await create({
@@ -264,7 +275,7 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
           source_type: "upload",
         },
       });
-      toast.success("Projet ajouté");
+      toast.success("Photo uploadée avec succès.");
       setTitle("");
       setDescription("");
       setFile(null);
