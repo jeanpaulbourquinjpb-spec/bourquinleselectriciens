@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, FileText } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram } from "lucide-react";
 import sloganImg from "@/assets/slogan-bourquin.png";
 import { ContactForm } from "@/components/ContactForm";
 
@@ -105,21 +105,6 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="mt-10">
-              <h3 className="text-lg">Téléchargez</h3>
-              <ul className="mt-4 space-y-3 text-sm">
-                <li>
-                  <a href="https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Vive20la20vie.pdf" target="_blank" rel="noreferrer" className="link-brand inline-flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Revue « Vive la vie » des SIG
-                  </a>
-                </li>
-                <li>
-                  <a href="https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Dunkrevue-articleBourquin.pdf" target="_blank" rel="noreferrer" className="link-brand inline-flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Revue « Dunk » des Lions de Genève
-                  </a>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>

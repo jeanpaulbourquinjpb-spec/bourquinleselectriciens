@@ -10,13 +10,22 @@ export const SPONSORING_CATEGORIES = [
   "Football",
 ] as const;
 
-export type SponsoringCategory = (typeof SPONSORING_CATEGORIES)[number];
-
 export type SponsoringPhotoDTO = {
   id: string;
-  category: SponsoringCategory;
   url: string;
+  is_cover: boolean;
   sort_order: number;
+};
+
+export type SponsoringEntryDTO = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  image_url: string;
+  sort_order: number;
+  created_at: string;
+  photos: SponsoringPhotoDTO[];
 };
 
 async function assertAdmin(userId: string) {
@@ -29,26 +38,135 @@ async function assertAdmin(userId: string) {
   if (!data) throw new Error("Forbidden: admin role required");
 }
 
-export const listSponsoringPhotos = createServerFn({ method: "GET" }).handler(async () => {
+export const listSponsoringEntries = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
-    .from("sponsoring_photos")
-    .select("id, category, url, sort_order")
-    .order("category", { ascending: true })
+    .from("sponsoring_entries")
+    .select("id, title, description, category, image_url, sort_order, created_at")
     .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
   if (error) {
-    console.error("listSponsoringPhotos error:", error);
-    return { photos: [] as SponsoringPhotoDTO[] };
+    console.error("listSponsoringEntries error:", error);
+    return { entries: [] as SponsoringEntryDTO[] };
   }
-  return { photos: (data ?? []) as SponsoringPhotoDTO[] };
+  const entries = (data ?? []) as Omit<SponsoringEntryDTO, "photos">[];
+  const ids = entries.map((e) => e.id);
+  const photosByEntry = new Map<string, SponsoringPhotoDTO[]>();
+  if (ids.length > 0) {
+    const { data: photos } = await supabaseAdmin
+      .from("sponsoring_photos")
+      .select("id, entry_id, url, is_cover, sort_order, created_at")
+      .in("entry_id", ids)
+      .order("is_cover", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    for (const row of photos ?? []) {
+      const arr = photosByEntry.get(row.entry_id) ?? [];
+      arr.push({
+        id: row.id,
+        url: row.url,
+        is_cover: row.is_cover,
+        sort_order: row.sort_order,
+      });
+      photosByEntry.set(row.entry_id, arr);
+    }
+  }
+  const result: SponsoringEntryDTO[] = entries.map((e) => {
+    const photos = photosByEntry.get(e.id) ?? [];
+    const finalPhotos =
+      photos.length > 0
+        ? photos
+        : e.image_url
+          ? [{ id: `legacy-${e.id}`, url: e.image_url, is_cover: true, sort_order: 0 }]
+          : [];
+    return { ...e, photos: finalPhotos };
+  });
+  return { entries: result };
 });
+
+const createSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).optional().nullable(),
+  category: z.string().trim().min(1).max(100),
+  image_url: z.string().url().max(2000),
+});
+
+export const createSponsoringEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => createSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: row, error } = await supabaseAdmin
+      .from("sponsoring_entries")
+      .insert({
+        title: data.title,
+        description: data.description ?? null,
+        category: data.category,
+        image_url: data.image_url,
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    if (row) {
+      await supabaseAdmin.from("sponsoring_photos").insert({
+        entry_id: row.id,
+        url: row.image_url,
+        is_cover: true,
+        sort_order: 0,
+      });
+    }
+    return { entry: row };
+  });
+
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().max(2000).nullable().optional(),
+  category: z.string().trim().min(1).max(100).optional(),
+});
+
+export const updateSponsoringEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => updateSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { id, ...patch } = data;
+    const { error } = await supabaseAdmin.from("sponsoring_entries").update(patch).eq("id", id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteSponsoringEntry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: photos } = await supabaseAdmin
+      .from("sponsoring_photos")
+      .select("url")
+      .eq("entry_id", data.id);
+    const marker = "/storage/v1/object/public/sponsoring-photos/";
+    const paths: string[] = [];
+    for (const ph of photos ?? []) {
+      const idx = ph.url.indexOf(marker);
+      if (idx >= 0) paths.push(ph.url.slice(idx + marker.length));
+    }
+    if (paths.length > 0) {
+      await supabaseAdmin.storage.from("sponsoring-photos").remove(paths);
+    }
+    const { error } = await supabaseAdmin
+      .from("sponsoring_entries")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
 
 export const addSponsoringPhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z
       .object({
-        category: z.enum(SPONSORING_CATEGORIES),
+        entry_id: z.string().uuid(),
         url: z.string().url().max(2000),
       })
       .parse(input),
@@ -58,10 +176,11 @@ export const addSponsoringPhoto = createServerFn({ method: "POST" })
     const { count } = await supabaseAdmin
       .from("sponsoring_photos")
       .select("id", { count: "exact", head: true })
-      .eq("category", data.category);
+      .eq("entry_id", data.entry_id);
     const { error } = await supabaseAdmin.from("sponsoring_photos").insert({
-      category: data.category,
+      entry_id: data.entry_id,
       url: data.url,
+      is_cover: false,
       sort_order: count ?? 0,
     });
     if (error) throw new Error(error.message);
@@ -79,15 +198,31 @@ export const deleteSponsoringPhoto = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (row?.url) {
-      const marker = "/storage/v1/object/public/project-photos/";
+      const marker = "/storage/v1/object/public/sponsoring-photos/";
       const idx = row.url.indexOf(marker);
       if (idx >= 0) {
         const path = row.url.slice(idx + marker.length);
-        await supabaseAdmin.storage.from("project-photos").remove([path]);
+        await supabaseAdmin.storage.from("sponsoring-photos").remove([path]);
       }
     }
     const { error } = await supabaseAdmin.from("sponsoring_photos").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const reorderSponsoringEntries = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    for (let i = 0; i < data.ids.length; i++) {
+      await supabaseAdmin
+        .from("sponsoring_entries")
+        .update({ sort_order: i })
+        .eq("id", data.ids[i]);
+    }
     return { ok: true };
   });
 
@@ -96,19 +231,29 @@ export const reorderSponsoringPhotos = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
-        category: z.enum(SPONSORING_CATEGORIES),
-        ids: z.array(z.string().uuid()).min(1).max(500),
+        entry_id: z.string().uuid(),
+        photo_ids: z.array(z.string().uuid()).min(1).max(100),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    for (let i = 0; i < data.ids.length; i++) {
+    for (let i = 0; i < data.photo_ids.length; i++) {
       await supabaseAdmin
         .from("sponsoring_photos")
-        .update({ sort_order: i })
-        .eq("id", data.ids[i])
-        .eq("category", data.category);
+        .update({ sort_order: i, is_cover: i === 0 })
+        .eq("id", data.photo_ids[i]);
+    }
+    const { data: cover } = await supabaseAdmin
+      .from("sponsoring_photos")
+      .select("url")
+      .eq("id", data.photo_ids[0])
+      .maybeSingle();
+    if (cover?.url) {
+      await supabaseAdmin
+        .from("sponsoring_entries")
+        .update({ image_url: cover.url })
+        .eq("id", data.entry_id);
     }
     return { ok: true };
   });
