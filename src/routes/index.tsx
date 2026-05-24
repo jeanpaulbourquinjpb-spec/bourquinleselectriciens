@@ -359,6 +359,8 @@ function HomePage() {
           </div>
         </div>
 
+        <GoogleReviewsSection />
+
         <SiteFooter />
       </section>
     </div>
