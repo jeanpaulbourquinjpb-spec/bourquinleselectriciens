@@ -64,8 +64,10 @@ async function scrapeOne(url: string): Promise<{ caption: string | null; image: 
 
 function inferCategory(text: string | null): string {
   const t = (text ?? "").toLowerCase();
-  if (/(usine|atelier|industri|entrep[oô]t|hangar)/.test(t)) return "Industriel";
+  if (/(alarme|vid[eé]osurveillance|s[eé]curit[eé]|cam[eé]ra)/.test(t)) return "Sécurité";
+  if (/(éclairage|eclairage|luminaire|led|lumi[eè]re)/.test(t)) return "Éclairage";
   if (/(r[eé]novation|mise aux normes|r[eé]fection)/.test(t)) return "Rénovation";
+  if (/(chantier|immeuble|b[aâ]timent|grand projet)/.test(t)) return "Grands projets";
   if (/(bureau|commerc|magasin|boutique|restaurant|h[oô]tel|cabinet)/.test(t)) return "Commercial";
   return "Résidentiel";
 }
