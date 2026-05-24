@@ -16,12 +16,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCcw, Instagram } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, Star, X } from "lucide-react";
 import {
   listProjects,
   createProject,
   deleteProject,
+  addProjectPhoto,
+  deleteProjectPhoto,
+  setCoverPhoto,
   isCurrentUserAdmin,
   CATEGORIES,
   type ProjectDTO,
@@ -202,34 +206,171 @@ function AdminProjetsPage() {
   );
 }
 
+const ALLOWED: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
+const MAX_SIZE = 10 * 1024 * 1024;
+
+async function uploadToStorage(file: File): Promise<string> {
+  if (file.size > MAX_SIZE) {
+    throw new Error(`Fichier "${file.name}" trop volumineux (max 10 Mo).`);
+  }
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  const contentType = file.type || ALLOWED[ext];
+  if (!contentType || !Object.values(ALLOWED).includes(contentType) || !(ext in ALLOWED)) {
+    throw new Error(`Format non supporté pour "${file.name}". JPG, PNG ou WEBP.`);
+  }
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error: upErr } = await supabase.storage
+    .from("project-photos")
+    .upload(path, file, { contentType, cacheControl: "3600", upsert: false });
+  if (upErr) throw upErr;
+  const { data: pub } = supabase.storage.from("project-photos").getPublicUrl(path);
+  return pub.publicUrl;
+}
+
 function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void }) {
+  const queryClient = useQueryClient();
+  const addPhoto = useServerFn(addProjectPhoto);
+  const removePhoto = useServerFn(deleteProjectPhoto);
+  const setCover = useServerFn(setCoverPhoto);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  const photos = p.photos;
+
+  async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setBusy(true);
+    let ok = 0;
+    for (const f of files) {
+      try {
+        const url = await uploadToStorage(f);
+        await addPhoto({ data: { project_id: p.id, url } });
+        ok++;
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Erreur upload");
+      }
+    }
+    if (ok > 0) toast.success(`${ok} photo(s) ajoutée(s).`);
+    if (fileRef.current) fileRef.current.value = "";
+    setBusy(false);
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+  }
+
+  async function handleRemovePhoto(id: string) {
+    if (!confirm("Supprimer cette photo ?")) return;
+    try {
+      await removePhoto({ data: { id } });
+      toast.success("Photo supprimée");
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  async function handleSetCover(photoId: string) {
+    try {
+      await setCover({ data: { project_id: p.id, photo_id: photoId } });
+      toast.success("Photo de couverture définie");
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
   return (
-    <div className="card-soft p-4 flex gap-3">
-      <div className="w-24 h-24 shrink-0 bg-[color:var(--surface-muted)] rounded overflow-hidden">
-        {p.image_url ? (
-          <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
-        ) : null}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-[color:var(--muted-foreground)]">{p.category ?? "—"}</p>
-        <p className="text-sm font-medium truncate">{p.title}</p>
-        <div className="flex items-center gap-3 mt-2">
-          {p.instagram_url && (
-            <a
-              href={p.instagram_url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs inline-flex items-center gap-1 text-[color:var(--muted-foreground)] hover:text-foreground"
+    <div className="card-soft p-4 space-y-3">
+      <div className="flex gap-3">
+        <div className="w-24 h-24 shrink-0 bg-[color:var(--surface-muted)] rounded overflow-hidden">
+          {p.image_url ? (
+            <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
+          ) : null}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-[color:var(--muted-foreground)]">{p.category ?? "—"}</p>
+          <p className="text-sm font-medium truncate">{p.title}</p>
+          <div className="flex items-center gap-3 mt-2">
+            {p.instagram_url && (
+              <a
+                href={p.instagram_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs inline-flex items-center gap-1 text-[color:var(--muted-foreground)] hover:text-foreground"
+              >
+                <Instagram className="w-3 h-3" /> IG
+              </a>
+            )}
+            <button
+              onClick={onDelete}
+              className="text-xs inline-flex items-center gap-1 text-destructive hover:underline"
             >
-              <Instagram className="w-3 h-3" /> IG
-            </a>
-          )}
-          <button
-            onClick={onDelete}
-            className="text-xs inline-flex items-center gap-1 text-destructive hover:underline"
+              <Trash2 className="w-3 h-3" /> Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex flex-wrap gap-2">
+          {photos.map((ph) => (
+            <div key={ph.id} className="relative group">
+              <img
+                src={ph.url}
+                alt=""
+                className={cn(
+                  "w-16 h-16 object-cover rounded border-2",
+                  ph.is_cover ? "border-primary" : "border-transparent",
+                )}
+              />
+              <button
+                type="button"
+                title="Définir comme couverture"
+                onClick={() => handleSetCover(ph.id)}
+                className="absolute -top-1 -left-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Star
+                  className={cn(
+                    "w-3 h-3",
+                    ph.is_cover ? "fill-primary text-primary" : "text-foreground",
+                  )}
+                />
+              </button>
+              <button
+                type="button"
+                title="Supprimer"
+                onClick={() => handleRemovePhoto(ph.id)}
+                className="absolute -top-1 -right-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-3 h-3 text-destructive" />
+              </button>
+            </div>
+          ))}
+          <label
+            className={cn(
+              "w-16 h-16 rounded border-2 border-dashed border-[color:var(--border)] flex items-center justify-center cursor-pointer hover:bg-[color:var(--surface-muted)]",
+              busy && "opacity-50 cursor-wait",
+            )}
           >
-            <Trash2 className="w-3 h-3" /> Supprimer
-          </button>
+            {busy ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Plus className="w-4 h-4" />
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={handleAdd}
+              disabled={busy}
+            />
+          </label>
         </div>
       </div>
     </div>
@@ -238,34 +379,18 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
 
 function UploadCard({ onCreated }: { onCreated: () => void }) {
   const create = useServerFn(createProject);
+  const addPhoto = useServerFn(addProjectPhoto);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Résidentiel");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file) {
-      toast.error("Veuillez sélectionner une photo");
-      return;
-    }
-    const MAX_SIZE = 10 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      toast.error("Fichier trop volumineux. Taille maximale : 10 Mo.");
-      return;
-    }
-    const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    const allowedTypes: Record<string, string> = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      webp: "image/webp",
-    };
-    const contentType = file.type || allowedTypes[ext];
-    if (!contentType || !Object.values(allowedTypes).includes(contentType) || !(ext in allowedTypes)) {
-      toast.error("Format non supporté. Formats acceptés : JPG, PNG ou WEBP.");
+    if (files.length === 0) {
+      toast.error("Veuillez sélectionner au moins une photo");
       return;
     }
     if (!title.trim()) {
@@ -275,32 +400,36 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
 
     setUploading(true);
     try {
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("project-photos")
-        .upload(path, file, { contentType, cacheControl: "3600", upsert: false });
-      if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("project-photos").getPublicUrl(path);
-      await create({
+      // Upload first file as cover
+      const coverUrl = await uploadToStorage(files[0]);
+      const { project } = await create({
         data: {
           title: title.trim(),
           description: description.trim() || null,
           category,
-          image_url: pub.publicUrl,
+          image_url: coverUrl,
           source_type: "upload",
         },
       });
-      toast.success("Photo uploadée avec succès.");
+      // Upload additional photos
+      for (let i = 1; i < files.length; i++) {
+        try {
+          const url = await uploadToStorage(files[i]);
+          await addPhoto({ data: { project_id: project.id, url } });
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Erreur photo additionnelle");
+        }
+      }
+      toast.success(`Projet créé avec ${files.length} photo(s).`);
       setTitle("");
       setDescription("");
-      setFile(null);
+      setFiles([]);
       if (fileRef.current) fileRef.current.value = "";
       onCreated();
     } catch (e) {
       console.error("Upload error:", e);
       const msg = e instanceof Error ? e.message : "Erreur inconnue";
       toast.error(`Échec de l'upload : ${msg}`);
-
     } finally {
       setUploading(false);
     }
@@ -308,17 +437,23 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="card-soft p-6 space-y-4 h-fit sticky top-24">
-      <h2 className="text-xl">Ajouter une photo</h2>
+      <h2 className="text-xl">Ajouter un projet</h2>
 
       <div>
-        <Label htmlFor="file">Photo (jpg, png, webp)</Label>
+        <Label htmlFor="file">Photos (jpg, png, webp — la première sera la couverture)</Label>
         <Input
           ref={fileRef}
           id="file"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          multiple
+          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
         />
+        {files.length > 0 && (
+          <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
+            {files.length} fichier(s) sélectionné(s)
+          </p>
+        )}
       </div>
 
       <div>
