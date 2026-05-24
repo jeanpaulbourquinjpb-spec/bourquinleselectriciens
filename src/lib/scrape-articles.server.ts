@@ -157,7 +157,7 @@ export async function scrapeAndStoreArticles(maxPages = 40): Promise<ScrapeResul
   // 3. Scrape and insert
   for (const url of toScrape) {
     try {
-      const { extracted, metaTitle, metaDesc } = await fcScrape(url);
+      const { extracted, metaTitle, metaDesc, metaImage } = await fcScrape(url);
       result.scraped++;
 
       const title = (extracted.title || metaTitle || "").trim();
@@ -178,6 +178,7 @@ export async function scrapeAndStoreArticles(maxPages = 40): Promise<ScrapeResul
         excerpt: (extracted.excerpt || metaDesc || "").trim() || null,
         category: (extracted.category || "").trim() || null,
         published_at: publishedAt,
+        image_url: metaImage?.trim() || null,
       });
 
       if (error) {
