@@ -18,7 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, X, GripVertical } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, X, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import {
   listProjects,
   createProject,
@@ -32,6 +32,15 @@ import {
   type ProjectDTO,
   type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
+import {
+  listSponsoringPhotos,
+  addSponsoringPhoto,
+  deleteSponsoringPhoto,
+  reorderSponsoringPhotos,
+  SPONSORING_CATEGORIES,
+  type SponsoringCategory,
+  type SponsoringPhotoDTO,
+} from "@/lib/sponsoring.functions";
 import { scrapeInstagramPosts } from "@/lib/scrape-instagram.functions";
 
 export const Route = createFileRoute("/admin/projets")({
