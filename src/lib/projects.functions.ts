@@ -182,3 +182,79 @@ export const isCurrentUserAdmin = createServerFn({ method: "GET" })
       .maybeSingle();
     return { isAdmin: !!data };
   });
+
+export const addProjectPhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        project_id: z.string().uuid(),
+        url: z.string().url().max(2000),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { count } = await supabaseAdmin
+      .from("project_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", data.project_id);
+    const { error } = await supabaseAdmin.from("project_photos").insert({
+      project_id: data.project_id,
+      url: data.url,
+      is_cover: false,
+      sort_order: count ?? 0,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteProjectPhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: row } = await supabaseAdmin
+      .from("project_photos")
+      .select("url")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (row?.url) {
+      const marker = "/storage/v1/object/public/project-photos/";
+      const idx = row.url.indexOf(marker);
+      if (idx >= 0) {
+        const path = row.url.slice(idx + marker.length);
+        await supabaseAdmin.storage.from("project-photos").remove([path]);
+      }
+    }
+    const { error } = await supabaseAdmin.from("project_photos").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const setCoverPhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ project_id: z.string().uuid(), photo_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    await supabaseAdmin
+      .from("project_photos")
+      .update({ is_cover: false })
+      .eq("project_id", data.project_id);
+    const { data: photo, error } = await supabaseAdmin
+      .from("project_photos")
+      .update({ is_cover: true })
+      .eq("id", data.photo_id)
+      .select("url")
+      .single();
+    if (error) throw new Error(error.message);
+    if (photo?.url) {
+      await supabaseAdmin
+        .from("projects")
+        .update({ image_url: photo.url })
+        .eq("id", data.project_id);
+    }
+    return { ok: true };
+  });
