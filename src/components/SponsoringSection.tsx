@@ -1,63 +1,75 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  SPONSORING_CATEGORIES,
-  type SponsoringCategory,
-  type SponsoringPhotoDTO,
-} from "@/lib/sponsoring.functions";
+import type { SponsoringEntryDTO, SponsoringPhotoDTO } from "@/lib/sponsoring.functions";
 
-const DESCRIPTIONS: Record<SponsoringCategory, string> = {
-  "Équitation":
-    "Fiers de soutenir l'excellence équestre internationale aux côtés des plus grands cavaliers.",
-  "Basketball":
-    "Partenaire des Lions de Genève, nous soutenons le sport collectif et l'esprit d'équipe.",
-  "Course à pied":
-    "Engagés aux côtés des coureurs genevois pour des causes qui nous tiennent à cœur.",
-  "Football":
-    "Supporters du football genevois et des grands événements sportifs internationaux.",
-};
-
-export function SponsoringSection({ photos }: { photos: SponsoringPhotoDTO[] }) {
+export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }) {
   const [lightbox, setLightbox] = useState<{
     photos: SponsoringPhotoDTO[];
     index: number;
   } | null>(null);
 
+  // Group entries by category, preserving entry sort order
+  const byCategory = new Map<string, SponsoringEntryDTO[]>();
+  for (const e of entries) {
+    const arr = byCategory.get(e.category) ?? [];
+    arr.push(e);
+    byCategory.set(e.category, arr);
+  }
+  const categories = Array.from(byCategory.keys());
+
   return (
     <>
       <div className="container-x mt-12 space-y-16">
-        {SPONSORING_CATEGORIES.map((cat) => {
-          const items = photos.filter((p) => p.category === cat);
+        {categories.length === 0 && (
+          <p className="text-sm text-[color:var(--muted-foreground)] italic">
+            Engagements à venir.
+          </p>
+        )}
+        {categories.map((cat) => {
+          const items = byCategory.get(cat) ?? [];
           return (
             <div key={cat}>
               <h4 className="text-2xl">{cat}</h4>
-              <p className="mt-2 max-w-2xl text-sm text-[color:var(--muted-foreground)]">
-                {DESCRIPTIONS[cat]}
-              </p>
-              {items.length === 0 ? (
-                <p className="mt-6 text-xs text-[color:var(--muted-foreground)] italic">
-                  Photos à venir.
-                </p>
-              ) : (
-                <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                  {items.map((ph, i) => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => setLightbox({ photos: items, index: i })}
-                      className="relative aspect-square bg-[color:var(--surface-muted)] overflow-hidden rounded group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    >
+              <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((entry) => (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    onClick={() =>
+                      entry.photos.length > 0 &&
+                      setLightbox({ photos: entry.photos, index: 0 })
+                    }
+                    className="group relative aspect-[4/3] bg-[color:var(--surface-muted)] overflow-hidden rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary text-left"
+                  >
+                    {entry.image_url ? (
                       <img
-                        src={ph.url}
-                        alt={`${cat} ${i + 1}`}
+                        src={entry.image_url}
+                        alt={entry.title}
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    </button>
-                  ))}
-                </div>
-              )}
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <ImageIcon className="w-8 h-8 text-[color:var(--muted-foreground)]" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                      <h5 className="text-white text-lg font-semibold">{entry.title}</h5>
+                      {entry.description && (
+                        <p className="mt-1 text-white/85 text-sm line-clamp-3">
+                          {entry.description}
+                        </p>
+                      )}
+                      {entry.photos.length > 1 && (
+                        <p className="mt-2 text-white/70 text-xs">
+                          {entry.photos.length} photos
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           );
         })}
@@ -172,7 +184,6 @@ function Lightbox({
             )}
           />
         ))}
-        {photos.length === 0 && <ImageIcon className="w-12 h-12 text-white/40" />}
       </div>
       {hasMany && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm tabular-nums">
