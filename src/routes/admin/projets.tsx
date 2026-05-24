@@ -18,7 +18,19 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, X, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Loader2,
+  Trash2,
+  Upload,
+  Instagram,
+  Plus,
+  X,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
+  Pencil,
+  Check,
+} from "lucide-react";
 import {
   listProjects,
   createProject,
@@ -33,15 +45,18 @@ import {
   type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
 import {
-  listSponsoringPhotos,
+  listSponsoringEntries,
+  createSponsoringEntry,
+  updateSponsoringEntry,
+  deleteSponsoringEntry,
   addSponsoringPhoto,
   deleteSponsoringPhoto,
+  reorderSponsoringEntries,
   reorderSponsoringPhotos,
   SPONSORING_CATEGORIES,
-  type SponsoringCategory,
+  type SponsoringEntryDTO,
   type SponsoringPhotoDTO,
 } from "@/lib/sponsoring.functions";
-import { scrapeInstagramPosts } from "@/lib/scrape-instagram.functions";
 
 export const Route = createFileRoute("/admin/projets")({
   component: AdminProjetsPage,
@@ -60,7 +75,6 @@ function AdminProjetsPage() {
   const list = useServerFn(listProjects);
   const checkAdmin = useServerFn(isCurrentUserAdmin);
   const remove = useServerFn(deleteProject);
-  const scrape = useServerFn(scrapeInstagramPosts);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,7 +107,6 @@ function AdminProjetsPage() {
     };
   }, [navigate, checkAdmin]);
 
-
   const projectsQuery = useQuery({
     queryKey: ["projects"],
     queryFn: () => list(),
@@ -103,25 +116,6 @@ function AdminProjetsPage() {
   async function handleSignOut() {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
-  }
-
-  const [scraping, setScraping] = useState(false);
-  async function handleScrape() {
-    setScraping(true);
-    try {
-      const res = await scrape();
-      const added = res.results.filter((r) => r.status === "added").length;
-      const noImg = res.results.filter((r) => r.status === "no_image").length;
-      const err = res.results.filter((r) => r.status === "error").length;
-      toast.success(
-        `Import Instagram : ${added} ajoutés, ${noImg} sans image (à compléter), ${err} erreurs.`,
-      );
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors du scraping");
-    } finally {
-      setScraping(false);
-    }
   }
 
   async function handleDelete(id: string) {
@@ -186,8 +180,6 @@ function AdminProjetsPage() {
           </div>
 
           <AdminTabs
-            onScrape={handleScrape}
-            scraping={scraping}
             projects={projectsQuery.data?.projects ?? []}
             projectsLoading={projectsQuery.isLoading}
             onDeleteProject={handleDelete}
@@ -201,15 +193,11 @@ function AdminProjetsPage() {
 }
 
 function AdminTabs({
-  onScrape,
-  scraping,
   projects,
   projectsLoading,
   onDeleteProject,
   onProjectsChanged,
 }: {
-  onScrape: () => void;
-  scraping: boolean;
   projects: ProjectDTO[];
   projectsLoading: boolean;
   onDeleteProject: (id: string) => void;
@@ -241,16 +229,6 @@ function AdminTabs({
 
       {tab === "projets" ? (
         <div className="mt-8">
-          <div className="flex justify-end mb-4">
-            <Button onClick={onScrape} disabled={scraping} variant="secondary">
-              {scraping ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-4 h-4 mr-2" />
-              )}
-              Importer les posts Instagram
-            </Button>
-          </div>
           <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
             <UploadCard onCreated={onProjectsChanged} />
             <div>
@@ -286,7 +264,6 @@ function ProjectsList({
   const [order, setOrder] = useState<string[]>(projects.map((p) => p.id));
   const [dragId, setDragId] = useState<string | null>(null);
 
-  // sync when server data changes
   useEffect(() => {
     setOrder(projects.map((p) => p.id));
   }, [projects]);
@@ -393,7 +370,7 @@ const ALLOWED: Record<string, string> = {
 };
 const MAX_SIZE = 10 * 1024 * 1024;
 
-async function uploadToStorage(file: File): Promise<string> {
+async function uploadToStorage(file: File, bucket = "project-photos"): Promise<string> {
   if (file.size > MAX_SIZE) {
     throw new Error(`Fichier "${file.name}" trop volumineux (max 10 Mo).`);
   }
@@ -404,10 +381,10 @@ async function uploadToStorage(file: File): Promise<string> {
   }
   const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const { error: upErr } = await supabase.storage
-    .from("project-photos")
+    .from(bucket)
     .upload(path, file, { contentType, cacheControl: "3600", upsert: false });
   if (upErr) throw upErr;
-  const { data: pub } = supabase.storage.from("project-photos").getPublicUrl(path);
+  const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path);
   return pub.publicUrl;
 }
 
@@ -620,7 +597,6 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
 
     setUploading(true);
     try {
-      // Upload first file as cover
       const coverUrl = await uploadToStorage(files[0]);
       const { project } = await create({
         data: {
@@ -631,7 +607,6 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
           source_type: "upload",
         },
       });
-      // Upload additional photos
       for (let i = 1; i < files.length; i++) {
         try {
           const url = await uploadToStorage(files[i]);
@@ -722,96 +697,61 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
   );
 }
 
+/* ============================== SPONSORING ============================== */
+
 function SponsoringAdmin() {
   const queryClient = useQueryClient();
-  const listFn = useServerFn(listSponsoringPhotos);
-  const addFn = useServerFn(addSponsoringPhoto);
-  const delFn = useServerFn(deleteSponsoringPhoto);
-  const reorderFn = useServerFn(reorderSponsoringPhotos);
+  const listFn = useServerFn(listSponsoringEntries);
+  const deleteEntryFn = useServerFn(deleteSponsoringEntry);
+  const reorderFn = useServerFn(reorderSponsoringEntries);
 
-  const q = useQuery({ queryKey: ["sponsoring-photos"], queryFn: () => listFn() });
-  const photos = q.data?.photos ?? [];
+  const q = useQuery({ queryKey: ["sponsoring-entries"], queryFn: () => listFn() });
+  const entries: SponsoringEntryDTO[] = q.data?.entries ?? [];
 
-  return (
-    <div className="mt-8 space-y-12">
-      {SPONSORING_CATEGORIES.map((cat) => (
-        <SponsoringCategoryBlock
-          key={cat}
-          category={cat}
-          photos={photos.filter((p) => p.category === cat)}
-          onAdd={async (url) => {
-            await addFn({ data: { category: cat, url } });
-            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
-          }}
-          onDelete={async (id) => {
-            await delFn({ data: { id } });
-            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
-          }}
-          onReorder={async (ids) => {
-            await reorderFn({ data: { category: cat, ids } });
-            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+  // Collected categories = default + any custom from existing entries
+  const knownCategories = useMemo(() => {
+    const set = new Set<string>(SPONSORING_CATEGORIES);
+    for (const e of entries) set.add(e.category);
+    return Array.from(set);
+  }, [entries]);
 
-function SponsoringCategoryBlock({
-  category,
-  photos,
-  onAdd,
-  onDelete,
-  onReorder,
-}: {
-  category: SponsoringCategory;
-  photos: SponsoringPhotoDTO[];
-  onAdd: (url: string) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
-  onReorder: (ids: string[]) => Promise<void>;
-}) {
-  const [order, setOrder] = useState<string[]>(photos.map((p) => p.id));
+  const [order, setOrder] = useState<string[]>(entries.map((e) => e.id));
   const [dragId, setDragId] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setOrder(photos.map((p) => p.id));
-  }, [photos]);
+    setOrder(entries.map((e) => e.id));
+  }, [entries]);
 
-  const byId = new Map(photos.map((p) => [p.id, p]));
-  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as SponsoringPhotoDTO[];
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as SponsoringEntryDTO[];
 
-  async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
-    setBusy(true);
-    let ok = 0;
-    for (const f of files) {
-      try {
-        const url = await uploadToStorage(f);
-        await onAdd(url);
-        ok++;
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Erreur upload");
-      }
-    }
-    if (ok > 0) toast.success(`${ok} photo(s) ajoutée(s) à ${category}.`);
-    if (fileRef.current) fileRef.current.value = "";
-    setBusy(false);
+  function invalidate() {
+    queryClient.invalidateQueries({ queryKey: ["sponsoring-entries"] });
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Supprimer cette photo ?")) return;
+  async function persistOrder(ids: string[]) {
     try {
-      await onDelete(id);
-      toast.success("Photo supprimée");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur");
+      await reorderFn({ data: { ids } });
+      toast.success("Ordre enregistré");
+      invalidate();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
     }
   }
 
-  function onDragOverPhoto(e: React.DragEvent, overId: string) {
+  function move(id: string, dir: -1 | 1) {
+    setOrder((prev) => {
+      const i = prev.indexOf(id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      persistOrder(next);
+      return next;
+    });
+  }
+
+  function onDragOver(e: React.DragEvent, overId: string) {
     e.preventDefault();
     if (!dragId || dragId === overId) return;
     setOrder((prev) => {
@@ -824,114 +764,577 @@ function SponsoringCategoryBlock({
       return next;
     });
   }
-
-  async function onDragEndPhoto() {
+  async function onDragEnd() {
     const ids = order;
     setDragId(null);
-    if (ids.length < 2) return;
+    await persistOrder(ids);
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Supprimer cette entrée et toutes ses photos ?")) return;
     try {
-      await onReorder(ids);
-      toast.success("Ordre enregistré");
+      await deleteEntryFn({ data: { id } });
+      toast.success("Entrée supprimée");
+      invalidate();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  return (
+    <div className="mt-8 grid lg:grid-cols-[1fr_2fr] gap-10">
+      <SponsoringUploadCard
+        knownCategories={knownCategories}
+        onCreated={invalidate}
+      />
+      <div>
+        <h2 className="text-xl mb-4">Entrées sponsoring ({entries.length})</h2>
+        <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
+          Glissez les entrées ou utilisez les flèches pour les réordonner.
+        </p>
+        {q.isLoading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {ordered.map((e, i) => (
+              <div
+                key={e.id}
+                draggable
+                onDragStart={() => setDragId(e.id)}
+                onDragOver={(ev) => onDragOver(ev, e.id)}
+                onDragEnd={onDragEnd}
+                className={cn(
+                  "transition-opacity relative",
+                  dragId === e.id ? "opacity-50" : "opacity-100",
+                )}
+              >
+                <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+                  <button
+                    type="button"
+                    aria-label="Monter"
+                    disabled={i === 0}
+                    onClick={() => move(e.id, -1)}
+                    className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Descendre"
+                    disabled={i === ordered.length - 1}
+                    onClick={() => move(e.id, 1)}
+                    className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <AdminSponsoringCard
+                  entry={e}
+                  knownCategories={knownCategories}
+                  onDelete={() => handleDelete(e.id)}
+                  onChanged={invalidate}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SponsoringUploadCard({
+  knownCategories,
+  onCreated,
+}: {
+  knownCategories: string[];
+  onCreated: () => void;
+}) {
+  const create = useServerFn(createSponsoringEntry);
+  const addPhoto = useServerFn(addSponsoringPhoto);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<string>(knownCategories[0] ?? "Équitation");
+  const [addingCustom, setAddingCustom] = useState(false);
+  const [customCat, setCustomCat] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!knownCategories.includes(category) && !addingCustom) {
+      setCategory(knownCategories[0] ?? "Équitation");
+    }
+  }, [knownCategories, category, addingCustom]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (files.length === 0) {
+      toast.error("Veuillez sélectionner au moins une photo");
+      return;
+    }
+    if (!title.trim()) {
+      toast.error("Le titre est requis.");
+      return;
+    }
+    const finalCategory = addingCustom ? customCat.trim() : category;
+    if (!finalCategory) {
+      toast.error("La catégorie est requise.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const coverUrl = await uploadToStorage(files[0], "sponsoring-photos");
+      const { entry } = await create({
+        data: {
+          title: title.trim(),
+          description: description.trim() || null,
+          category: finalCategory,
+          image_url: coverUrl,
+        },
+      });
+      const entryId = (entry as { id: string } | null)?.id;
+      if (entryId) {
+        for (let i = 1; i < files.length; i++) {
+          try {
+            const url = await uploadToStorage(files[i], "sponsoring-photos");
+            await addPhoto({ data: { entry_id: entryId, url } });
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erreur photo additionnelle");
+          }
+        }
+      }
+      toast.success(`Entrée créée avec ${files.length} photo(s).`);
+      setTitle("");
+      setDescription("");
+      setFiles([]);
+      setCustomCat("");
+      setAddingCustom(false);
+      if (fileRef.current) fileRef.current.value = "";
+      onCreated();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur inconnue";
+      toast.error(`Échec : ${msg}`);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card-soft p-6 space-y-4 h-fit sticky top-24">
+      <h2 className="text-xl">Ajouter une entrée sponsoring</h2>
+
+      <div>
+        <Label htmlFor="sp-file">Photos (la première sera la couverture)</Label>
+        <Input
+          ref={fileRef}
+          id="sp-file"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+        />
+        {files.length > 0 && (
+          <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
+            {files.length} fichier(s) sélectionné(s)
+          </p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="sp-title">Titre</Label>
+        <Input
+          id="sp-title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={200}
+          required
+        />
+      </div>
+
+      <div>
+        <Label>Catégorie</Label>
+        {addingCustom ? (
+          <div className="flex gap-2">
+            <Input
+              value={customCat}
+              onChange={(e) => setCustomCat(e.target.value)}
+              placeholder="Nouvelle catégorie"
+              maxLength={100}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setAddingCustom(false);
+                setCustomCat("");
+              }}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {knownCategories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setAddingCustom(true)}
+              title="Ajouter une catégorie"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="sp-desc">Description (optionnel)</Label>
+        <Textarea
+          id="sp-desc"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          maxLength={2000}
+          rows={4}
+        />
+      </div>
+
+      <Button type="submit" disabled={uploading} className="w-full">
+        {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+        Ajouter
+      </Button>
+    </form>
+  );
+}
+
+function AdminSponsoringCard({
+  entry,
+  knownCategories,
+  onDelete,
+  onChanged,
+}: {
+  entry: SponsoringEntryDTO;
+  knownCategories: string[];
+  onDelete: () => void;
+  onChanged: () => void;
+}) {
+  const update = useServerFn(updateSponsoringEntry);
+  const addPhoto = useServerFn(addSponsoringPhoto);
+  const removePhoto = useServerFn(deleteSponsoringPhoto);
+  const reorderPhotos = useServerFn(reorderSponsoringPhotos);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(entry.title);
+  const [description, setDescription] = useState(entry.description ?? "");
+  const [category, setCategory] = useState(entry.category);
+  const [addingCustom, setAddingCustom] = useState(false);
+  const [customCat, setCustomCat] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [photoOrder, setPhotoOrder] = useState<string[]>(entry.photos.map((p) => p.id));
+  const [dragPhoto, setDragPhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPhotoOrder(entry.photos.map((p) => p.id));
+    setTitle(entry.title);
+    setDescription(entry.description ?? "");
+    setCategory(entry.category);
+  }, [entry]);
+
+  const photosById = new Map<string, SponsoringPhotoDTO>(
+    entry.photos.map((ph) => [ph.id, ph]),
+  );
+  const orderedPhotos = photoOrder
+    .map((id) => photosById.get(id))
+    .filter(Boolean) as SponsoringPhotoDTO[];
+
+  async function saveEdit() {
+    const finalCategory = addingCustom ? customCat.trim() : category;
+    if (!title.trim()) {
+      toast.error("Titre requis");
+      return;
+    }
+    if (!finalCategory) {
+      toast.error("Catégorie requise");
+      return;
+    }
+    try {
+      await update({
+        data: {
+          id: entry.id,
+          title: title.trim(),
+          description: description.trim() || null,
+          category: finalCategory,
+        },
+      });
+      toast.success("Entrée mise à jour");
+      setEditing(false);
+      setAddingCustom(false);
+      setCustomCat("");
+      onChanged();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     }
   }
 
-  function move(id: string, dir: -1 | 1) {
-    setOrder((prev) => {
-      const i = prev.indexOf(id);
-      const j = i + dir;
-      if (i < 0 || j < 0 || j >= prev.length) return prev;
+  async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setBusy(true);
+    let ok = 0;
+    for (const f of files) {
+      try {
+        const url = await uploadToStorage(f, "sponsoring-photos");
+        await addPhoto({ data: { entry_id: entry.id, url } });
+        ok++;
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Erreur upload");
+      }
+    }
+    if (ok > 0) toast.success(`${ok} photo(s) ajoutée(s).`);
+    if (fileRef.current) fileRef.current.value = "";
+    setBusy(false);
+    onChanged();
+  }
+
+  async function handleRemovePhoto(id: string) {
+    if (!confirm("Supprimer cette photo ?")) return;
+    try {
+      await removePhoto({ data: { id } });
+      toast.success("Photo supprimée");
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  function onPhotoDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragPhoto || dragPhoto === overId) return;
+    setPhotoOrder((prev) => {
       const next = [...prev];
-      [next[i], next[j]] = [next[j], next[i]];
-      onReorder(next).catch((err) =>
-        toast.error(err instanceof Error ? err.message : "Erreur"),
-      );
+      const from = next.indexOf(dragPhoto);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragPhoto);
       return next;
     });
   }
 
+  async function onPhotoDragEnd() {
+    const ids = photoOrder;
+    setDragPhoto(null);
+    if (ids.length < 2) return;
+    try {
+      await reorderPhotos({ data: { entry_id: entry.id, photo_ids: ids } });
+      toast.success("Ordre des photos enregistré");
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
   return (
-    <div className="card-soft p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg">
-          {category} <span className="text-sm text-[color:var(--muted-foreground)]">({photos.length})</span>
-        </h3>
-        <label
-          className={cn(
-            "inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border border-[color:var(--border)] cursor-pointer hover:bg-[color:var(--surface-muted)]",
-            busy && "opacity-50 cursor-wait",
+    <div className="card-soft p-4 space-y-3">
+      <div className="flex gap-3">
+        <div className="shrink-0 cursor-grab text-[color:var(--muted-foreground)] flex items-center">
+          <GripVertical className="w-4 h-4" />
+        </div>
+        <div className="w-20 h-20 shrink-0 bg-[color:var(--surface-muted)] rounded overflow-hidden">
+          {entry.image_url ? (
+            <img
+              src={entry.image_url}
+              alt={entry.title}
+              className="w-full h-full object-cover"
+            />
+          ) : null}
+        </div>
+        <div className="flex-1 min-w-0">
+          {editing ? (
+            <div className="space-y-2">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={200}
+                placeholder="Titre"
+              />
+              {addingCustom ? (
+                <div className="flex gap-1">
+                  <Input
+                    value={customCat}
+                    onChange={(e) => setCustomCat(e.target.value)}
+                    placeholder="Nouvelle catégorie"
+                    maxLength={100}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setAddingCustom(false);
+                      setCustomCat("");
+                    }}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-1">
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {knownCategories.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAddingCustom(true)}
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
+              )}
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={2}
+                placeholder="Description"
+                maxLength={2000}
+              />
+              <div className="flex gap-2">
+                <Button type="button" size="sm" onClick={saveEdit}>
+                  <Check className="w-3 h-3 mr-1" /> Enregistrer
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditing(false)}
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-xs text-[color:var(--muted-foreground)]">{entry.category}</p>
+              <p className="text-sm font-medium truncate">{entry.title}</p>
+              {entry.description && (
+                <p className="text-xs text-[color:var(--muted-foreground)] mt-1 line-clamp-2">
+                  {entry.description}
+                </p>
+              )}
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  onClick={() => setEditing(true)}
+                  className="text-xs inline-flex items-center gap-1 text-[color:var(--muted-foreground)] hover:text-foreground"
+                >
+                  <Pencil className="w-3 h-3" /> Éditer
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="text-xs inline-flex items-center gap-1 text-destructive hover:underline"
+                >
+                  <Trash2 className="w-3 h-3" /> Supprimer
+                </button>
+              </div>
+            </>
           )}
-        >
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-          Ajouter des photos
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            className="hidden"
-            onChange={handleAdd}
-            disabled={busy}
-          />
-        </label>
+        </div>
       </div>
 
-      {ordered.length === 0 ? (
-        <p className="mt-4 text-xs text-[color:var(--muted-foreground)] italic">
-          Aucune photo. Ajoutez-en avec le bouton ci-dessus.
+      <div>
+        <p className="text-[11px] text-[color:var(--muted-foreground)] mb-1">
+          Glissez les photos pour changer l'ordre. La première est la couverture.
         </p>
-      ) : (
-        <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-          {ordered.map((ph, i) => (
+        <div className="flex flex-wrap gap-2">
+          {orderedPhotos.map((ph, i) => (
             <div
               key={ph.id}
               draggable
-              onDragStart={() => setDragId(ph.id)}
-              onDragOver={(e) => onDragOverPhoto(e, ph.id)}
-              onDragEnd={onDragEndPhoto}
+              onDragStart={(e) => {
+                e.stopPropagation();
+                setDragPhoto(ph.id);
+              }}
+              onDragOver={(e) => onPhotoDragOver(e, ph.id)}
+              onDragEnd={onPhotoDragEnd}
               className={cn(
                 "relative group cursor-grab",
-                dragId === ph.id && "opacity-50",
+                dragPhoto === ph.id && "opacity-50",
               )}
             >
               <img
                 src={ph.url}
                 alt=""
-                className="w-full aspect-square object-cover rounded border border-[color:var(--border)]"
+                className={cn(
+                  "w-16 h-16 object-cover rounded border-2",
+                  i === 0 ? "border-primary" : "border-transparent",
+                )}
               />
-              <div className="absolute top-1 left-1 flex flex-col gap-0.5">
-                <button
-                  type="button"
-                  disabled={i === 0}
-                  onClick={() => move(ph.id, -1)}
-                  className="w-6 h-6 rounded bg-white/90 flex items-center justify-center disabled:opacity-30"
-                  aria-label="Monter"
-                >
-                  <ArrowUp className="w-3 h-3" />
-                </button>
-                <button
-                  type="button"
-                  disabled={i === ordered.length - 1}
-                  onClick={() => move(ph.id, 1)}
-                  className="w-6 h-6 rounded bg-white/90 flex items-center justify-center disabled:opacity-30"
-                  aria-label="Descendre"
-                >
-                  <ArrowDown className="w-3 h-3" />
-                </button>
-              </div>
+              {i === 0 && (
+                <span className="absolute -top-1 -left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1 rounded">
+                  COUV
+                </span>
+              )}
               <button
                 type="button"
-                onClick={() => handleDelete(ph.id)}
-                aria-label="Supprimer"
-                className="absolute top-1 right-1 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Supprimer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemovePhoto(ph.id);
+                }}
+                className="absolute -top-1 -right-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="w-3 h-3 text-destructive" />
               </button>
             </div>
           ))}
+          <label
+            className={cn(
+              "w-16 h-16 rounded border-2 border-dashed border-[color:var(--border)] flex items-center justify-center cursor-pointer hover:bg-[color:var(--surface-muted)]",
+              busy && "opacity-50 cursor-wait",
+            )}
+          >
+            {busy ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Plus className="w-4 h-4" />
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={handleAdd}
+              disabled={busy}
+            />
+          </label>
         </div>
-      )}
+      </div>
     </div>
   );
 }
