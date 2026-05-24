@@ -18,17 +18,19 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, Star, X } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, X, GripVertical } from "lucide-react";
 import {
   listProjects,
   createProject,
   deleteProject,
   addProjectPhoto,
   deleteProjectPhoto,
-  setCoverPhoto,
+  reorderProjects,
+  reorderProjectPhotos,
   isCurrentUserAdmin,
   CATEGORIES,
   type ProjectDTO,
+  type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
 import { scrapeInstagramPosts } from "@/lib/scrape-instagram.functions";
 
