@@ -28,6 +28,10 @@ const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
   queryFn: () => listProjects(),
 });
+const sponsoringQueryOptions = queryOptions({
+  queryKey: ["sponsoring-photos"],
+  queryFn: () => listSponsoringPhotos(),
+});
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -35,6 +39,7 @@ export const Route = createFileRoute("/")({
     await Promise.all([
       context.queryClient.ensureQueryData(articlesQueryOptions),
       context.queryClient.ensureQueryData(projectsQueryOptions),
+      context.queryClient.ensureQueryData(sponsoringQueryOptions),
     ]);
   },
   head: () => ({
