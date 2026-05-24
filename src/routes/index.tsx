@@ -131,6 +131,7 @@ function HomePage() {
   useHashScroll();
   const { data: articlesData } = useSuspenseQuery(articlesQueryOptions);
   const { data: projectsData } = useSuspenseQuery(projectsQueryOptions);
+  const { data: sponsoringData } = useSuspenseQuery(sponsoringQueryOptions);
 
   return (
     <div>
