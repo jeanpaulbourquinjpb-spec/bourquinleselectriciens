@@ -57,6 +57,15 @@ import {
   type SponsoringEntryDTO,
   type SponsoringPhotoDTO,
 } from "@/lib/sponsoring.functions";
+import {
+  listPartners,
+  createPartner,
+  updatePartner,
+  deletePartner,
+  reorderPartners,
+  type PartnerDTO,
+} from "@/lib/partners.functions";
+
 
 export const Route = createFileRoute("/admin/projets")({
   component: AdminProjetsPage,
@@ -203,14 +212,15 @@ function AdminTabs({
   onDeleteProject: (id: string) => void;
   onProjectsChanged: () => void;
 }) {
-  const [tab, setTab] = useState<"projets" | "sponsoring">("projets");
+  const [tab, setTab] = useState<"projets" | "sponsoring" | "partenaires">("projets");
 
   return (
     <div className="mt-8">
-      <div className="border-b border-[color:var(--border)] flex gap-2">
+      <div className="border-b border-[color:var(--border)] flex gap-2 flex-wrap">
         {([
           ["projets", "Nos Projets"],
           ["sponsoring", "Sponsoring"],
+          ["partenaires", "Associations & Partenariats"],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -245,12 +255,15 @@ function AdminTabs({
             </div>
           </div>
         </div>
-      ) : (
+      ) : tab === "sponsoring" ? (
         <SponsoringAdmin />
+      ) : (
+        <PartnersAdmin />
       )}
     </div>
   );
 }
+
 
 function ProjectsList({
   projects,
@@ -1334,6 +1347,388 @@ function AdminSponsoringCard({
             />
           </label>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------- Partners (Associations & Partenariats) --------------------------- */
+
+const PARTNER_LOGO_ALLOWED: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+};
+
+async function uploadPartnerLogo(file: File): Promise<string> {
+  if (file.size > MAX_SIZE) {
+    throw new Error(`Fichier "${file.name}" trop volumineux (max 10 Mo).`);
+  }
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  const contentType = file.type || PARTNER_LOGO_ALLOWED[ext];
+  if (!contentType || !(ext in PARTNER_LOGO_ALLOWED)) {
+    throw new Error(`Format non supporté pour "${file.name}". JPG, PNG, WEBP ou SVG.`);
+  }
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error: upErr } = await supabase.storage
+    .from("partner-logos")
+    .upload(path, file, { contentType, cacheControl: "3600", upsert: false });
+  if (upErr) throw upErr;
+  const { data: pub } = supabase.storage.from("partner-logos").getPublicUrl(path);
+  return pub.publicUrl;
+}
+
+function PartnersAdmin() {
+  const queryClient = useQueryClient();
+  const listFn = useServerFn(listPartners);
+  const removeFn = useServerFn(deletePartner);
+  const reorderFn = useServerFn(reorderPartners);
+
+  const q = useQuery({ queryKey: ["partners"], queryFn: () => listFn() });
+  const partners: PartnerDTO[] = q.data?.partners ?? [];
+
+  const [order, setOrder] = useState<string[]>(partners.map((p) => p.id));
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOrder(partners.map((p) => p.id));
+  }, [partners]);
+
+  const byId = new Map(partners.map((p) => [p.id, p]));
+  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as PartnerDTO[];
+
+  function invalidate() {
+    queryClient.invalidateQueries({ queryKey: ["partners"] });
+  }
+
+  async function persistOrder(ids: string[]) {
+    try {
+      await reorderFn({ data: { ids } });
+      toast.success("Ordre enregistré");
+      invalidate();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  function move(id: string, dir: -1 | 1) {
+    setOrder((prev) => {
+      const i = prev.indexOf(id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      persistOrder(next);
+      return next;
+    });
+  }
+
+  function onDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragId);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragId);
+      return next;
+    });
+  }
+  async function onDragEnd() {
+    const ids = order;
+    setDragId(null);
+    await persistOrder(ids);
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Supprimer ce partenaire ?")) return;
+    try {
+      await removeFn({ data: { id } });
+      toast.success("Partenaire supprimé");
+      invalidate();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  return (
+    <div className="mt-8 grid lg:grid-cols-[1fr_2fr] gap-10">
+      <PartnerUploadCard onCreated={invalidate} />
+      <div>
+        <h2 className="text-xl mb-4">Partenaires ({partners.length})</h2>
+        <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
+          Glissez ou utilisez les flèches pour réordonner. L'ordre est appliqué sur la page publique.
+        </p>
+        {q.isLoading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {ordered.map((p, i) => (
+              <div
+                key={p.id}
+                draggable
+                onDragStart={() => setDragId(p.id)}
+                onDragOver={(ev) => onDragOver(ev, p.id)}
+                onDragEnd={onDragEnd}
+                className={cn(
+                  "transition-opacity relative",
+                  dragId === p.id ? "opacity-50" : "opacity-100",
+                )}
+              >
+                <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+                  <button
+                    type="button"
+                    aria-label="Monter"
+                    disabled={i === 0}
+                    onClick={() => move(p.id, -1)}
+                    className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Descendre"
+                    disabled={i === ordered.length - 1}
+                    onClick={() => move(p.id, 1)}
+                    className="w-7 h-7 rounded bg-background border border-[color:var(--border)] flex items-center justify-center disabled:opacity-30 hover:bg-[color:var(--surface-muted)]"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <PartnerCard partner={p} onDelete={() => handleDelete(p.id)} onChanged={invalidate} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PartnerUploadCard({ onCreated }: { onCreated: () => void }) {
+  const create = useServerFn(createPartner);
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) {
+      toast.error("Le nom est requis.");
+      return;
+    }
+    setBusy(true);
+    try {
+      let logo_url: string | null = null;
+      if (file) {
+        logo_url = await uploadPartnerLogo(file);
+      }
+      await create({
+        data: {
+          name: name.trim(),
+          url: url.trim() ? url.trim() : null,
+          logo_url,
+        },
+      });
+      toast.success("Partenaire créé.");
+      setName("");
+      setUrl("");
+      setFile(null);
+      if (fileRef.current) fileRef.current.value = "";
+      onCreated();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur inconnue";
+      toast.error(`Échec : ${msg}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card-soft p-6 space-y-4 h-fit sticky top-24">
+      <h2 className="text-xl">Ajouter un partenaire</h2>
+      <div>
+        <Label htmlFor="pt-name">Nom</Label>
+        <Input id="pt-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={200} required />
+      </div>
+      <div>
+        <Label htmlFor="pt-url">Lien (URL)</Label>
+        <Input
+          id="pt-url"
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://..."
+          maxLength={2000}
+        />
+      </div>
+      <div>
+        <Label htmlFor="pt-logo">Logo (optionnel — JPG, PNG, WEBP, SVG)</Label>
+        <Input
+          ref={fileRef}
+          id="pt-logo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/svg+xml"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+        <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
+          Sans logo, le nom sera affiché en texte gris.
+        </p>
+      </div>
+      <Button type="submit" disabled={busy} className="w-full">
+        {busy ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+        Ajouter
+      </Button>
+    </form>
+  );
+}
+
+function PartnerCard({
+  partner,
+  onDelete,
+  onChanged,
+}: {
+  partner: PartnerDTO;
+  onDelete: () => void;
+  onChanged: () => void;
+}) {
+  const update = useServerFn(updatePartner);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(partner.name);
+  const [url, setUrl] = useState(partner.url ?? "");
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function save() {
+    if (!name.trim()) {
+      toast.error("Nom requis");
+      return;
+    }
+    setBusy(true);
+    try {
+      await update({
+        data: {
+          id: partner.id,
+          name: name.trim(),
+          url: url.trim() ? url.trim() : null,
+        },
+      });
+      toast.success("Partenaire mis à jour");
+      setEditing(false);
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function replaceLogo(file: File) {
+    setBusy(true);
+    try {
+      const logo_url = await uploadPartnerLogo(file);
+      await update({ data: { id: partner.id, logo_url } });
+      toast.success("Logo mis à jour");
+      onChanged();
+      if (fileRef.current) fileRef.current.value = "";
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeLogo() {
+    if (!confirm("Supprimer le logo ? Le nom sera affiché à la place.")) return;
+    setBusy(true);
+    try {
+      await update({ data: { id: partner.id, logo_url: null } });
+      toast.success("Logo supprimé");
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card-soft p-4 space-y-3">
+      <div className="aspect-[3/2] bg-[color:var(--surface-muted)] rounded flex items-center justify-center overflow-hidden">
+        {partner.logo_url ? (
+          <img src={partner.logo_url} alt={partner.name} className="max-h-full max-w-full object-contain p-3" />
+        ) : (
+          <span className="text-sm font-semibold text-[#666666]">{partner.name}</span>
+        )}
+      </div>
+      {editing ? (
+        <div className="space-y-2">
+          <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={200} />
+          <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." maxLength={2000} />
+          <div className="flex gap-2">
+            <Button type="button" size="sm" onClick={save} disabled={busy} className="flex-1">
+              <Check className="w-4 h-4 mr-1" /> Enregistrer
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <p className="font-medium text-sm">{partner.name}</p>
+          {partner.url && (
+            <a
+              href={partner.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-[color:var(--muted-foreground)] underline break-all"
+            >
+              {partner.url}
+            </a>
+          )}
+        </div>
+      )}
+      <div className="flex gap-2 flex-wrap">
+        {!editing && (
+          <Button type="button" size="sm" variant="outline" onClick={() => setEditing(true)} disabled={busy}>
+            <Pencil className="w-3.5 h-3.5 mr-1" /> Éditer
+          </Button>
+        )}
+        <Button type="button" size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={busy}>
+          <Upload className="w-3.5 h-3.5 mr-1" /> {partner.logo_url ? "Remplacer logo" : "Ajouter logo"}
+        </Button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/svg+xml"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) replaceLogo(f);
+          }}
+        />
+        {partner.logo_url && (
+          <Button type="button" size="sm" variant="ghost" onClick={removeLogo} disabled={busy}>
+            Sans logo
+          </Button>
+        )}
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onDelete}
+          disabled={busy}
+          className="text-destructive hover:text-destructive ml-auto"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
       </div>
     </div>
   );
