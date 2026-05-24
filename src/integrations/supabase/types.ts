@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       project_photos: {
         Row: {
           created_at: string
