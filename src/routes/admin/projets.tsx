@@ -65,10 +65,19 @@ function AdminProjetsPage() {
         setAuthChecked(true);
       }
     })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate({ to: "/login" });
+      }
+    });
+
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
   }, [navigate, checkAdmin]);
+
 
   const projectsQuery = useQuery({
     queryKey: ["projects"],
@@ -242,6 +251,11 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       toast.error("Veuillez sélectionner une photo");
       return;
     }
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error("Fichier trop volumineux. Taille maximale : 10 Mo.");
+      return;
+    }
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
     const allowedTypes: Record<string, string> = {
       jpg: "image/jpeg",
@@ -251,13 +265,14 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
     };
     const contentType = file.type || allowedTypes[ext];
     if (!contentType || !Object.values(allowedTypes).includes(contentType) || !(ext in allowedTypes)) {
-      toast.error("Format accepté : jpg, png ou webp");
+      toast.error("Format non supporté. Formats acceptés : JPG, PNG ou WEBP.");
       return;
     }
     if (!title.trim()) {
-      toast.error("Titre requis");
+      toast.error("Le titre est requis.");
       return;
     }
+
     setUploading(true);
     try {
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -282,7 +297,10 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       if (fileRef.current) fileRef.current.value = "";
       onCreated();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de l'upload");
+      console.error("Upload error:", e);
+      const msg = e instanceof Error ? e.message : "Erreur inconnue";
+      toast.error(`Échec de l'upload : ${msg}`);
+
     } finally {
       setUploading(false);
     }
