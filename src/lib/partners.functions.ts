@@ -12,7 +12,6 @@ export type PartnerDTO = {
   created_at: string;
 };
 
-const ADMIN_EMAIL = "jean-paul@bourquinelectricite.ch";
 
 async function assertAdmin(userId: string) {
   const { data } = await supabaseAdmin
