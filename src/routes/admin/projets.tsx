@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, Star, X } from "lucide-react";
 import {
