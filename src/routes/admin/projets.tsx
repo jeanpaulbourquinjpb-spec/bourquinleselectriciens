@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,17 +18,19 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, Star, X } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCcw, Instagram, Plus, X, GripVertical } from "lucide-react";
 import {
   listProjects,
   createProject,
   deleteProject,
   addProjectPhoto,
   deleteProjectPhoto,
-  setCoverPhoto,
+  reorderProjects,
+  reorderProjectPhotos,
   isCurrentUserAdmin,
   CATEGORIES,
   type ProjectDTO,
+  type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
 import { scrapeInstagramPosts } from "@/lib/scrape-instagram.functions";
 
@@ -188,20 +190,91 @@ function AdminProjetsPage() {
               <h2 className="text-xl mb-4">
                 Projets ({projectsQuery.data?.projects.length ?? 0})
               </h2>
+              <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
+                Glissez les projets pour les réordonner. L'ordre est appliqué sur la page publique.
+              </p>
               {projectsQuery.isLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {projectsQuery.data?.projects.map((p) => (
-                    <AdminProjectCard key={p.id} p={p} onDelete={() => handleDelete(p.id)} />
-                  ))}
-                </div>
+                <ProjectsList
+                  projects={projectsQuery.data?.projects ?? []}
+                  onDelete={handleDelete}
+                />
               )}
             </div>
           </div>
         </div>
       </section>
       <SiteFooter />
+    </div>
+  );
+}
+
+function ProjectsList({
+  projects,
+  onDelete,
+}: {
+  projects: ProjectDTO[];
+  onDelete: (id: string) => void;
+}) {
+  const queryClient = useQueryClient();
+  const reorder = useServerFn(reorderProjects);
+  const [order, setOrder] = useState<string[]>(projects.map((p) => p.id));
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  // sync when server data changes
+  useEffect(() => {
+    setOrder(projects.map((p) => p.id));
+  }, [projects]);
+
+  const byId = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
+  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as ProjectDTO[];
+
+  function onDragStart(id: string) {
+    setDragId(id);
+  }
+  function onDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragId);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragId);
+      return next;
+    });
+  }
+  async function onDragEnd() {
+    const ids = order;
+    setDragId(null);
+    try {
+      await reorder({ data: { ids } });
+      toast.success("Ordre des projets enregistré");
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      {ordered.map((p) => (
+        <div
+          key={p.id}
+          draggable
+          onDragStart={() => onDragStart(p.id)}
+          onDragOver={(e) => onDragOver(e, p.id)}
+          onDragEnd={onDragEnd}
+          className={cn(
+            "transition-opacity",
+            dragId === p.id ? "opacity-50" : "opacity-100",
+          )}
+        >
+          <AdminProjectCard p={p} onDelete={() => onDelete(p.id)} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -236,11 +309,20 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
   const queryClient = useQueryClient();
   const addPhoto = useServerFn(addProjectPhoto);
   const removePhoto = useServerFn(deleteProjectPhoto);
-  const setCover = useServerFn(setCoverPhoto);
+  const reorderPhotos = useServerFn(reorderProjectPhotos);
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [photoOrder, setPhotoOrder] = useState<string[]>(p.photos.map((ph) => ph.id));
+  const [dragPhoto, setDragPhoto] = useState<string | null>(null);
 
-  const photos = p.photos;
+  useEffect(() => {
+    setPhotoOrder(p.photos.map((ph) => ph.id));
+  }, [p.photos]);
+
+  const photosById = new Map<string, ProjectPhotoDTO>(p.photos.map((ph) => [ph.id, ph]));
+  const orderedPhotos = photoOrder
+    .map((id) => photosById.get(id))
+    .filter(Boolean) as ProjectPhotoDTO[];
 
   async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -273,10 +355,28 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
     }
   }
 
-  async function handleSetCover(photoId: string) {
+  function onPhotoDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragPhoto || dragPhoto === overId) return;
+    setPhotoOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragPhoto);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragPhoto);
+      return next;
+    });
+  }
+
+  async function onPhotoDragEnd() {
+    const ids = photoOrder;
+    setDragPhoto(null);
+    if (ids.length < 2) return;
     try {
-      await setCover({ data: { project_id: p.id, photo_id: photoId } });
-      toast.success("Photo de couverture définie");
+      await reorderPhotos({ data: { project_id: p.id, photo_ids: ids } });
+      toast.success("Ordre des photos enregistré");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
@@ -286,7 +386,10 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
   return (
     <div className="card-soft p-4 space-y-3">
       <div className="flex gap-3">
-        <div className="w-24 h-24 shrink-0 bg-[color:var(--surface-muted)] rounded overflow-hidden">
+        <div className="shrink-0 cursor-grab text-[color:var(--muted-foreground)] flex items-center">
+          <GripVertical className="w-4 h-4" />
+        </div>
+        <div className="w-20 h-20 shrink-0 bg-[color:var(--surface-muted)] rounded overflow-hidden">
           {p.image_url ? (
             <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
           ) : null}
@@ -316,34 +419,45 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
       </div>
 
       <div>
+        <p className="text-[11px] text-[color:var(--muted-foreground)] mb-1">
+          Glissez les photos pour changer l'ordre. La première est la couverture.
+        </p>
         <div className="flex flex-wrap gap-2">
-          {photos.map((ph) => (
-            <div key={ph.id} className="relative group">
+          {orderedPhotos.map((ph, i) => (
+            <div
+              key={ph.id}
+              draggable
+              onDragStart={(e) => {
+                e.stopPropagation();
+                setDragPhoto(ph.id);
+              }}
+              onDragOver={(e) => onPhotoDragOver(e, ph.id)}
+              onDragEnd={onPhotoDragEnd}
+              className={cn(
+                "relative group cursor-grab",
+                dragPhoto === ph.id && "opacity-50",
+              )}
+            >
               <img
                 src={ph.url}
                 alt=""
                 className={cn(
                   "w-16 h-16 object-cover rounded border-2",
-                  ph.is_cover ? "border-primary" : "border-transparent",
+                  i === 0 ? "border-primary" : "border-transparent",
                 )}
               />
-              <button
-                type="button"
-                title="Définir comme couverture"
-                onClick={() => handleSetCover(ph.id)}
-                className="absolute -top-1 -left-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Star
-                  className={cn(
-                    "w-3 h-3",
-                    ph.is_cover ? "fill-primary text-primary" : "text-foreground",
-                  )}
-                />
-              </button>
+              {i === 0 && (
+                <span className="absolute -top-1 -left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1 rounded">
+                  COUV
+                </span>
+              )}
               <button
                 type="button"
                 title="Supprimer"
-                onClick={() => handleRemovePhoto(ph.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemovePhoto(ph.id);
+                }}
                 className="absolute -top-1 -right-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="w-3 h-3 text-destructive" />

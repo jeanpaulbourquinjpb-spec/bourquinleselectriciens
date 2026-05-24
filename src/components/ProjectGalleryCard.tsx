@@ -108,27 +108,8 @@ export function ProjectGalleryCard({ p }: { p: ProjectDTO }) {
           )}
         </button>
 
-        {hasMany && (
-          <div className="p-3 flex gap-2 overflow-x-auto">
-            {photos.map((ph, i) => (
-              <button
-                key={ph.id}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Voir la photo ${i + 1}`}
-                className={cn(
-                  "shrink-0 w-14 h-14 rounded overflow-hidden border-2 transition-colors",
-                  i === index
-                    ? "border-primary"
-                    : "border-transparent hover:border-[color:var(--border)]",
-                )}
-              >
-                <img src={ph.url} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
       </div>
+
 
       {lightbox && photos.length > 0 && (
         <Lightbox

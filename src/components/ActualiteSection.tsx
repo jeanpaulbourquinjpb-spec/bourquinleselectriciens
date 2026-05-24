@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { ArrowRight, ImageIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { ArticleDTO } from "@/lib/articles.functions";
 
 function formatDate(iso: string | null): string | null {
@@ -16,32 +15,49 @@ function formatDate(iso: string | null): string | null {
   }
 }
 
-function ArticleImageCard({ a }: { a: ArticleDTO }) {
+function ArticleImage({ src, alt }: { src: string | null; alt: string }) {
+  if (!src) {
+    return (
+      <div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ backgroundColor: "#ff6633" }}
+        aria-label="Image indisponible"
+      >
+        <ImageIcon className="w-10 h-10 text-white/80" />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      className="absolute inset-0 w-full h-full object-cover"
+      onError={(e) => {
+        const el = e.currentTarget;
+        el.style.display = "none";
+        const parent = el.parentElement;
+        if (parent && !parent.querySelector("[data-fallback]")) {
+          const div = document.createElement("div");
+          div.setAttribute("data-fallback", "true");
+          div.className = "absolute inset-0";
+          div.style.backgroundColor = "#ff6633";
+          parent.appendChild(div);
+        }
+      }}
+    />
+  );
+}
+
+function ArticleCard({ a }: { a: ArticleDTO }) {
   const date = formatDate(a.published_at);
   return (
     <article className="card-soft flex flex-col overflow-hidden !p-0 h-full">
       <div className="relative w-full aspect-[16/10] bg-[color:var(--surface-muted)] overflow-hidden">
-        {a.image_url ? (
-          <img
-            src={a.image_url}
-            alt={a.title}
-            loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-[color:var(--muted-foreground)]">
-            <ImageIcon className="w-10 h-10 opacity-40" />
-          </div>
-        )}
+        <ArticleImage src={a.image_url} alt={a.title} />
       </div>
       <div className="p-6 flex flex-col flex-1">
-        {(a.category || date) && (
-          <p className="eyebrow mb-2">
-            {a.category}
-            {a.category && date ? " · " : ""}
-            {date}
-          </p>
-        )}
+        {date && <p className="eyebrow mb-2">{date}</p>}
         <h4 className="text-lg flex-1">{a.title}</h4>
         <a
           href={a.url}
@@ -56,6 +72,46 @@ function ArticleImageCard({ a }: { a: ArticleDTO }) {
   );
 }
 
+function CategorySection({ name, articles }: { name: string; articles: ArticleDTO[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? articles : articles.slice(0, 2);
+  const hidden = articles.length - visible.length;
+
+  return (
+    <section className="mt-16">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <h3 className="text-2xl">{name}</h3>
+        <span className="text-sm text-[color:var(--muted-foreground)]">
+          {articles.length} article{articles.length > 1 ? "s" : ""}
+        </span>
+      </div>
+
+      <div
+        className={
+          "mt-6 grid gap-6 grid-cols-1 md:grid-cols-2" +
+          (expanded ? " max-h-[2000px]" : " max-h-[1200px]") +
+          " overflow-hidden transition-[max-height] duration-500"
+        }
+      >
+        {visible.map((a) => (
+          <ArticleCard key={a.id} a={a} />
+        ))}
+      </div>
+
+      {(hidden > 0 || expanded) && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="btn-outline"
+          >
+            {expanded ? "Voir moins" : `Voir plus (${hidden})`}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = useMemo(
@@ -63,25 +119,16 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
     [articles, featured?.id],
   );
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    rest.forEach((a) => {
-      if (a.category) set.add(a.category);
-    });
-    return Array.from(set).sort();
+  const grouped = useMemo(() => {
+    const map = new Map<string, ArticleDTO[]>();
+    for (const a of rest) {
+      const key = a.category?.trim() || "Autres";
+      const arr = map.get(key) ?? [];
+      arr.push(a);
+      map.set(key, arr);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b, "fr"));
   }, [rest]);
-
-  const [filter, setFilter] = useState<string>("all");
-  const [expanded, setExpanded] = useState(false);
-
-  const filtered = useMemo(
-    () => (filter === "all" ? rest : rest.filter((a) => a.category === filter)),
-    [filter, rest],
-  );
-
-  const showAll = filter !== "all" || expanded;
-  const visible = showAll ? filtered : filtered.slice(0, 2);
-  const hiddenCount = filtered.length - visible.length;
 
   if (!featured) {
     return (
@@ -93,7 +140,10 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
 
   return (
     <>
-      <article className="card-soft mt-12 flex flex-col gap-3 md:p-10">
+      <article className="card-soft mt-12 flex flex-col gap-3 md:p-10 overflow-hidden">
+        <div className="relative w-full aspect-[21/9] -mx-6 -mt-6 md:-mx-10 md:-mt-10 mb-4 bg-[color:var(--surface-muted)] overflow-hidden">
+          <ArticleImage src={featured.image_url} alt={featured.title} />
+        </div>
         {(featured.category || formatDate(featured.published_at)) && (
           <p className="eyebrow">
             {featured.category}
@@ -113,59 +163,9 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
         </a>
       </article>
 
-      {rest.length > 0 && (
-        <>
-          <h3 className="mt-16 text-2xl">Tous les articles</h3>
-
-          {categories.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {[
-                { label: "Toutes les catégories", value: "all" },
-                ...categories.map((c) => ({ label: c, value: c })),
-              ].map((f) => {
-                const active = filter === f.value;
-                return (
-                  <button
-                    key={f.value}
-                    onClick={() => {
-                      setFilter(f.value);
-                      setExpanded(false);
-                    }}
-                    className={cn(
-                      "px-4 py-2 rounded-full border text-sm transition-colors",
-                      active
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background border-[color:var(--border)] hover:bg-[color:var(--surface-muted)]",
-                    )}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {filtered.length === 0 ? (
-            <p className="mt-8 text-sm text-muted-foreground">
-              Aucun article dans cette catégorie.
-            </p>
-          ) : (
-            <div className="mt-8 grid gap-6 grid-cols-1 md:grid-cols-2 transition-all duration-500">
-              {visible.map((a) => (
-                <ArticleImageCard key={a.id} a={a} />
-              ))}
-            </div>
-          )}
-
-          {hiddenCount > 0 && (
-            <div className="mt-10 flex justify-center">
-              <button onClick={() => setExpanded(true)} className="btn-outline">
-                Voir plus ({hiddenCount})
-              </button>
-            </div>
-          )}
-        </>
-      )}
+      {grouped.map(([cat, items]) => (
+        <CategorySection key={cat} name={cat} articles={items} />
+      ))}
     </>
   );
 }
