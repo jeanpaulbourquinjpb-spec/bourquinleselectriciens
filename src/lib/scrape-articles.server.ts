@@ -22,10 +22,10 @@ type FirecrawlScrapeResp = {
   success?: boolean;
   data?: {
     json?: ExtractedArticle;
-    metadata?: { title?: string; description?: string; sourceURL?: string };
+    metadata?: { title?: string; description?: string; sourceURL?: string; ogImage?: string; "og:image"?: string };
   };
   json?: ExtractedArticle;
-  metadata?: { title?: string; description?: string; sourceURL?: string };
+  metadata?: { title?: string; description?: string; sourceURL?: string; ogImage?: string; "og:image"?: string };
 };
 
 function requireKey() {
