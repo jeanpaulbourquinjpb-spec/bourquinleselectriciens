@@ -127,29 +127,73 @@ export type Database = {
         }
         Relationships: []
       }
-      sponsoring_photos: {
+      sponsoring_entries: {
         Row: {
           category: string
           created_at: string
+          description: string | null
           id: string
+          image_url: string
           sort_order: number
-          url: string
+          title: string
+          updated_at: string
         }
         Insert: {
           category: string
           created_at?: string
+          description?: string | null
           id?: string
+          image_url: string
           sort_order?: number
-          url: string
+          title: string
+          updated_at?: string
         }
         Update: {
           category?: string
           created_at?: string
+          description?: string | null
           id?: string
+          image_url?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sponsoring_photos: {
+        Row: {
+          created_at: string
+          entry_id: string
+          id: string
+          is_cover: boolean
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          id?: string
+          is_cover?: boolean
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          id?: string
+          is_cover?: boolean
           sort_order?: number
           url?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sponsoring_photos_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "sponsoring_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
