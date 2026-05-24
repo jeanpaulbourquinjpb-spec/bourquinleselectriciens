@@ -78,25 +78,6 @@ const cgv = [
   { name: "Prix d'interventions", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Les+prix+d-interventions+01.01.2026.pdf" },
 ];
 
-const sponsoring = [
-  { text: "Fédération Equestre Internationale, Dressage European Championship Crozet 2025 — 27 au 31.08.25 — Crozet, France" },
-  { text: "Generali Genève Marathon, association Speed 4 ALS — 11.05.25 — Genève" },
-  { text: "Concours de dressage international 5★ Jiva Hill Stables — 28.08.24 au 01.09.24 — Crozet, France" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 02 au 06.08.23 — Crozet, France" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 25 au 28.08.22 — Crozet, France" },
-  { text: "Club partner's de l'équipe de basketball des Lions de Genève — soirée de Gala — Palexpo, Grand-Saconnex, Genève" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 20 au 22.08.21 — Crozet, France" },
-  { text: "Membre du Golden Lions Club GLC et sponsor de l'équipe de basketball des « Lions de Genève » — saison 2020" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 08 au 11.08.19 — Crozet, France" },
-  { text: "Club partner's de l'équipe de basketball des Lions de Genève — saison 2019 — Grand-Saconnex, Genève" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 10 au 12.08.18 — Crozet, France" },
-  { text: "Coureur Paulo Dos Santos sur 80 km pour la 1ère de l'EcoTrail Genève — 2018 — Place des Nations, Genève" },
-  { text: "Club partner's de l'équipe de basketball des Lions de Genève — saison 2018 — Grand-Saconnex, Genève" },
-  { text: "Concours de dressage international de Jiva Hill Stables — 03 au 04.08.17 — Crozet, France" },
-  { text: "Club partner's de l'équipe de basketball des Lions de Genève — saison 2017 — Grand-Saconnex, Genève" },
-  { text: "Manifestation de course à pied Run4Science — 12.06.16 — Refuge de Darwin, Bernex à Genève" },
-  { text: "Club partner's de l'équipe de basketball des Lions de Genève — saison 2016 — Grand-Saconnex, Genève" },
-];
 
 /* ----------------------------- Helpers ----------------------------- */
 
