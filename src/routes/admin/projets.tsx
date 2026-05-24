@@ -721,3 +721,217 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
     </form>
   );
 }
+
+function SponsoringAdmin() {
+  const queryClient = useQueryClient();
+  const listFn = useServerFn(listSponsoringPhotos);
+  const addFn = useServerFn(addSponsoringPhoto);
+  const delFn = useServerFn(deleteSponsoringPhoto);
+  const reorderFn = useServerFn(reorderSponsoringPhotos);
+
+  const q = useQuery({ queryKey: ["sponsoring-photos"], queryFn: () => listFn() });
+  const photos = q.data?.photos ?? [];
+
+  return (
+    <div className="mt-8 space-y-12">
+      {SPONSORING_CATEGORIES.map((cat) => (
+        <SponsoringCategoryBlock
+          key={cat}
+          category={cat}
+          photos={photos.filter((p) => p.category === cat)}
+          onAdd={async (url) => {
+            await addFn({ data: { category: cat, url } });
+            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
+          }}
+          onDelete={async (id) => {
+            await delFn({ data: { id } });
+            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
+          }}
+          onReorder={async (ids) => {
+            await reorderFn({ data: { category: cat, ids } });
+            queryClient.invalidateQueries({ queryKey: ["sponsoring-photos"] });
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SponsoringCategoryBlock({
+  category,
+  photos,
+  onAdd,
+  onDelete,
+  onReorder,
+}: {
+  category: SponsoringCategory;
+  photos: SponsoringPhotoDTO[];
+  onAdd: (url: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onReorder: (ids: string[]) => Promise<void>;
+}) {
+  const [order, setOrder] = useState<string[]>(photos.map((p) => p.id));
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setOrder(photos.map((p) => p.id));
+  }, [photos]);
+
+  const byId = new Map(photos.map((p) => [p.id, p]));
+  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as SponsoringPhotoDTO[];
+
+  async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setBusy(true);
+    let ok = 0;
+    for (const f of files) {
+      try {
+        const url = await uploadToStorage(f);
+        await onAdd(url);
+        ok++;
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Erreur upload");
+      }
+    }
+    if (ok > 0) toast.success(`${ok} photo(s) ajoutée(s) à ${category}.`);
+    if (fileRef.current) fileRef.current.value = "";
+    setBusy(false);
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Supprimer cette photo ?")) return;
+    try {
+      await onDelete(id);
+      toast.success("Photo supprimée");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  function onDragOverPhoto(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragId);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragId);
+      return next;
+    });
+  }
+
+  async function onDragEndPhoto() {
+    const ids = order;
+    setDragId(null);
+    if (ids.length < 2) return;
+    try {
+      await onReorder(ids);
+      toast.success("Ordre enregistré");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  function move(id: string, dir: -1 | 1) {
+    setOrder((prev) => {
+      const i = prev.indexOf(id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      onReorder(next).catch((err) =>
+        toast.error(err instanceof Error ? err.message : "Erreur"),
+      );
+      return next;
+    });
+  }
+
+  return (
+    <div className="card-soft p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-lg">
+          {category} <span className="text-sm text-[color:var(--muted-foreground)]">({photos.length})</span>
+        </h3>
+        <label
+          className={cn(
+            "inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border border-[color:var(--border)] cursor-pointer hover:bg-[color:var(--surface-muted)]",
+            busy && "opacity-50 cursor-wait",
+          )}
+        >
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+          Ajouter des photos
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={handleAdd}
+            disabled={busy}
+          />
+        </label>
+      </div>
+
+      {ordered.length === 0 ? (
+        <p className="mt-4 text-xs text-[color:var(--muted-foreground)] italic">
+          Aucune photo. Ajoutez-en avec le bouton ci-dessus.
+        </p>
+      ) : (
+        <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          {ordered.map((ph, i) => (
+            <div
+              key={ph.id}
+              draggable
+              onDragStart={() => setDragId(ph.id)}
+              onDragOver={(e) => onDragOverPhoto(e, ph.id)}
+              onDragEnd={onDragEndPhoto}
+              className={cn(
+                "relative group cursor-grab",
+                dragId === ph.id && "opacity-50",
+              )}
+            >
+              <img
+                src={ph.url}
+                alt=""
+                className="w-full aspect-square object-cover rounded border border-[color:var(--border)]"
+              />
+              <div className="absolute top-1 left-1 flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => move(ph.id, -1)}
+                  className="w-6 h-6 rounded bg-white/90 flex items-center justify-center disabled:opacity-30"
+                  aria-label="Monter"
+                >
+                  <ArrowUp className="w-3 h-3" />
+                </button>
+                <button
+                  type="button"
+                  disabled={i === ordered.length - 1}
+                  onClick={() => move(ph.id, 1)}
+                  className="w-6 h-6 rounded bg-white/90 flex items-center justify-center disabled:opacity-30"
+                  aria-label="Descendre"
+                >
+                  <ArrowDown className="w-3 h-3" />
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(ph.id)}
+                aria-label="Supprimer"
+                className="absolute top-1 right-1 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-3 h-3 text-destructive" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
