@@ -222,10 +222,10 @@ function HomePage() {
             <p className="eyebrow">Engagement</p>
             <h3 className="mt-3 text-3xl md:text-4xl">Sponsoring</h3>
             <p className="mt-4 max-w-2xl text-sm">
-              Une chronologie de nos engagements sportifs, culturels et associatifs.
+              Nos engagements sportifs aux côtés des équipes et événements qui nous tiennent à cœur.
             </p>
           </div>
-          <SponsoringTimeline items={sponsoring} />
+          <SponsoringSection photos={sponsoringData.photos} />
         </div>
       </section>
 
