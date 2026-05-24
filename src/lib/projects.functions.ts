@@ -117,7 +117,16 @@ export const createProject = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return { project: row as ProjectDTO };
+    // Auto-create cover photo row
+    if (row) {
+      await supabaseAdmin.from("project_photos").insert({
+        project_id: row.id,
+        url: row.image_url,
+        is_cover: true,
+        sort_order: 0,
+      });
+    }
+    return { project: { ...(row as Omit<ProjectDTO, "photos">), photos: [] } };
   });
 
 const updateSchema = z.object({
