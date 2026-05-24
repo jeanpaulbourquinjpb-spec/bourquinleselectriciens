@@ -163,9 +163,6 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="mt-20">
-          <GoogleReviewsSection />
-        </div>
 
         <PartnersCarousel />
       </section>
@@ -335,15 +332,6 @@ function HomePage() {
             </div>
 
             <div>
-              <div className="rounded-2xl overflow-hidden border border-[color:var(--line)] aspect-[4/3]">
-                <iframe
-                  title="Localisation bourquin les électriciens"
-                  src="https://www.google.com/maps?q=Rue+Henri-Blanvalet+21,+1207+Gen%C3%A8ve&output=embed"
-                  className="w-full h-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
               <div className="mt-8">
                 <h3 className="text-lg">Échangez, partagez</h3>
                 <div className="flex gap-3 mt-4">
