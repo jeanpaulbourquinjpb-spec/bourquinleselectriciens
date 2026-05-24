@@ -297,7 +297,10 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       if (fileRef.current) fileRef.current.value = "";
       onCreated();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de l'upload");
+      console.error("Upload error:", e);
+      const msg = e instanceof Error ? e.message : "Erreur inconnue";
+      toast.error(`Échec de l'upload : ${msg}`);
+
     } finally {
       setUploading(false);
     }
