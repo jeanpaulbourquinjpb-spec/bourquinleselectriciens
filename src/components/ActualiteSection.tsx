@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, ImageIcon } from "lucide-react";
+import { useMemo, useRef } from "react";
+import { ArrowRight, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import type { ArticleDTO } from "@/lib/articles.functions";
 
 function formatDate(iso: string | null): string | null {
@@ -15,7 +15,15 @@ function formatDate(iso: string | null): string | null {
   }
 }
 
-function ArticleImage({ src, alt }: { src: string | null; alt: string }) {
+function ArticleImage({
+  src,
+  alt,
+  enhance,
+}: {
+  src: string | null;
+  alt: string;
+  enhance?: boolean;
+}) {
   if (!src) {
     return (
       <div
@@ -33,6 +41,7 @@ function ArticleImage({ src, alt }: { src: string | null; alt: string }) {
       alt={alt}
       loading="lazy"
       className="absolute inset-0 w-full h-full object-cover"
+      style={enhance ? { filter: "brightness(1.05) contrast(1.08) saturate(1.05)" } : undefined}
       onError={(e) => {
         const el = e.currentTarget;
         el.style.display = "none";
@@ -49,86 +58,91 @@ function ArticleImage({ src, alt }: { src: string | null; alt: string }) {
   );
 }
 
-function ArticleCard({ a }: { a: ArticleDTO }) {
+function CompactCard({ a }: { a: ArticleDTO }) {
   const date = formatDate(a.published_at);
   return (
-    <article className="card-soft flex flex-col overflow-hidden !p-0 h-full">
-      <div className="relative w-full aspect-[16/10] bg-[color:var(--surface-muted)] overflow-hidden">
-        <ArticleImage src={a.image_url} alt={a.title} />
+    <a
+      href={a.url}
+      target="_blank"
+      rel="noreferrer"
+      className="card-soft flex gap-4 !p-3 hover:shadow-md transition-shadow h-full"
+    >
+      <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 bg-[color:var(--surface-muted)] overflow-hidden rounded">
+        <ArticleImage src={a.image_url} alt={a.title} enhance />
       </div>
-      <div className="p-6 flex flex-col flex-1">
-        {date && <p className="eyebrow mb-2">{date}</p>}
-        <h4 className="text-lg flex-1">{a.title}</h4>
-        <a
-          href={a.url}
-          target="_blank"
-          rel="noreferrer"
-          className="link-brand mt-5 inline-flex items-center gap-1 text-sm font-semibold w-fit"
-        >
-          Lire l'article <ArrowRight className="w-4 h-4" />
-        </a>
+      <div className="flex flex-col flex-1 min-w-0 py-1">
+        {date && <p className="eyebrow mb-1 text-[10px]">{date}</p>}
+        <h4 className="text-sm md:text-base leading-snug line-clamp-3 flex-1">{a.title}</h4>
+        <span className="link-brand mt-2 inline-flex items-center gap-1 text-xs font-semibold w-fit">
+          Lire <ArrowRight className="w-3 h-3" />
+        </span>
       </div>
-    </article>
+    </a>
   );
 }
 
-function CategorySection({ name, articles }: { name: string; articles: ArticleDTO[] }) {
-  const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? articles : articles.slice(0, 2);
-  const hidden = articles.length - visible.length;
+function ArticlesCarousel({ articles }: { articles: ArticleDTO[] }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  const scrollByCard = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.round(el.clientWidth * 0.9), behavior: "smooth" });
+  };
+
+  if (articles.length === 0) return null;
 
   return (
-    <section className="mt-16">
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <h3 className="text-2xl">{name}</h3>
-        <span className="text-sm text-[color:var(--muted-foreground)]">
-          {articles.length} article{articles.length > 1 ? "s" : ""}
-        </span>
-      </div>
-
-      <div
-        className={
-          "mt-6 grid gap-6 grid-cols-1 md:grid-cols-2" +
-          (expanded ? " max-h-[2000px]" : " max-h-[1200px]") +
-          " overflow-hidden transition-[max-height] duration-500"
-        }
-      >
-        {visible.map((a) => (
-          <ArticleCard key={a.id} a={a} />
-        ))}
-      </div>
-
-      {(hidden > 0 || expanded) && (
-        <div className="mt-6 flex justify-center">
+    <div className="mt-12">
+      <div className="flex items-end justify-between gap-4 mb-4">
+        <h3 className="text-2xl">Tous les articles</h3>
+        <div className="flex gap-2">
           <button
-            onClick={() => setExpanded((v) => !v)}
-            className="btn-outline"
+            type="button"
+            onClick={() => scrollByCard(-1)}
+            aria-label="Précédent"
+            className="w-10 h-10 rounded-full border border-[color:var(--border)] bg-background flex items-center justify-center hover:bg-[color:var(--surface-muted)] transition-colors"
           >
-            {expanded ? "Voir moins" : `Voir plus (${hidden})`}
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByCard(1)}
+            aria-label="Suivant"
+            className="w-10 h-10 rounded-full border border-[color:var(--border)] bg-background flex items-center justify-center hover:bg-[color:var(--surface-muted)] transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-      )}
-    </section>
+      </div>
+      <div
+        ref={scrollerRef}
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-2 px-2"
+        style={{ scrollbarWidth: "thin" }}
+      >
+        {articles.map((a) => (
+          <div
+            key={a.id}
+            className="snap-start shrink-0 w-[88%] sm:w-[calc(50%-0.5rem)]"
+          >
+            <CompactCard a={a} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
 export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
   const featured = articles.find((a) => a.featured) ?? articles[0];
-  const rest = useMemo(
-    () => articles.filter((a) => a.id !== featured?.id),
-    [articles, featured?.id],
-  );
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, ArticleDTO[]>();
-    for (const a of rest) {
-      const key = a.category?.trim() || "Autres";
-      const arr = map.get(key) ?? [];
-      arr.push(a);
-      map.set(key, arr);
-    }
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b, "fr"));
-  }, [rest]);
+  const rest = useMemo(() => {
+    const list = articles.filter((a) => a.id !== featured?.id);
+    return list.sort((a, b) => {
+      const da = a.published_at ? new Date(a.published_at).getTime() : 0;
+      const db = b.published_at ? new Date(b.published_at).getTime() : 0;
+      return db - da;
+    });
+  }, [articles, featured?.id]);
 
   if (!featured) {
     return (
@@ -163,9 +177,7 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
         </a>
       </article>
 
-      {grouped.map(([cat, items]) => (
-        <CategorySection key={cat} name={cat} articles={items} />
-      ))}
+      <ArticlesCarousel articles={rest} />
     </>
   );
 }
