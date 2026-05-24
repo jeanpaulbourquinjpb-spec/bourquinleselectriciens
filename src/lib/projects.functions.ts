@@ -3,6 +3,13 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export type ProjectPhotoDTO = {
+  id: string;
+  url: string;
+  is_cover: boolean;
+  sort_order: number;
+};
+
 export type ProjectDTO = {
   id: string;
   title: string;
@@ -13,6 +20,7 @@ export type ProjectDTO = {
   source_type: string;
   sort_order: number;
   created_at: string;
+  photos: ProjectPhotoDTO[];
 };
 
 export const CATEGORIES = [
