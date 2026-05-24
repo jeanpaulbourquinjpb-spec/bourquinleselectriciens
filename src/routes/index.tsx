@@ -129,6 +129,35 @@ function HomePage() {
     <div>
       <SiteHeader />
 
+      {/* ============================== HERO ============================== */}
+      <section className="relative w-full overflow-hidden">
+        <img
+          src={heroImg}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
+        <div className="relative container-x py-24 md:py-36 text-white">
+          <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: "#ff6633" }}>
+            GENÈVE DEPUIS 1968
+          </p>
+          <h1 className="mt-4 text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+            <span style={{ color: "#ff6633" }}>bourquin</span>{" "}
+            <span className="text-white">les électriciens</span>
+          </h1>
+          <p className="mt-5 text-xl md:text-2xl italic" style={{ color: "#ff6633" }}>
+            entre nous, le courant passe…
+          </p>
+          <p className="mt-4 text-base md:text-lg text-white">
+            Électricité · Télécom · Sécurité · Domotique · Dépannage
+          </p>
+          <p className="mt-6 max-w-2xl text-sm md:text-base text-white/90">
+            Une entreprise familiale, trois générations de savoir-faire au service de votre confort et de votre sécurité.
+          </p>
+        </div>
+      </section>
+
       {/* ============================== ACCUEIL ============================== */}
       <section id="accueil" className="scroll-mt-20 pt-16">
         <div className="container-x">
