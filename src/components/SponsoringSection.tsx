@@ -6,19 +6,13 @@ import { SPONSORING_CATEGORIES } from "@/lib/sponsoring.functions";
 
 const CATEGORY_ORDER = SPONSORING_CATEGORIES as readonly string[];
 
-function extractYear(entry: SponsoringEntryDTO): string {
-  const m = entry.title.match(/(19|20)\d{2}/);
-  if (m) return m[0];
-  return new Date(entry.created_at).getFullYear().toString();
-}
-
 export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }) {
   const [lightbox, setLightbox] = useState<{
     photos: SponsoringPhotoDTO[];
     index: number;
+    title: string;
   } | null>(null);
 
-  // Sort by configured category order, then by entry sort_order
   const sorted = useMemo(() => {
     const idx = (c: string) => {
       const i = CATEGORY_ORDER.indexOf(c);
@@ -40,12 +34,9 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
   const trackRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [activeCategory, setActiveCategory] = useState<string>(
-    sorted[0]?.category ?? "",
-  );
+  const [activeCategory, setActiveCategory] = useState<string>(sorted[0]?.category ?? "");
   const touchStartX = useRef<number | null>(null);
 
-  // Observe cards to determine active card → category
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -81,8 +72,8 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
     track.scrollBy({ left: dir * step, behavior: "smooth" });
   }, []);
 
-  // Progress within total
-  const progress = sorted.length > 1 ? activIndexClamp(activeIndex, sorted.length) : 0;
+  const progress =
+    sorted.length > 1 ? Math.min(1, Math.max(0, activeIndex / (sorted.length - 1))) : 0;
 
   return (
     <>
@@ -95,15 +86,6 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
 
         {sorted.length > 0 && (
           <>
-            <div className="relative h-10 mb-6">
-              <h4
-                key={activeCategory}
-                className="absolute left-0 top-0 text-2xl text-[color:var(--brand)] animate-fade-in"
-              >
-                {activeCategory}
-              </h4>
-            </div>
-
             <div className="relative">
               <button
                 type="button"
@@ -133,48 +115,22 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
                 }}
                 className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
-                {sorted.map((entry, i) => {
-                  const year = extractYear(entry);
-                  return (
-                    <div
-                      key={entry.id}
-                      ref={(el) => { itemRefs.current[i] = el; }}
-                      className="snap-center shrink-0 basis-full md:basis-[calc(50%-12px)]"
-                    >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          entry.photos.length > 0 &&
-                          setLightbox({ photos: entry.photos, index: 0 })
-                        }
-                        className="group block w-full text-left"
-                      >
-                        <div className="relative aspect-[4/3] bg-[color:var(--surface-muted)] overflow-hidden rounded-lg">
-                          {entry.image_url ? (
-                            <img
-                              src={entry.image_url}
-                              alt={entry.title}
-                              loading="lazy"
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <ImageIcon className="w-8 h-8 text-[color:var(--muted-foreground)]" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-4 flex items-baseline justify-between gap-4">
-                          <h5 className="text-lg font-medium text-[#666666]">
-                            {entry.title}
-                          </h5>
-                          <span className="text-sm tabular-nums text-[color:var(--brand)] shrink-0">
-                            {year}
-                          </span>
-                        </div>
-                      </button>
-                    </div>
-                  );
-                })}
+                {sorted.map((entry, i) => (
+                  <div
+                    key={entry.id}
+                    ref={(el) => {
+                      itemRefs.current[i] = el;
+                    }}
+                    className="snap-center shrink-0 basis-full md:basis-[calc(50%-12px)]"
+                  >
+                    <SponsoringCard
+                      entry={entry}
+                      onOpenLightbox={(index) =>
+                        setLightbox({ photos: entry.photos, index, title: entry.title })
+                      }
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -183,17 +139,16 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
               {categoriesInOrder.map((cat) => {
                 const isActive = cat === activeCategory;
                 return (
-                  <div key={cat} className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "h-1.5 rounded-full transition-all duration-300",
-                        isActive
-                          ? "w-10 bg-[color:var(--brand)]"
-                          : "w-6 bg-[color:var(--line)]",
-                      )}
-                      aria-hidden
-                    />
-                  </div>
+                  <span
+                    key={cat}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300",
+                      isActive
+                        ? "w-10 bg-[color:var(--brand)]"
+                        : "w-6 bg-[color:var(--line)]",
+                    )}
+                    aria-hidden
+                  />
                 );
               })}
             </div>
@@ -211,6 +166,7 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
         <Lightbox
           photos={lightbox.photos}
           startIndex={lightbox.index}
+          title={lightbox.title}
           onClose={() => setLightbox(null)}
         />
       )}
@@ -218,18 +174,131 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
   );
 }
 
-function activIndexClamp(i: number, n: number): number {
-  if (n <= 1) return 0;
-  return Math.min(1, Math.max(0, i / (n - 1)));
+function SponsoringCard({
+  entry,
+  onOpenLightbox,
+}: {
+  entry: SponsoringEntryDTO;
+  onOpenLightbox: (index: number) => void;
+}) {
+  const photos = entry.photos;
+  const [index, setIndex] = useState(0);
+  const hasMany = photos.length > 1;
+
+  const go = useCallback(
+    (dir: 1 | -1) => {
+      setIndex((i) => (i + dir + photos.length) % photos.length);
+    },
+    [photos.length],
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={() => photos.length > 0 && onOpenLightbox(index)}
+      className="group relative block w-full text-left aspect-[4/3] bg-[color:var(--surface-muted)] overflow-hidden rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand)]"
+    >
+      {photos.length > 0 ? (
+        photos.map((ph, i) => (
+          <img
+            key={ph.id}
+            src={ph.url}
+            alt={entry.title}
+            loading="lazy"
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
+              i === index ? "opacity-100" : "opacity-0",
+            )}
+          />
+        ))
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ImageIcon className="w-8 h-8 text-[color:var(--muted-foreground)]" />
+        </div>
+      )}
+
+      {/* Bottom gradient overlay with text */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-5 pt-16">
+        <p className="text-[11px] uppercase tracking-[0.18em] font-medium text-[#ff6633]">
+          {entry.category}
+        </p>
+        <p className="mt-1 text-white text-base font-bold leading-snug line-clamp-2">
+          {entry.title}
+        </p>
+        {entry.description && (
+          <p className="mt-1 text-white/90 text-sm leading-snug line-clamp-2">
+            {entry.description}
+          </p>
+        )}
+      </div>
+
+      {/* Per-card photo navigation */}
+      {hasMany && (
+        <>
+          <span
+            role="button"
+            tabIndex={0}
+            aria-label="Photo précédente"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(-1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                go(-1);
+              }
+            }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </span>
+          <span
+            role="button"
+            tabIndex={0}
+            aria-label="Photo suivante"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                go(1);
+              }
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </span>
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+            {photos.map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full transition-colors",
+                  i === index ? "bg-white" : "bg-white/40",
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </button>
+  );
 }
 
 function Lightbox({
   photos,
   startIndex,
+  title,
   onClose,
 }: {
   photos: SponsoringPhotoDTO[];
   startIndex: number;
+  title: string;
   onClose: () => void;
 }) {
   const [index, setIndex] = useState(startIndex);
@@ -260,6 +329,7 @@ function Lightbox({
     <div
       role="dialog"
       aria-modal="true"
+      aria-label={title}
       onClick={onClose}
       className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center animate-fade-in"
     >
@@ -314,7 +384,7 @@ function Lightbox({
           <img
             key={ph.id}
             src={ph.url}
-            alt=""
+            alt={title}
             className={cn(
               "absolute max-w-full max-h-full object-contain transition-opacity duration-500",
               i === index ? "opacity-100" : "opacity-0 pointer-events-none",
