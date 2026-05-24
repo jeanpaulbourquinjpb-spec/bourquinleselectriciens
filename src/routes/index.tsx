@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringSection } from "@/components/SponsoringSection";
-import { listSponsoringPhotos } from "@/lib/sponsoring.functions";
+import { listSponsoringEntries } from "@/lib/sponsoring.functions";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { ContactForm } from "@/components/ContactForm";
 import { ActualiteSection } from "@/components/ActualiteSection";
@@ -29,8 +29,8 @@ const projectsQueryOptions = queryOptions({
   queryFn: () => listProjects(),
 });
 const sponsoringQueryOptions = queryOptions({
-  queryKey: ["sponsoring-photos"],
-  queryFn: () => listSponsoringPhotos(),
+  queryKey: ["sponsoring-entries"],
+  queryFn: () => listSponsoringEntries(),
 });
 
 export const Route = createFileRoute("/")({
@@ -203,7 +203,7 @@ function HomePage() {
               Nos engagements sportifs aux côtés des équipes et événements qui nous tiennent à cœur.
             </p>
           </div>
-          <SponsoringSection photos={sponsoringData.photos} />
+          <SponsoringSection entries={sponsoringData.entries} />
         </div>
       </section>
 
@@ -339,21 +339,6 @@ function HomePage() {
                   <a href="https://instagram.com/bourquinleselectriciens/" target="_blank" rel="noreferrer" className="btn-outline" aria-label="Instagram"><Instagram className="w-4 h-4" /> Instagram</a>
                   <a href="https://facebook.com/bourquinelectricite/" target="_blank" rel="noreferrer" className="btn-outline" aria-label="Facebook"><Facebook className="w-4 h-4" /> Facebook</a>
                 </div>
-              </div>
-              <div className="mt-10">
-                <h3 className="text-lg">Téléchargez</h3>
-                <ul className="mt-4 space-y-3 text-sm">
-                  <li>
-                    <a href="https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Vive20la20vie.pdf" target="_blank" rel="noreferrer" className="link-brand inline-flex items-center gap-2">
-                      <FileText className="w-4 h-4" /> Revue « Vive la vie » des SIG
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Dunkrevue-articleBourquin.pdf" target="_blank" rel="noreferrer" className="link-brand inline-flex items-center gap-2">
-                      <FileText className="w-4 h-4" /> Revue « Dunk » des Lions de Genève
-                    </a>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
