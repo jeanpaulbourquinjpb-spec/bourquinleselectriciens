@@ -51,7 +51,7 @@ async function fcMap(url: string): Promise<string[]> {
     .filter((u): u is string => typeof u === "string");
 }
 
-async function fcScrape(url: string): Promise<{ extracted: ExtractedArticle; metaTitle?: string; metaDesc?: string }> {
+async function fcScrape(url: string): Promise<{ extracted: ExtractedArticle; metaTitle?: string; metaDesc?: string; metaImage?: string }> {
   const schema = {
     type: "object",
     properties: {
@@ -81,10 +81,12 @@ async function fcScrape(url: string): Promise<{ extracted: ExtractedArticle; met
   if (!res.ok) throw new Error(`Firecrawl scrape failed [${res.status}]: ${await res.text()}`);
   const json = (await res.json()) as FirecrawlScrapeResp;
   const data = json.data ?? json;
+  const meta = data.metadata ?? {};
   return {
     extracted: data.json ?? {},
-    metaTitle: data.metadata?.title,
-    metaDesc: data.metadata?.description,
+    metaTitle: meta.title,
+    metaDesc: meta.description,
+    metaImage: meta.ogImage ?? meta["og:image"],
   };
 }
 
