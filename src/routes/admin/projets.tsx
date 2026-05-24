@@ -190,20 +190,91 @@ function AdminProjetsPage() {
               <h2 className="text-xl mb-4">
                 Projets ({projectsQuery.data?.projects.length ?? 0})
               </h2>
+              <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
+                Glissez les projets pour les réordonner. L'ordre est appliqué sur la page publique.
+              </p>
               {projectsQuery.isLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {projectsQuery.data?.projects.map((p) => (
-                    <AdminProjectCard key={p.id} p={p} onDelete={() => handleDelete(p.id)} />
-                  ))}
-                </div>
+                <ProjectsList
+                  projects={projectsQuery.data?.projects ?? []}
+                  onDelete={handleDelete}
+                />
               )}
             </div>
           </div>
         </div>
       </section>
       <SiteFooter />
+    </div>
+  );
+}
+
+function ProjectsList({
+  projects,
+  onDelete,
+}: {
+  projects: ProjectDTO[];
+  onDelete: (id: string) => void;
+}) {
+  const queryClient = useQueryClient();
+  const reorder = useServerFn(reorderProjects);
+  const [order, setOrder] = useState<string[]>(projects.map((p) => p.id));
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  // sync when server data changes
+  useEffect(() => {
+    setOrder(projects.map((p) => p.id));
+  }, [projects]);
+
+  const byId = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
+  const ordered = order.map((id) => byId.get(id)).filter(Boolean) as ProjectDTO[];
+
+  function onDragStart(id: string) {
+    setDragId(id);
+  }
+  function onDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragId);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragId);
+      return next;
+    });
+  }
+  async function onDragEnd() {
+    const ids = order;
+    setDragId(null);
+    try {
+      await reorder({ data: { ids } });
+      toast.success("Ordre des projets enregistré");
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    }
+  }
+
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      {ordered.map((p) => (
+        <div
+          key={p.id}
+          draggable
+          onDragStart={() => onDragStart(p.id)}
+          onDragOver={(e) => onDragOver(e, p.id)}
+          onDragEnd={onDragEnd}
+          className={cn(
+            "transition-opacity",
+            dragId === p.id ? "opacity-50" : "opacity-100",
+          )}
+        >
+          <AdminProjectCard p={p} onDelete={() => onDelete(p.id)} />
+        </div>
+      ))}
     </div>
   );
 }
