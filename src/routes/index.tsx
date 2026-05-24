@@ -285,15 +285,6 @@ function HomePage() {
             <div className="space-y-8">
               <div className="card-soft">
                 <div className="flex gap-4">
-                  <Phone className="w-6 h-6 text-brand shrink-0" />
-                  <div>
-                    <h3 className="text-lg">Téléphone</h3>
-                    <a href="tel:0228498333" className="link-brand text-base mt-1 inline-block">022 849 83 33</a>
-                  </div>
-                </div>
-              </div>
-              <div className="card-soft">
-                <div className="flex gap-4">
                   <Mail className="w-6 h-6 text-brand shrink-0" />
                   <div>
                     <h3 className="text-lg">E-mail</h3>
