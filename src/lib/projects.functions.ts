@@ -15,7 +15,14 @@ export type ProjectDTO = {
   created_at: string;
 };
 
-export const CATEGORIES = ["Résidentiel", "Commercial", "Industriel", "Rénovation"] as const;
+export const CATEGORIES = [
+  "Éclairage",
+  "Sécurité",
+  "Rénovation",
+  "Grands projets",
+  "Résidentiel",
+  "Commercial",
+] as const;
 
 async function assertAdmin(userId: string) {
   const { data, error } = await supabaseAdmin
