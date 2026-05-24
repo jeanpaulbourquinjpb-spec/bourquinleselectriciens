@@ -8,12 +8,14 @@ import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringTimeline } from "@/components/SponsoringTimeline";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { ContactForm } from "@/components/ContactForm";
+import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
   ArrowRight, FileText, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import sloganImg from "@/assets/slogan-bourquin.png";
+import heroImg from "@/assets/hero.png";
 import { getArticles, type ArticleDTO } from "@/lib/articles.functions";
 import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
 
@@ -128,6 +130,35 @@ function HomePage() {
     <div>
       <SiteHeader />
 
+      {/* ============================== HERO ============================== */}
+      <section className="relative w-full overflow-hidden">
+        <img
+          src={heroImg}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
+        <div className="relative container-x py-24 md:py-36 text-white">
+          <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: "#ff6633" }}>
+            GENÈVE DEPUIS 1968
+          </p>
+          <h1 className="mt-4 text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+            <span style={{ color: "#ff6633" }}>bourquin</span>{" "}
+            <span className="text-white">les électriciens</span>
+          </h1>
+          <p className="mt-5 text-xl md:text-2xl italic" style={{ color: "#ff6633" }}>
+            entre nous, le courant passe…
+          </p>
+          <p className="mt-4 text-base md:text-lg text-white">
+            Électricité · Télécom · Sécurité · Domotique · Dépannage
+          </p>
+          <p className="mt-6 max-w-2xl text-sm md:text-base text-white/90">
+            Une entreprise familiale, trois générations de savoir-faire au service de votre confort et de votre sécurité.
+          </p>
+        </div>
+      </section>
+
       {/* ============================== ACCUEIL ============================== */}
       <section id="accueil" className="scroll-mt-20 pt-16">
         <div className="container-x">
@@ -233,7 +264,7 @@ function HomePage() {
         <div className="container-x py-24">
           <p className="eyebrow">Notre actualité</p>
           <h2 className="mt-2 text-3xl md:text-5xl">À la une</h2>
-          <ActualiteContent articles={articlesData.articles} />
+          <ActualiteSection articles={articlesData.articles} />
         </div>
       </section>
 
@@ -359,65 +390,6 @@ function HomePage() {
 }
 
 /* ----------------------------- Sub-sections ----------------------------- */
-
-function ActualiteContent({ articles }: { articles: ArticleDTO[] }) {
-  const featured = articles.find((a) => a.featured) ?? articles[0];
-  const rest = articles.filter((a) => a.id !== featured?.id);
-
-  if (!featured) {
-    return (
-      <p className="mt-12 text-sm text-muted-foreground">
-        Aucun article pour le moment. La prochaine mise à jour automatique aura lieu bientôt.
-      </p>
-    );
-  }
-
-  return (
-    <>
-      <article className="card-soft mt-12 flex flex-col gap-3 md:p-10">
-        {(featured.category || formatDate(featured.published_at)) && (
-          <p className="eyebrow">
-            {featured.category}
-            {featured.category && formatDate(featured.published_at) ? " · " : ""}
-            {formatDate(featured.published_at)}
-          </p>
-        )}
-        <h3 className="text-2xl md:text-3xl">{featured.title}</h3>
-        {featured.excerpt && <p className="text-base">{featured.excerpt}</p>}
-        <a href={featured.url} target="_blank" rel="noreferrer" className="link-brand mt-2 inline-flex items-center gap-1 text-sm font-semibold">
-          Lire l'article <ArrowRight className="w-4 h-4" />
-        </a>
-      </article>
-
-      {rest.length > 0 && (
-        <>
-          <h3 className="mt-16 text-2xl">Tous les articles</h3>
-          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {rest.map((a) => {
-              const date = formatDate(a.published_at);
-              return (
-                <article key={a.id} className="card-soft flex flex-col">
-                  {(a.category || date) && (
-                    <p className="eyebrow mb-2">
-                      {a.category}
-                      {a.category && date ? " · " : ""}
-                      {date}
-                    </p>
-                  )}
-                  <h4 className="text-lg">{a.title}</h4>
-                  {a.excerpt && <p className="mt-3 text-sm flex-1">{a.excerpt}</p>}
-                  <a href={a.url} target="_blank" rel="noreferrer" className="link-brand mt-5 inline-flex items-center gap-1 text-sm font-semibold">
-                    Vers l'article <ArrowRight className="w-4 h-4" />
-                  </a>
-                </article>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </>
-  );
-}
 
 type Filter = (typeof CATEGORIES)[number] | "all";
 
