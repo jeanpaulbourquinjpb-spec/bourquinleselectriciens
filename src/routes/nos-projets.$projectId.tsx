@@ -56,10 +56,10 @@ export const Route = createFileRoute("/nos-projets/$projectId")({
 });
 
 function ProjectDetailPage() {
-  const { project: p } = useSuspenseQuery({
-    ...projectsQueryOptions,
-    select: (d) => ({ project: d.projects.find((x) => x.id === Route.useParams().projectId)! }),
-  }).data;
+  const { projectId } = Route.useParams();
+  const { data } = useSuspenseQuery(projectsQueryOptions);
+  const p = data.projects.find((x) => x.id === projectId)!;
+
 
   return (
     <div>
