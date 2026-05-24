@@ -171,7 +171,7 @@ function AdminProjetsPage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Administration</p>
-              <h1 className="mt-2 text-3xl">Galerie « Nos projets »</h1>
+              <h1 className="mt-2 text-3xl">Gestion du contenu</h1>
               <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
                 Connecté en tant que {userEmail}.{" "}
                 <button onClick={handleSignOut} className="underline">
@@ -183,38 +183,93 @@ function AdminProjetsPage() {
                 </Link>
               </p>
             </div>
-            <Button onClick={handleScrape} disabled={scraping} variant="secondary">
-              {scraping ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCcw className="w-4 h-4 mr-2" />}
+          </div>
+
+          <AdminTabs
+            onScrape={handleScrape}
+            scraping={scraping}
+            projects={projectsQuery.data?.projects ?? []}
+            projectsLoading={projectsQuery.isLoading}
+            onDeleteProject={handleDelete}
+            onProjectsChanged={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
+          />
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function AdminTabs({
+  onScrape,
+  scraping,
+  projects,
+  projectsLoading,
+  onDeleteProject,
+  onProjectsChanged,
+}: {
+  onScrape: () => void;
+  scraping: boolean;
+  projects: ProjectDTO[];
+  projectsLoading: boolean;
+  onDeleteProject: (id: string) => void;
+  onProjectsChanged: () => void;
+}) {
+  const [tab, setTab] = useState<"projets" | "sponsoring">("projets");
+
+  return (
+    <div className="mt-8">
+      <div className="border-b border-[color:var(--border)] flex gap-2">
+        {([
+          ["projets", "Nos Projets"],
+          ["sponsoring", "Sponsoring"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={cn(
+              "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              tab === key
+                ? "border-primary text-foreground"
+                : "border-transparent text-[color:var(--muted-foreground)] hover:text-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "projets" ? (
+        <div className="mt-8">
+          <div className="flex justify-end mb-4">
+            <Button onClick={onScrape} disabled={scraping} variant="secondary">
+              {scraping ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-4 h-4 mr-2" />
+              )}
               Importer les posts Instagram
             </Button>
           </div>
-
-          <div className="mt-10 grid lg:grid-cols-[1fr_2fr] gap-10">
-            <UploadCard
-              onCreated={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
-            />
-
-
+          <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
+            <UploadCard onCreated={onProjectsChanged} />
             <div>
-              <h2 className="text-xl mb-4">
-                Projets ({projectsQuery.data?.projects.length ?? 0})
-              </h2>
+              <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
-                Glissez les projets pour les réordonner. L'ordre est appliqué sur la page publique.
+                Glissez les projets ou utilisez les flèches pour les réordonner. L'ordre est
+                appliqué sur la page publique.
               </p>
-              {projectsQuery.isLoading ? (
+              {projectsLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <ProjectsList
-                  projects={projectsQuery.data?.projects ?? []}
-                  onDelete={handleDelete}
-                />
+                <ProjectsList projects={projects} onDelete={onDeleteProject} />
               )}
             </div>
           </div>
         </div>
-      </section>
-      <SiteFooter />
+      ) : (
+        <SponsoringAdmin />
+      )}
     </div>
   );
 }
