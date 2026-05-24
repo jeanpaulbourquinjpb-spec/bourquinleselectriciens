@@ -107,6 +107,18 @@ function LoginPage() {
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
               />
             </div>
+            {mode === "signin" && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={resetting}
+                  className="text-sm underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]"
+                >
+                  {resetting ? "Envoi…" : "Mot de passe oublié ?"}
+                </button>
+              </div>
+            )}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Patientez…" : mode === "signin" ? "Se connecter" : "Créer le compte"}
             </Button>
