@@ -212,14 +212,15 @@ function AdminTabs({
   onDeleteProject: (id: string) => void;
   onProjectsChanged: () => void;
 }) {
-  const [tab, setTab] = useState<"projets" | "sponsoring">("projets");
+  const [tab, setTab] = useState<"projets" | "sponsoring" | "partenaires">("projets");
 
   return (
     <div className="mt-8">
-      <div className="border-b border-[color:var(--border)] flex gap-2">
+      <div className="border-b border-[color:var(--border)] flex gap-2 flex-wrap">
         {([
           ["projets", "Nos Projets"],
           ["sponsoring", "Sponsoring"],
+          ["partenaires", "Associations & Partenariats"],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -254,12 +255,15 @@ function AdminTabs({
             </div>
           </div>
         </div>
-      ) : (
+      ) : tab === "sponsoring" ? (
         <SponsoringAdmin />
+      ) : (
+        <PartnersAdmin />
       )}
     </div>
   );
 }
+
 
 function ProjectsList({
   projects,
