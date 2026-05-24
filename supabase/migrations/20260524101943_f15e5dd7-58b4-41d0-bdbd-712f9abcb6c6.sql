@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Project photos are publicly accessible" ON storage.objects;
