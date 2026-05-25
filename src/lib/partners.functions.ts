@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { deleteWithStorage } from "./storage.server";
 
 export type PartnerDTO = {
   id: string;
@@ -88,21 +89,12 @@ export const deletePartner = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    const { data: row } = await supabaseAdmin
-      .from("partners")
-      .select("logo_url")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (row?.logo_url) {
-      const marker = "/storage/v1/object/public/partner-logos/";
-      const idx = row.logo_url.indexOf(marker);
-      if (idx >= 0) {
-        const path = row.logo_url.slice(idx + marker.length);
-        await supabaseAdmin.storage.from("partner-logos").remove([path]);
-      }
-    }
-    const { error } = await supabaseAdmin.from("partners").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    await deleteWithStorage({
+      table: "partners",
+      id: data.id,
+      bucket: "partner-logos",
+      urlColumns: ["logo_url"],
+    });
     return { ok: true };
   });
 

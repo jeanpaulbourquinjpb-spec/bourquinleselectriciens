@@ -18,7 +18,11 @@ export function PartnersCarousel() {
     );
   }
 
-  const loop = [...partners, ...partners];
+  // Need at least 3 logos for a smooth marquee loop; below that, render
+  // them once, centered, with no animation (otherwise a single uploaded
+  // logo appears twice because the marquee duplicates its track).
+  const animate = partners.length >= 3;
+  const items = animate ? [...partners, ...partners] : partners;
   return (
     <section className="py-20 bg-[color:var(--surface-muted)] overflow-hidden">
       <div className="container-x">
@@ -26,8 +30,10 @@ export function PartnersCarousel() {
         <h2 className="mt-3 text-3xl md:text-4xl text-center">Ils nous font confiance</h2>
       </div>
       <div className="mt-12 relative">
-        <div className="marquee-track flex gap-16 w-max">
-          {loop.map((p, i) => {
+        <div
+          className={`flex gap-16 ${animate ? "marquee-track w-max" : "w-full justify-center flex-wrap"}`}
+        >
+          {items.map((p, i) => {
             const content = p.logo_url ? (
               <img
                 src={p.logo_url}
