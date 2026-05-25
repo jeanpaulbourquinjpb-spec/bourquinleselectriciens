@@ -71,7 +71,7 @@ export async function deleteWithStorage(opts: {
   }
 
   // 4. Delete the row
-  const { error: delErr } = await supabaseAdmin.from(table).delete().eq("id", id);
+  const { error: delErr } = await db.from(table).delete().eq("id", id);
   if (delErr) throw new Error(delErr.message);
 }
 
@@ -102,5 +102,5 @@ export async function deleteRowsWithStorage(opts: {
     const { error } = await supabaseAdmin.storage.from(bucket).remove(paths);
     if (error) console.error(`Storage bulk remove error (${bucket}):`, error.message);
   }
-  await supabaseAdmin.from(table).delete().eq(filterColumn, filterValue);
+  await db.from(table).delete().eq(filterColumn, filterValue);
 }
