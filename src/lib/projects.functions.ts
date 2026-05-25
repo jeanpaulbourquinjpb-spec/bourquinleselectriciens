@@ -153,22 +153,22 @@ export const deleteProject = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    // Try to remove storage file if it lives in our bucket
-    const { data: row } = await supabaseAdmin
-      .from("projects")
-      .select("image_url, source_type")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (row?.source_type === "upload" && row.image_url) {
-      const marker = "/storage/v1/object/public/project-photos/";
-      const idx = row.image_url.indexOf(marker);
-      if (idx >= 0) {
-        const path = row.image_url.slice(idx + marker.length);
-        await supabaseAdmin.storage.from("project-photos").remove([path]);
-      }
-    }
-    const { error } = await supabaseAdmin.from("projects").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    await deleteWithStorage({
+      table: "projects",
+      id: data.id,
+      bucket: "project-photos",
+      urlColumns: ["image_url"],
+      childCleanup: async () => {
+        // Cascade: remove every project_photos row + its storage file
+        await deleteRowsWithStorage({
+          table: "project_photos",
+          filterColumn: "project_id",
+          filterValue: data.id,
+          bucket: "project-photos",
+          urlColumn: "url",
+        });
+      },
+    });
     return { ok: true };
   });
 
