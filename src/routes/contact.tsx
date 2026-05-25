@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import sloganImg from "@/assets/slogan-bourquin.png";
 import { ContactForm } from "@/components/ContactForm";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 
@@ -21,13 +20,12 @@ function ContactPage() {
     <div>
       <SiteHeader />
       <section className="container-x py-20">
-        <p className="eyebrow">Infos pratiques</p>
-        <h1 className="mt-3 text-4xl md:text-5xl">Contact</h1>
-        <img src={sloganImg} alt="entre nous, le courant passe…" className="mt-5 h-6 md:h-7 w-auto" />
-
-        <div className="mt-12 max-w-3xl">
-          <p className="eyebrow">Écrivez-nous</p>
-          <h2 className="mt-3 text-3xl md:text-4xl">Formulaire de contact</h2>
+        <div className="max-w-3xl">
+          <h1 className="text-4xl md:text-5xl">Contactez-nous</h1>
+          <p className="mt-4 text-xl md:text-2xl text-[color:var(--muted)]">
+            Une question ? Un projet ? Nous sommes là.
+          </p>
+          <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par E-mail.</p>
           <div className="mt-8">
             <ContactForm />
           </div>

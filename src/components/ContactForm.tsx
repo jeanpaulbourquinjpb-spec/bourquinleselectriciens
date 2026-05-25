@@ -82,7 +82,7 @@ export function ContactForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <p>Utilisez le formulaire ci-dessous pour nous contacter par E-mail.</p>
+
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
