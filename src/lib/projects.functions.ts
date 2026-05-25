@@ -262,21 +262,12 @@ export const deleteProjectPhoto = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    const { data: row } = await supabaseAdmin
-      .from("project_photos")
-      .select("url")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (row?.url) {
-      const marker = "/storage/v1/object/public/project-photos/";
-      const idx = row.url.indexOf(marker);
-      if (idx >= 0) {
-        const path = row.url.slice(idx + marker.length);
-        await supabaseAdmin.storage.from("project-photos").remove([path]);
-      }
-    }
-    const { error } = await supabaseAdmin.from("project_photos").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    await deleteWithStorage({
+      table: "project_photos",
+      id: data.id,
+      bucket: "project-photos",
+      urlColumns: ["url"],
+    });
     return { ok: true };
   });
 
