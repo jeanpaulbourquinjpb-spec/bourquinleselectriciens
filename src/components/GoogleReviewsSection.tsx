@@ -95,63 +95,130 @@ export function GoogleReviewsSection() {
             />
           </div>
 
-          <div className="space-y-4">
-            {error && (
-              <div
-                className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700"
-                role="alert"
-              >
-                <p className="font-semibold">Erreur de chargement des avis Google</p>
-                <p className="mt-1 break-words">{error}</p>
-              </div>
-            )}
-            {loading && (
-              <div className="card-soft text-sm text-[color:var(--muted-foreground,#666)]">
-                Chargement des avis…
-              </div>
-            )}
-            {!loading && !error && reviews.length === 0 && (
-              <div className="card-soft text-sm">
-                Les avis ne sont pas disponibles pour le moment.
-              </div>
-            )}
-            {reviews.map((r, i) => (
-              <article
-                key={`${r.time}-${i}`}
-                className="rounded-2xl bg-white p-6 border border-[color:var(--line)]"
-                style={{ boxShadow: "0 4px 18px -8px rgba(0,0,0,0.15)" }}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{r.author_name}</p>
-                    <p className="text-xs text-[color:var(--muted-foreground,#666)] mt-0.5">
-                      {r.relative_time_description}
-                    </p>
-                  </div>
-                  <Stars rating={r.rating} />
-                </div>
-                <p className="mt-3 text-sm leading-relaxed line-clamp-5">{r.text}</p>
-              </article>
-            ))}
-          </div>
+          <ReviewsCarousel reviews={reviews} loading={loading} error={error} />
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <a href={WRITE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-brand">
+            Laisser un avis Google
+          </a>
           <a
-            href={WRITE_REVIEW_URL}
+            href={data?.url ?? `https://search.google.com/local/reviews?placeid=${PLACE_ID}`}
             target="_blank"
             rel="noreferrer"
-            className="btn-brand"
+            className="btn-outline"
           >
-            Laisser un avis <ExternalLink className="w-4 h-4" />
+            Voir tous les avis Google
           </a>
-          {data?.url && (
-            <a href={data.url} target="_blank" rel="noreferrer" className="btn-outline">
-              Voir tous les avis
-            </a>
-          )}
         </div>
       </div>
     </section>
   );
 }
+
+type Review = NonNullable<GoogleReviewsData["reviews"]>[number];
+
+function ReviewsCarousel({
+  reviews,
+  loading,
+  error,
+}: {
+  reviews: Review[];
+  loading: boolean;
+  error: string | null;
+}) {
+  const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const count = reviews.length;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isPaused || count <= 1) return;
+    intervalRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % count);
+    }, 5000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPaused, count]);
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700" role="alert">
+        <p className="font-semibold">Erreur de chargement des avis Google</p>
+        <p className="mt-1 break-words">{error}</p>
+      </div>
+    );
+  }
+  if (loading) {
+    return (
+      <div className="card-soft text-sm text-[color:var(--muted-foreground,#666)]">
+        Chargement des avis…
+      </div>
+    );
+  }
+  if (count === 0) {
+    return <div className="card-soft text-sm">Les avis ne sont pas disponibles pour le moment.</div>;
+  }
+
+  const prev = () => setIndex((i) => (i - 1 + count) % count);
+  const next = () => setIndex((i) => (i + 1) % count);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${index * 100}%)` }}
+        >
+          {reviews.map((r, i) => (
+            <div
+              key={`${r.time}-${i}`}
+              className="shrink-0 basis-full md:basis-1/2 px-2"
+            >
+              <article
+                className="h-full rounded-2xl bg-white p-6 border border-[color:var(--line)] flex flex-col"
+                style={{ boxShadow: "0 4px 18px -8px rgba(0,0,0,0.15)" }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-semibold">{r.author_name}</p>
+                  <Stars rating={r.rating} />
+                </div>
+                <p className="mt-3 text-sm leading-relaxed line-clamp-3 flex-1">{r.text}</p>
+                <p className="mt-3 text-xs text-[color:var(--muted-foreground,#666)]">
+                  {r.relative_time_description}
+                </p>
+              </article>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {count > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Avis précédent"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 md:-translate-x-4 z-10 rounded-full bg-white border border-[color:var(--line)] shadow-md p-2 hover:bg-[color:var(--surface-muted)]"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Avis suivant"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 md:translate-x-4 z-10 rounded-full bg-white border border-[color:var(--line)] shadow-md p-2 hover:bg-[color:var(--surface-muted)]"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
