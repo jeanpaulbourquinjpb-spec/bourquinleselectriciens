@@ -1,5 +1,10 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// The Supabase typed client narrows table names via generics; this helper
+// is intentionally generic, so we use an untyped handle for dynamic table access.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any;
+
 /**
  * Extract a storage object path from its public URL.
  * Returns null if the URL doesn't belong to the given bucket.
