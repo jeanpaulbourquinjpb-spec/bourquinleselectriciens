@@ -143,15 +143,15 @@ function HomePage() {
             Électricité · Télécom · Sécurité · Domotique · Dépannage
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap items-start gap-3">
             <GoogleRatingBadge />
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
               Trois générations de savoir-faire
             </span>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#contact" className="btn-brand">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+            <a href="#contact" className="btn-brand justify-center sm:justify-start">
               Contactez-nous
             </a>
             <a
