@@ -181,7 +181,7 @@ function ReviewsCarousel({
           {reviews.map((r, i) => (
             <div
               key={`${r.time}-${i}`}
-              className="shrink-0 basis-full md:basis-1/2 px-2"
+              className="shrink-0 basis-full px-2"
             >
               <article
                 className="h-full rounded-2xl bg-white p-6 border border-[color:var(--line)] flex flex-col"
