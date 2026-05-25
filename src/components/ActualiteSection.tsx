@@ -88,9 +88,11 @@ function ArticleImage({
 function FeaturedArticle({ a }: { a: ArticleDTO }) {
   const date = formatDate(a.published_at);
   return (
-    <article
-      className="card-soft mt-12 overflow-hidden !p-0 grid md:grid-cols-2"
-      style={{ maxHeight: 280 }}
+    <a
+      href={a.url}
+      target="_blank"
+      rel="noreferrer"
+      className="card-soft mt-12 overflow-hidden !p-0 grid md:grid-cols-2 md:max-h-[280px] hover:shadow-md transition-shadow"
     >
       <div className="relative w-full h-48 md:h-full min-h-[200px] bg-[color:var(--surface-muted)] overflow-hidden">
         <ArticleImage src={a.image_url} alt={a.title} />
@@ -105,16 +107,11 @@ function FeaturedArticle({ a }: { a: ArticleDTO }) {
         )}
         <h3 className="text-xl md:text-2xl line-clamp-2">{a.title}</h3>
         {a.excerpt && <p className="text-sm line-clamp-2">{a.excerpt}</p>}
-        <a
-          href={a.url}
-          target="_blank"
-          rel="noreferrer"
-          className="link-brand mt-1 inline-flex items-center gap-1 text-sm font-semibold w-fit"
-        >
+        <span className="link-brand mt-1 inline-flex items-center gap-1 text-sm font-semibold w-fit">
           Lire l'article <ArrowRight className="w-4 h-4" />
-        </a>
+        </span>
       </div>
-    </article>
+    </a>
   );
 }
 
