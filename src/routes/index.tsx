@@ -291,9 +291,13 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
     () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
     [filter, projects],
   );
+  const availableCategories = useMemo(
+    () => CATEGORIES.filter((c) => projects.some((p) => p.category === c)),
+    [projects],
+  );
   const filters: { label: string; value: Filter }[] = [
     { label: "Tous les projets", value: "all" },
-    ...CATEGORIES.map((c) => ({ label: c, value: c })),
+    ...availableCategories.map((c) => ({ label: c, value: c })),
   ];
 
   return (
