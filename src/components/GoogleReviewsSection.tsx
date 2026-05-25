@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Star, ExternalLink } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { getGoogleReviews, getGoogleMapsEmbedUrl, type GoogleReviewsData } from "@/lib/reviews.functions";
+
 
 const PLACE_ID = "ChIJfS2J5zZljEcREXY9RXGNl_I";
 const WRITE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${PLACE_ID}`;
