@@ -141,24 +141,21 @@ export const deleteSponsoringEntry = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    const { data: photos } = await supabaseAdmin
-      .from("sponsoring_photos")
-      .select("url")
-      .eq("entry_id", data.id);
-    const marker = "/storage/v1/object/public/sponsoring-photos/";
-    const paths: string[] = [];
-    for (const ph of photos ?? []) {
-      const idx = ph.url.indexOf(marker);
-      if (idx >= 0) paths.push(ph.url.slice(idx + marker.length));
-    }
-    if (paths.length > 0) {
-      await supabaseAdmin.storage.from("sponsoring-photos").remove(paths);
-    }
-    const { error } = await supabaseAdmin
-      .from("sponsoring_entries")
-      .delete()
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    await deleteWithStorage({
+      table: "sponsoring_entries",
+      id: data.id,
+      bucket: "sponsoring-photos",
+      urlColumns: ["image_url"],
+      childCleanup: async () => {
+        await deleteRowsWithStorage({
+          table: "sponsoring_photos",
+          filterColumn: "entry_id",
+          filterValue: data.id,
+          bucket: "sponsoring-photos",
+          urlColumn: "url",
+        });
+      },
+    });
     return { ok: true };
   });
 
