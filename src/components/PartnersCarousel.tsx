@@ -45,7 +45,7 @@ export function PartnersCarousel() {
               <span className="text-sm font-semibold text-[#666666]">{p.name}</span>
             );
             const className =
-              "shrink-0 h-20 w-40 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition duration-300";
+              "shrink-0 h-20 w-40 flex items-center justify-center opacity-90 hover:opacity-100 transition duration-300";
             return p.url ? (
               <a
                 key={`${p.id}-${i}`}
