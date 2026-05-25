@@ -15,6 +15,7 @@ import {
   ArrowRight, FileText, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
 import sloganImg from "@/assets/slogan-bourquin.png";
 import heroImg from "@/assets/hero.png";
 import { getArticles, type ArticleDTO } from "@/lib/articles.functions";
@@ -141,9 +142,25 @@ function HomePage() {
           <p className="mt-4 text-base md:text-lg text-white">
             Électricité · Télécom · Sécurité · Domotique · Dépannage
           </p>
-          <p className="mt-6 max-w-2xl text-sm md:text-base text-white/90">
-            Une entreprise familiale, trois générations de savoir-faire au service de votre confort et de votre sécurité.
-          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <GoogleRatingBadge />
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
+              Trois générations de savoir-faire
+            </span>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="#contact" className="btn-brand">
+              Contactez-nous
+            </a>
+            <a
+              href="#services"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-white/70 px-5 py-2.5 text-sm font-medium text-white hover:bg-white hover:text-black transition-colors"
+            >
+              Nos services
+            </a>
+          </div>
         </div>
       </section>
 
