@@ -158,7 +158,7 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="numeroCompteur">Numéro de compteur</label>
+        <label className={labelCls} htmlFor="numeroCompteur">Numéro de compteur électrique</label>
         <input id="numeroCompteur" name="numeroCompteur" maxLength={100} className={inputCls} />
         <p className="text-xs mt-2 text-[color:var(--muted)]">
           Vous pouvez aussi envoyer une photo de votre compteur ou une facture d'électricité en pièce jointe
