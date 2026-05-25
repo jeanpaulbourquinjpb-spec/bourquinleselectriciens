@@ -44,7 +44,7 @@ export async function deleteWithStorage(opts: {
   const { table, id, bucket, urlColumns, childCleanup } = opts;
 
   // 1. Fetch the row to get file URLs
-  const { data: row, error: fetchErr } = await supabaseAdmin
+  const { data: row, error: fetchErr } = await db
     .from(table)
     .select(urlColumns.join(", "))
     .eq("id", id)
@@ -66,7 +66,7 @@ export async function deleteWithStorage(opts: {
     }
   }
   if (paths.length > 0) {
-    const { error: rmErr } = await supabaseAdmin.storage.from(bucket).remove(paths);
+    const { error: rmErr } = await db.storage.from(bucket).remove(paths);
     if (rmErr) console.error(`Storage remove error (${bucket}):`, rmErr.message);
   }
 
@@ -87,7 +87,7 @@ export async function deleteRowsWithStorage(opts: {
   urlColumn: string;
 }): Promise<void> {
   const { table, filterColumn, filterValue, bucket, urlColumn } = opts;
-  const { data: rows } = await supabaseAdmin
+  const { data: rows } = await db
     .from(table)
     .select(`id, ${urlColumn}`)
     .eq(filterColumn, filterValue);
@@ -99,7 +99,7 @@ export async function deleteRowsWithStorage(opts: {
     if (path) paths.push(path);
   }
   if (paths.length > 0) {
-    const { error } = await supabaseAdmin.storage.from(bucket).remove(paths);
+    const { error } = await db.storage.from(bucket).remove(paths);
     if (error) console.error(`Storage bulk remove error (${bucket}):`, error.message);
   }
   await db.from(table).delete().eq(filterColumn, filterValue);
