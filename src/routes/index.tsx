@@ -183,18 +183,6 @@ function HomePage() {
             innovantes et durables, alliant sécurité, confort, et efficience énergétique, à une clientèle
             institutionnelle, commerciale et privée.
           </p>
-          <p className="mt-4 max-w-3xl">
-            À disposition et écoute de ses clients pour l'entretien de tous types d'installations électriques
-            dans les domaines suivants&nbsp;:
-          </p>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2 max-w-2xl">
-            {["étude, conseil et contrôle", "rénovation", "éclairage", "télécommunications", "maintenance & dépannage"].map((d) => (
-              <li key={d} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand" />
-                <span className="capitalize">{d}</span>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div className="py-20 bg-[color:var(--surface-muted)] overflow-hidden">
