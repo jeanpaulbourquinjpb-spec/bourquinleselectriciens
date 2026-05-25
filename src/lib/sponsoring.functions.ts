@@ -190,21 +190,12 @@ export const deleteSponsoringPhoto = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    const { data: row } = await supabaseAdmin
-      .from("sponsoring_photos")
-      .select("url")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (row?.url) {
-      const marker = "/storage/v1/object/public/sponsoring-photos/";
-      const idx = row.url.indexOf(marker);
-      if (idx >= 0) {
-        const path = row.url.slice(idx + marker.length);
-        await supabaseAdmin.storage.from("sponsoring-photos").remove([path]);
-      }
-    }
-    const { error } = await supabaseAdmin.from("sponsoring_photos").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    await deleteWithStorage({
+      table: "sponsoring_photos",
+      id: data.id,
+      bucket: "sponsoring-photos",
+      urlColumns: ["url"],
+    });
     return { ok: true };
   });
 
