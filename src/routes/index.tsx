@@ -118,8 +118,8 @@ function HomePage() {
     <div>
       <SiteHeader />
 
-      {/* ============================== HERO ============================== */}
-      <section className="relative w-full overflow-hidden">
+      <section id="accueil" className="scroll-mt-20 relative w-full overflow-hidden">
+
         <img
           src={heroImg}
           alt=""
@@ -147,25 +147,10 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============================== ACCUEIL ============================== */}
-      <section id="accueil" className="scroll-mt-20 pt-16">
-        <div className="container-x">
-          <p className="eyebrow">Domaines d'intervention</p>
-          <h1 className="mt-2 text-3xl md:text-5xl">À votre disposition pour l'entretien de toutes vos installations.</h1>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.slice(0, 6).map((s) => (
-              <div key={s.title} className="card-soft">
-                <s.icon className="w-7 h-7 text-brand" />
-                <h3 className="mt-5 text-lg">{s.title}</h3>
-                <p className="mt-2 text-sm">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-
+      <section className="pt-16">
         <PartnersCarousel />
       </section>
+
 
       {/* ============================== À PROPOS ============================== */}
       <section id="a-propos" className="scroll-mt-20">
