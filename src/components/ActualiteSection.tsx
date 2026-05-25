@@ -1,5 +1,5 @@
-import { useMemo, useRef } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { useMemo } from "react";
+import { ArrowRight, ImageIcon } from "lucide-react";
 import type { ArticleDTO } from "@/lib/articles.functions";
 
 function formatDate(iso: string | null): string | null {
@@ -58,21 +58,63 @@ function ArticleImage({
   );
 }
 
-function CompactCard({ a }: { a: ArticleDTO }) {
+function FeaturedArticle({ a }: { a: ArticleDTO }) {
+  const date = formatDate(a.published_at);
+  return (
+    <article
+      className="card-soft mt-12 overflow-hidden !p-0 grid md:grid-cols-2"
+      style={{ maxHeight: 280 }}
+    >
+      <div className="relative w-full h-48 md:h-full min-h-[200px] bg-[color:var(--surface-muted)] overflow-hidden">
+        <ArticleImage src={a.image_url} alt={a.title} />
+      </div>
+      <div className="flex flex-col justify-center p-6 md:p-8 gap-3 overflow-hidden">
+        {(a.category || date) && (
+          <p className="eyebrow">
+            {a.category}
+            {a.category && date ? " · " : ""}
+            {date}
+          </p>
+        )}
+        <h3 className="text-xl md:text-2xl line-clamp-2">{a.title}</h3>
+        {a.excerpt && <p className="text-sm line-clamp-2">{a.excerpt}</p>}
+        <a
+          href={a.url}
+          target="_blank"
+          rel="noreferrer"
+          className="link-brand mt-1 inline-flex items-center gap-1 text-sm font-semibold w-fit"
+        >
+          Lire l'article <ArrowRight className="w-4 h-4" />
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function ArticleCard({ a }: { a: ArticleDTO }) {
   const date = formatDate(a.published_at);
   return (
     <a
       href={a.url}
       target="_blank"
       rel="noreferrer"
-      className="card-soft flex gap-4 !p-3 hover:shadow-md transition-shadow h-full"
+      className="card-soft !p-0 overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow"
     >
-      <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 bg-[color:var(--surface-muted)] overflow-hidden rounded">
+      <div className="relative w-full aspect-[16/10] bg-[color:var(--surface-muted)] overflow-hidden">
         <ArticleImage src={a.image_url} alt={a.title} enhance />
       </div>
-      <div className="flex flex-col flex-1 min-w-0 py-1">
-        {date && <p className="eyebrow mb-1 text-[10px]">{date}</p>}
-        <h4 className="text-sm md:text-base leading-snug line-clamp-3 flex-1">{a.title}</h4>
+      <div className="flex flex-col flex-1 p-5 gap-2">
+        {(a.category || date) && (
+          <p className="eyebrow text-[10px]">
+            {a.category}
+            {a.category && date ? " · " : ""}
+            {date}
+          </p>
+        )}
+        <h4 className="text-base leading-snug line-clamp-3 flex-1">{a.title}</h4>
+        {a.excerpt && (
+          <p className="text-xs text-[color:var(--muted-foreground)] line-clamp-2">{a.excerpt}</p>
+        )}
         <span className="link-brand mt-2 inline-flex items-center gap-1 text-xs font-semibold w-fit">
           Lire <ArrowRight className="w-3 h-3" />
         </span>
@@ -81,68 +123,17 @@ function CompactCard({ a }: { a: ArticleDTO }) {
   );
 }
 
-function ArticlesCarousel({ articles }: { articles: ArticleDTO[] }) {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-
-  const scrollByCard = (dir: 1 | -1) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * Math.round(el.clientWidth * 0.9), behavior: "smooth" });
-  };
-
-  if (articles.length === 0) return null;
-
-  return (
-    <div className="mt-12">
-      <div className="flex items-end justify-between gap-4 mb-4">
-        <h3 className="text-2xl">Tous les articles</h3>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => scrollByCard(-1)}
-            aria-label="Précédent"
-            className="w-10 h-10 rounded-full border border-[color:var(--border)] bg-background flex items-center justify-center hover:bg-[color:var(--surface-muted)] transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollByCard(1)}
-            aria-label="Suivant"
-            className="w-10 h-10 rounded-full border border-[color:var(--border)] bg-background flex items-center justify-center hover:bg-[color:var(--surface-muted)] transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-      <div
-        ref={scrollerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-2 px-2"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        {articles.map((a) => (
-          <div
-            key={a.id}
-            className="snap-start shrink-0 w-[88%] sm:w-[calc(50%-0.5rem)]"
-          >
-            <CompactCard a={a} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
-  const featured = articles.find((a) => a.featured) ?? articles[0];
-  const rest = useMemo(() => {
-    const list = articles.filter((a) => a.id !== featured?.id);
-    return list.sort((a, b) => {
+  const sorted = useMemo(() => {
+    return [...articles].sort((a, b) => {
       const da = a.published_at ? new Date(a.published_at).getTime() : 0;
       const db = b.published_at ? new Date(b.published_at).getTime() : 0;
       return db - da;
     });
-  }, [articles, featured?.id]);
+  }, [articles]);
+
+  const featured = sorted[0];
+  const rest = sorted.slice(1);
 
   if (!featured) {
     return (
@@ -154,30 +145,15 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
 
   return (
     <>
-      <article className="card-soft mt-12 flex flex-col gap-3 md:p-10 overflow-hidden">
-        <div className="relative w-full aspect-[21/9] -mx-6 -mt-6 md:-mx-10 md:-mt-10 mb-4 bg-[color:var(--surface-muted)] overflow-hidden">
-          <ArticleImage src={featured.image_url} alt={featured.title} />
-        </div>
-        {(featured.category || formatDate(featured.published_at)) && (
-          <p className="eyebrow">
-            {featured.category}
-            {featured.category && formatDate(featured.published_at) ? " · " : ""}
-            {formatDate(featured.published_at)}
-          </p>
-        )}
-        <h3 className="text-2xl md:text-3xl">{featured.title}</h3>
-        {featured.excerpt && <p className="text-base">{featured.excerpt}</p>}
-        <a
-          href={featured.url}
-          target="_blank"
-          rel="noreferrer"
-          className="link-brand mt-2 inline-flex items-center gap-1 text-sm font-semibold w-fit"
-        >
-          Lire l'article <ArrowRight className="w-4 h-4" />
-        </a>
-      </article>
+      <FeaturedArticle a={featured} />
 
-      <ArticlesCarousel articles={rest} />
+      {rest.length > 0 && (
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((a) => (
+            <ArticleCard key={a.id} a={a} />
+          ))}
+        </div>
+      )}
     </>
   );
 }
