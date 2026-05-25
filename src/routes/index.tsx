@@ -164,11 +164,6 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="pt-16">
-        <PartnersCarousel />
-      </section>
-
-
       {/* ============================== À PROPOS ============================== */}
       <section id="a-propos" className="scroll-mt-20">
         <div className="container-x py-24">
@@ -185,6 +180,10 @@ function HomePage() {
           </p>
         </div>
 
+        <div className="pt-8 pb-16">
+          <PartnersCarousel />
+        </div>
+
         <div className="py-20 bg-[color:var(--surface-muted)] overflow-hidden">
           <div className="container-x">
             <p className="eyebrow">Engagement</p>
@@ -196,6 +195,7 @@ function HomePage() {
           <SponsoringSection entries={sponsoringData.entries} />
         </div>
       </section>
+
 
       {/* ============================== SERVICES ============================== */}
       <section id="services" className="scroll-mt-20">
