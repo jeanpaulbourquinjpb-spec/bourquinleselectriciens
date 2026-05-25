@@ -89,15 +89,15 @@ export function GoogleReviewsSection() {
             <ReviewsCarousel reviews={reviews} loading={loading} error={error} />
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <a href={WRITE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-brand">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap justify-center items-stretch sm:items-center gap-3">
+            <a href={WRITE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-brand justify-center">
               Laisser un avis
             </a>
             <a
               href={data?.url ?? `https://search.google.com/local/reviews?placeid=${PLACE_ID}`}
               target="_blank"
               rel="noreferrer"
-              className="btn-outline"
+              className="btn-outline justify-center"
             >
               Voir tous les avis Google
             </a>

@@ -143,15 +143,15 @@ function HomePage() {
             Électricité · Télécom · Sécurité · Domotique · Dépannage
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap items-start gap-3">
             <GoogleRatingBadge />
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
               Trois générations de savoir-faire
             </span>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#contact" className="btn-brand">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+            <a href="#contact" className="btn-brand justify-center sm:justify-start">
               Contactez-nous
             </a>
             <a
@@ -298,7 +298,7 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
 
   return (
     <>
-      <div className="mt-10 flex flex-wrap gap-2">
+      <div className="mt-10 flex gap-2 overflow-x-auto md:flex-wrap -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filters.map((f) => {
           const active = filter === f.value;
           return (
@@ -306,7 +306,7 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
               key={f.value}
               onClick={() => setFilter(f.value)}
               className={cn(
-                "px-4 py-2 rounded-full border text-sm transition-colors",
+                "shrink-0 whitespace-nowrap px-4 py-2 rounded-full border text-sm transition-colors",
                 active
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background border-[color:var(--border)] hover:bg-[color:var(--surface-muted)]",
