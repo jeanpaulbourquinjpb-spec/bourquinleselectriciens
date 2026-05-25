@@ -69,52 +69,55 @@ export function GoogleReviewsSection() {
   const reviews = data?.reviews ?? [];
 
   return (
-    <section className="py-24 bg-[color:var(--surface-muted)]">
+    <section className="py-16 bg-[color:var(--surface-muted)]">
       <div className="container-x">
-        <p className="eyebrow">Avis Google</p>
-        <h2 className="mt-2 text-3xl md:text-4xl">Ce que disent nos clients</h2>
+        <div className="mx-auto max-w-2xl">
+          <p className="eyebrow">Avis Google</p>
+          <h2 className="mt-2 text-3xl md:text-4xl">Ce que disent nos clients</h2>
 
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <span className="text-4xl font-semibold" style={{ color: "#ff6633" }}>
-            {rating.toFixed(1)}
-          </span>
-          <Stars rating={rating} size={22} />
-          <span className="text-sm text-[color:var(--muted-foreground,#666)]">
-            {total} avis sur Google
-          </span>
-        </div>
-
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-          <div className="rounded-2xl overflow-hidden border border-[color:var(--line)] aspect-[4/3] lg:aspect-auto lg:min-h-[420px] shadow-md">
-            <iframe
-              title="Localisation bourquin les électriciens"
-              src={mapSrc}
-              className="w-full h-full"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <span className="text-3xl font-semibold" style={{ color: "#ff6633" }}>
+              {rating.toFixed(1)}
+            </span>
+            <Stars rating={rating} size={20} />
+            <span className="text-sm text-[color:var(--muted-foreground,#666)]">
+              · {total} avis Google
+            </span>
           </div>
 
-          <ReviewsCarousel reviews={reviews} loading={loading} error={error} />
+          <div className="mt-6">
+            <ReviewsCarousel reviews={reviews} loading={loading} error={error} />
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <a href={WRITE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-brand">
+              Laisser un avis
+            </a>
+            <a
+              href={data?.url ?? `https://search.google.com/local/reviews?placeid=${PLACE_ID}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-outline"
+            >
+              Voir tous les avis Google
+            </a>
+          </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <a href={WRITE_REVIEW_URL} target="_blank" rel="noreferrer" className="btn-brand">
-            Laisser un avis Google
-          </a>
-          <a
-            href={data?.url ?? `https://search.google.com/local/reviews?placeid=${PLACE_ID}`}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-outline"
-          >
-            Voir tous les avis Google
-          </a>
+        <div className="mt-10 rounded-2xl overflow-hidden border border-[color:var(--line)] shadow-md" style={{ height: 300 }}>
+          <iframe
+            title="Localisation bourquin les électriciens — Rue Henri-Blanvalet 21, 1207 Genève"
+            src={mapSrc}
+            className="w-full h-full"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </div>
     </section>
   );
 }
+
 
 type Review = NonNullable<GoogleReviewsData["reviews"]>[number];
 
