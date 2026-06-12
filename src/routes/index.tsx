@@ -12,7 +12,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
-  ArrowRight, FileText, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
+  ArrowRight, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
@@ -68,16 +68,6 @@ const services = [
   { icon: Zap, title: "Efficience énergétique", text: "Solutions électriques durables pour votre sécurité, votre confort et votre efficience énergétique. Partenaire éco21 certifié." },
 ];
 
-const cgv = [
-  { name: "Temps d'intervention — Principe", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Letempsdintervention-Principe.pdf" },
-  { name: "Changements de prix du côté de nos fournisseurs", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Changementsdeprixducotedenosfournisseurs2022FR.pdf" },
-  { name: "CGV — Conditions générales de vente", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/ConditionsgnralesdeventeCGV-Edition23.08.2022.pdf" },
-  { name: "CGV Annexe 1 — Solutions électriques", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Annexe1-Solutionslecctriques-ComplmentnosconditionsgnralesdeventeCGV.pdf" },
-  { name: "CGV Annexe 2 — Percements", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Annexe2-Percements-ComplmentnosconditionsgnralesdeventeCGV.pdf" },
-  { name: "CGV Annexe 3 — Installations d'éclairage", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Annexe_3_-_Installations_d-%C3%A9clairage_-_Compl%C3%A9ment_%C3%A0_nos_conditions_g%C3%A9n%C3%A9rales_de_vente_CGV.pdf" },
-  { name: "CGV — Infos plaque de finitions métalliques", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/CGV-Infos-Plaquesdefinitionsmtalliques.pdf" },
-  { name: "Prix d'interventions", href: "https://de.cdn-website.com/196019cf1a714e1ea0eb1424eaebc914/files/uploaded/Les+prix+d-interventions+01.01.2026.pdf" },
-];
 
 
 /* ----------------------------- Helpers ----------------------------- */
@@ -217,20 +207,12 @@ function HomePage() {
               </article>
             ))}
           </div>
-        </div>
 
-        <div className="container-x pb-24">
-          <h3 className="text-2xl md:text-3xl">Prix et conditions générales de vente</h3>
-          <ul className="mt-8 grid gap-3 md:grid-cols-2">
-            {cgv.map((c) => (
-              <li key={c.name}>
-                <a href={c.href} target="_blank" rel="noreferrer" className="card-soft flex items-start gap-3 p-5">
-                  <FileText className="w-5 h-5 text-brand shrink-0 mt-0.5" />
-                  <span className="text-sm font-medium">{c.name}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-12 text-center">
+            <Link to="/documents" className="text-sm inline-flex items-center gap-1.5 hover:underline" style={{ color: "#666666" }}>
+              Documents & conditions générales <span>→</span>
+            </Link>
+          </div>
         </div>
       </section>
 
