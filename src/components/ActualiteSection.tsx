@@ -143,7 +143,7 @@ function ArticleCard({ a }: { a: ArticleDTO }) {
   );
 }
 
-export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
+export function ActualiteSection({ articles, isLoading }: { articles: ArticleDTO[]; isLoading?: boolean }) {
   const sorted = useMemo(() => {
     return [...articles].sort((a, b) => {
       const da = a.published_at ? new Date(a.published_at).getTime() : 0;
