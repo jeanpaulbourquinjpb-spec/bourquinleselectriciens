@@ -105,7 +105,7 @@ function formatDate(iso: string | null): string | null {
 
 function HomePage() {
   useHashScroll();
-  const { data: articlesData } = useSuspenseQuery(articlesQueryOptions);
+  const { data: articlesData, isLoading: articlesLoading } = useQuery(articlesQueryOptions);
   const { data: projectsData } = useSuspenseQuery(projectsQueryOptions);
   const { data: sponsoringData } = useSuspenseQuery(sponsoringQueryOptions);
 
