@@ -1,15 +1,20 @@
-import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useRouterState, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import logo from "@/assets/logo-bourquin.png";
 
-const sections = [
-  { hash: "accueil", label: "Accueil" },
-  { hash: "a-propos", label: "À propos" },
-  { hash: "services", label: "Services" },
-  { hash: "actualite", label: "Actualité" },
-  { hash: "nos-projets", label: "Nos Projets" },
-  { hash: "contact", label: "Contact" },
+type NavItem =
+  | { type: "hash"; hash: string; label: string }
+  | { type: "route"; to: string; label: string };
+
+const sections: readonly NavItem[] = [
+  { type: "hash", hash: "accueil", label: "Accueil" },
+  { type: "hash", hash: "a-propos", label: "À propos" },
+  { type: "hash", hash: "services", label: "Services" },
+  { type: "hash", hash: "actualite", label: "Actualité" },
+  { type: "hash", hash: "nos-projets", label: "Nos Projets" },
+  { type: "route", to: "/carrieres", label: "Carrières" },
+  { type: "hash", hash: "contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader() {
