@@ -66,6 +66,7 @@ import {
   type PartnerDTO,
 } from "@/lib/partners.functions";
 import { JobsAdmin } from "@/components/JobsAdmin";
+import { DocumentsAdmin } from "@/components/DocumentsAdmin";
 
 
 export const Route = createFileRoute("/admin/projets")({
