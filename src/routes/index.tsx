@@ -116,6 +116,10 @@ function HomePage() {
           src={heroImg}
           alt=""
           aria-hidden="true"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          sizes="100vw"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
