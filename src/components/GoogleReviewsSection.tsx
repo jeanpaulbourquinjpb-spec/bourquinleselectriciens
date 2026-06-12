@@ -39,10 +39,6 @@ export function GoogleReviewsSection() {
     fetchReviews()
       .then((d) => {
         if (cancelled) return;
-        console.log("[GoogleReviews] server response:", JSON.stringify(d));
-        if (d.raw) {
-          console.log("[GoogleReviews] raw Places API:", JSON.stringify(d.raw));
-        }
         setData(d);
         if (d.error) setError(d.error);
       })
