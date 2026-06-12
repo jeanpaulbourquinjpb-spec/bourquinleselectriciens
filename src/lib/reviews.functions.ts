@@ -79,11 +79,13 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       place_id: placeId ?? "",
     };
 
+    const GENERIC_ERROR = "Avis indisponibles pour le moment.";
+
     if (!apiKey || !placeId) {
-      return {
-        ...fallback,
-        error: `Missing env var: ${!apiKey ? "GOOGLE_PLACES_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
-      };
+      console.error(
+        `[GoogleReviews] Missing env var: ${!apiKey ? "GOOGLE_PLACES_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
+      );
+      return { ...fallback, error: GENERIC_ERROR };
     }
 
     try {
@@ -104,17 +106,15 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       try {
         json = JSON.parse(rawText) as PlacesV1Response;
       } catch {
-        return {
-          ...fallback,
-          error: `HTTP ${statusCode}: non-JSON response`,
-        };
+        console.error(`[GoogleReviews] HTTP ${statusCode}: non-JSON response`, rawText);
+        return { ...fallback, error: GENERIC_ERROR };
       }
 
       if (!res.ok) {
-        return {
-          ...fallback,
-          error: `HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
-        };
+        console.error(
+          `[GoogleReviews] HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
+        );
+        return { ...fallback, error: GENERIC_ERROR };
       }
 
       const reviews: GoogleReview[] = (json.reviews ?? [])
