@@ -208,11 +208,6 @@ function HomePage() {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <Link to="/documents" className="text-sm inline-flex items-center gap-1.5 hover:underline" style={{ color: "#666666" }}>
-              Documents & conditions générales <span>→</span>
-            </Link>
-          </div>
         </div>
       </section>
 
