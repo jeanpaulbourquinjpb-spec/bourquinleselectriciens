@@ -65,6 +65,7 @@ import {
   reorderPartners,
   type PartnerDTO,
 } from "@/lib/partners.functions";
+import { JobsAdmin } from "@/components/JobsAdmin";
 
 
 export const Route = createFileRoute("/admin/projets")({
