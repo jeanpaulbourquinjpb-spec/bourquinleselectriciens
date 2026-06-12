@@ -1,15 +1,20 @@
-import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useRouterState, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import logo from "@/assets/logo-bourquin.png";
 
-const sections = [
-  { hash: "accueil", label: "Accueil" },
-  { hash: "a-propos", label: "À propos" },
-  { hash: "services", label: "Services" },
-  { hash: "actualite", label: "Actualité" },
-  { hash: "nos-projets", label: "Nos Projets" },
-  { hash: "contact", label: "Contact" },
+type NavItem =
+  | { type: "hash"; hash: string; label: string }
+  | { type: "route"; to: string; label: string };
+
+const sections: readonly NavItem[] = [
+  { type: "hash", hash: "accueil", label: "Accueil" },
+  { type: "hash", hash: "a-propos", label: "À propos" },
+  { type: "hash", hash: "services", label: "Services" },
+  { type: "hash", hash: "actualite", label: "Actualité" },
+  { type: "hash", hash: "nos-projets", label: "Nos Projets" },
+  { type: "route", to: "/carrieres", label: "Carrières" },
+  { type: "hash", hash: "contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader() {
@@ -31,6 +36,7 @@ export function SiteHeader() {
       { rootMargin: "-30% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
     sections.forEach((s) => {
+      if (s.type !== "hash") return;
       const el = document.getElementById(s.hash);
       if (el) observer.observe(el);
     });
@@ -61,18 +67,30 @@ export function SiteHeader() {
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
-          {sections.map((s) => (
-            <a
-              key={s.hash}
-              href={`/#${s.hash}`}
-              onClick={(e) => handleClick(e, s.hash)}
-              className={`text-sm font-medium transition-colors ${
-                isHome && active === s.hash ? "text-brand" : "hover:text-brand"
-              }`}
-            >
-              {s.label}
-            </a>
-          ))}
+          {sections.map((s) =>
+            s.type === "hash" ? (
+              <a
+                key={s.hash}
+                href={`/#${s.hash}`}
+                onClick={(e) => handleClick(e, s.hash)}
+                className={`text-sm font-medium transition-colors ${
+                  isHome && active === s.hash ? "text-brand" : "hover:text-brand"
+                }`}
+              >
+                {s.label}
+              </a>
+            ) : (
+              <Link
+                key={s.to}
+                to={s.to}
+                onClick={() => setOpen(false)}
+                className="text-sm font-medium transition-colors hover:text-brand"
+                activeProps={{ className: "text-sm font-medium text-brand" }}
+              >
+                {s.label}
+              </Link>
+            ),
+          )}
           <a href="tel:0228498333" className="btn-brand">
             <Phone className="w-4 h-4" /> 022 849 83 33
           </a>
@@ -89,18 +107,30 @@ export function SiteHeader() {
       {open && (
         <div className="md:hidden border-t border-[color:var(--line)]">
           <div className="container-x py-4 flex flex-col gap-3">
-            {sections.map((s) => (
-              <a
-                key={s.hash}
-                href={`/#${s.hash}`}
-                onClick={(e) => handleClick(e, s.hash)}
-                className={`py-1 text-sm font-medium ${
-                  isHome && active === s.hash ? "text-brand" : ""
-                }`}
-              >
-                {s.label}
-              </a>
-            ))}
+            {sections.map((s) =>
+              s.type === "hash" ? (
+                <a
+                  key={s.hash}
+                  href={`/#${s.hash}`}
+                  onClick={(e) => handleClick(e, s.hash)}
+                  className={`py-1 text-sm font-medium ${
+                    isHome && active === s.hash ? "text-brand" : ""
+                  }`}
+                >
+                  {s.label}
+                </a>
+              ) : (
+                <Link
+                  key={s.to}
+                  to={s.to}
+                  onClick={() => setOpen(false)}
+                  className="py-1 text-sm font-medium"
+                  activeProps={{ className: "py-1 text-sm font-medium text-brand" }}
+                >
+                  {s.label}
+                </Link>
+              ),
+            )}
             <a href="tel:0228498333" className="btn-brand w-fit mt-2">
               <Phone className="w-4 h-4" /> 022 849 83 33
             </a>

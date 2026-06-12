@@ -17,6 +17,7 @@ import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CarrieresRouteImport } from './routes/carrieres'
 import { Route as ActualiteRouteImport } from './routes/actualite'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NosProjetsProjectIdRouteImport } from './routes/nos-projets.$projectId'
@@ -63,6 +64,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CarrieresRoute = CarrieresRouteImport.update({
+  id: '/carrieres',
+  path: '/carrieres',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ActualiteRoute = ActualiteRouteImport.update({
   id: '/actualite',
   path: '/actualite',
@@ -93,6 +99,7 @@ const ApiPublicHooksScrapeArticlesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
+  '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
+  '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/actualite': typeof ActualiteRoute
+  '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/actualite'
+    | '/carrieres'
     | '/contact'
     | '/login'
     | '/mentions-legales'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/actualite'
+    | '/carrieres'
     | '/contact'
     | '/login'
     | '/mentions-legales'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/actualite'
+    | '/carrieres'
     | '/contact'
     | '/login'
     | '/mentions-legales'
@@ -187,6 +199,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActualiteRoute: typeof ActualiteRoute
+  CarrieresRoute: typeof CarrieresRoute
   ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/carrieres': {
+      id: '/carrieres'
+      path: '/carrieres'
+      fullPath: '/carrieres'
+      preLoaderRoute: typeof CarrieresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/actualite': {
       id: '/actualite'
       path: '/actualite'
@@ -310,6 +330,7 @@ const NosProjetsRouteWithChildren = NosProjetsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActualiteRoute: ActualiteRoute,
+  CarrieresRoute: CarrieresRoute,
   ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
