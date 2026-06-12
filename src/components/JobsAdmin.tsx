@@ -145,7 +145,13 @@ export function JobsAdmin() {
         </div>
       )}
 
-      <JobFormDialog open={open} onOpenChange={setOpen} onCreated={invalidate} />
+      <JobFormDialog open={open} onOpenChange={setOpen} onSaved={invalidate} />
+      <JobFormDialog
+        open={!!editingJob}
+        onOpenChange={() => setEditingJob(null)}
+        onSaved={invalidate}
+        job={editingJob ?? undefined}
+      />
     </div>
   );
 }
