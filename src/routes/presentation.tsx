@@ -82,7 +82,7 @@ function PresentationPage() {
         <p className="eyebrow">Présentation</p>
         <h1 className="mt-3 text-4xl md:text-5xl">bourquin les électriciens à Genève</h1>
         <p className="mt-6 text-lg max-w-3xl">
-          Entreprise d'électricité générale active depuis 60 ans à Genève.
+          Entreprise d'électricité générale active depuis 1968 à Genève.
         </p>
         <p className="mt-6 max-w-3xl">
           Fondée à Genève en 1968, l'entreprise familiale incarne 3 générations de savoir-faire et de passion.
