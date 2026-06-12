@@ -123,6 +123,15 @@ export function JobsAdmin() {
                       type="button"
                       size="sm"
                       variant="ghost"
+                      onClick={() => setEditingJob(j)}
+                      className="mr-1"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
                       onClick={() => handleDelete(j.id)}
                       className="text-destructive hover:text-destructive"
                     >
