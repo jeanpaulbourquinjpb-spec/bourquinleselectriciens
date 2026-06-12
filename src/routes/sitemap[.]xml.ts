@@ -30,7 +30,6 @@ export const Route = createFileRoute("/sitemap.xml")({
         const { data: projects } = await supabaseAdmin
           .from("projects")
           .select("id, updated_at")
-          .eq("is_active", true)
           .order("created_at", { ascending: false });
 
         if (projects) {
