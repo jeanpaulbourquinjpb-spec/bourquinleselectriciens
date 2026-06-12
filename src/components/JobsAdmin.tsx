@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil } from "lucide-react";
 import {
   listJobs,
   createJob,
@@ -43,6 +43,7 @@ export function JobsAdmin() {
   const q = useQuery({ queryKey: ["jobs"], queryFn: () => list() });
   const jobs = q.data?.jobs ?? [];
   const [open, setOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<JobDTO | null>(null);
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["jobs"] });
