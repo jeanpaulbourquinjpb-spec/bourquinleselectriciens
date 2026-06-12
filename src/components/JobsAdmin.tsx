@@ -159,13 +159,16 @@ export function JobsAdmin() {
 function JobFormDialog({
   open,
   onOpenChange,
-  onCreated,
+  onSaved,
+  job,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreated: () => void;
+  onSaved: () => void;
+  job?: JobDTO;
 }) {
   const create = useServerFn(createJob);
+  const update = useServerFn(updateJob);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<JobCategory | "">("");
   const [contractType, setContractType] = useState<JobContractType | "">("");
@@ -174,14 +177,25 @@ function JobFormDialog({
   const [pdfUrl, setPdfUrl] = useState("");
   const [busy, setBusy] = useState(false);
 
-  function reset() {
-    setTitle("");
-    setCategory("");
-    setContractType("");
-    setDescription("");
-    setRequirements("");
-    setPdfUrl("");
-  }
+  const isEdit = !!job;
+
+  useEffect(() => {
+    if (job) {
+      setTitle(job.title);
+      setCategory(job.category || "");
+      setContractType(job.contract_type || "");
+      setDescription(job.description || "");
+      setRequirements(job.requirements || "");
+      setPdfUrl(job.pdf_url || "");
+    } else {
+      setTitle("");
+      setCategory("");
+      setContractType("");
+      setDescription("");
+      setRequirements("");
+      setPdfUrl("");
+    }
+  }, [job]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -191,20 +205,34 @@ function JobFormDialog({
     }
     setBusy(true);
     try {
-      await create({
-        data: {
-          title: title.trim(),
-          category: category || null,
-          contract_type: contractType || null,
-          description: description.trim() || null,
-          requirements: requirements.trim() || null,
-          pdf_url: pdfUrl.trim() || null,
-        },
-      });
-      toast.success("Offre créée");
-      reset();
+      if (isEdit && job) {
+        await update({
+          data: {
+            id: job.id,
+            title: title.trim(),
+            category: category || null,
+            contract_type: contractType || null,
+            description: description.trim() || null,
+            requirements: requirements.trim() || null,
+            pdf_url: pdfUrl.trim() || null,
+          },
+        });
+        toast.success("Offre modifiée");
+      } else {
+        await create({
+          data: {
+            title: title.trim(),
+            category: category || null,
+            contract_type: contractType || null,
+            description: description.trim() || null,
+            requirements: requirements.trim() || null,
+            pdf_url: pdfUrl.trim() || null,
+          },
+        });
+        toast.success("Offre créée");
+      }
       onOpenChange(false);
-      onCreated();
+      onSaved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -216,7 +244,7 @@ function JobFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nouvelle offre d'emploi</DialogTitle>
+          <DialogTitle>{isEdit ? "Modifier l'offre" : "Nouvelle offre d'emploi"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div>
@@ -302,7 +330,7 @@ function JobFormDialog({
               Annuler
             </Button>
             <Button type="submit" disabled={busy}>
-              {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Créer l'offre
+              {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} {isEdit ? "Enregistrer" : "Créer l'offre"}
             </Button>
           </DialogFooter>
         </form>
