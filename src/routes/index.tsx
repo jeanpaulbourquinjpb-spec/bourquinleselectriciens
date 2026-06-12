@@ -53,6 +53,9 @@ export const Route = createFileRoute("/")({
           "Entreprise d'électricité générale à Genève depuis 1968. Étude, rénovation, éclairage, télécom, sécurité, dépannage. « Entre nous le courant passe ».",
       },
     ],
+    links: [
+      { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" },
+    ],
   }),
 });
 
