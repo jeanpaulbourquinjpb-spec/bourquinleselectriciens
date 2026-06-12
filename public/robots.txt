@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.bourquinleselectriciens.ch/sitemap.xml
