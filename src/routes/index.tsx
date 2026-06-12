@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -264,6 +265,7 @@ type Filter = (typeof CATEGORIES)[number] | "all";
 
 function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const isMobile = useIsMobile();
   const filtered = useMemo(
     () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
     [filter, projects],
@@ -276,6 +278,31 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
     { label: "Tous les projets", value: "all" },
     ...availableCategories.map((c) => ({ label: c, value: c })),
   ];
+
+  // Desktop shows max 6; mobile carousel (filter=all) shows up to 6 swipeable
+  const useCarousel = isMobile && filter === "all";
+  const displayed = useCarousel ? filtered.slice(0, 6) : filtered.slice(0, 6);
+
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    if (!useCarousel) return;
+    const el = scrollerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const i = Math.round(el.scrollLeft / el.clientWidth);
+      setActiveSlide(i);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [useCarousel]);
+
+  const scrollToSlide = (i: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
 
   return (
     <>
@@ -303,13 +330,48 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
         <div className="mt-16 text-center text-[color:var(--muted-foreground)]">
           <p>Aucun projet à afficher pour le moment.</p>
         </div>
+      ) : useCarousel ? (
+        <div className="mt-10">
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {displayed.map((p) => (
+              <div key={p.id} className="snap-center shrink-0 w-full">
+                <ProjectGalleryCard p={p} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex justify-center gap-2">
+            {displayed.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Aller au projet ${i + 1}`}
+                onClick={() => scrollToSlide(i)}
+                className={cn(
+                  "h-2 w-2 rounded-full transition-colors",
+                  i === activeSlide ? "bg-[#ff6633]" : "bg-[color:var(--border)]",
+                )}
+              />
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
+          {displayed.map((p) => (
             <ProjectGalleryCard key={p.id} p={p} />
           ))}
         </div>
       )}
+
+      <div className="mt-10 flex justify-center">
+        <Link
+          to="/projets"
+          className="inline-flex items-center justify-center px-6 py-3 rounded-md border text-sm font-medium transition-colors border-[#ff6633] text-[#ff6633] bg-transparent hover:bg-[#ff6633] hover:text-white"
+        >
+          Voir tous nos projets
+        </Link>
+      </div>
     </>
   );
 }
