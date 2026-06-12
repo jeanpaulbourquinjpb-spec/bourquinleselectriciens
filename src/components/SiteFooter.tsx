@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="container-x pt-12 pb-4 flex justify-center">
         <img src={logomark} alt="" aria-hidden="true" className="h-10 w-auto opacity-80" />
       </div>
-      <div className="container-x pb-16 grid gap-12 md:grid-cols-4">
+      <div className="container-x pb-16 grid gap-12 md:grid-cols-5">
         <div className="md:col-span-2">
           <h3 className="text-2xl font-bold mb-3">bourquin les électriciens</h3>
           <img src={slogan} alt="entre nous, le courant passe…" className="h-5 w-auto" />
@@ -41,6 +41,13 @@ export function SiteFooter() {
             <li className="text-[color:var(--body)]/80">13:30 – 16:00</li>
             <li className="pt-2">Sam – Dim <span className="text-brand">Fermé</span></li>
           </ul>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-bold mb-4 uppercase tracking-wider">Documents</h4>
+          <Link to="/documents" className="text-sm hover:text-brand inline-flex items-center gap-1">
+            Documents & conditions générales <span>→</span>
+          </Link>
         </div>
       </div>
 
