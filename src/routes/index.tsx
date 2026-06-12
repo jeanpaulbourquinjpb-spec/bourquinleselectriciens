@@ -224,7 +224,7 @@ function HomePage() {
         <div className="container-x py-24">
           <p className="eyebrow">Notre actualité</p>
           <h2 className="mt-2 text-3xl md:text-5xl">À la une</h2>
-          <ActualiteSection articles={articlesData.articles} />
+          <ActualiteSection articles={articlesData?.articles ?? []} isLoading={articlesLoading} />
         </div>
       </section>
 
