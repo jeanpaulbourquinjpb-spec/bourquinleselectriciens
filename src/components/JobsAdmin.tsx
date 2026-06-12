@@ -232,7 +232,7 @@ function JobFormDialog({
             </div>
             <div>
               <Label htmlFor="job-contract">Type de contrat</Label>
-              <Select value={contractType} onValueChange={(v) => setContractType(v as JobContractType)}>
+              <Select value={contractType || undefined} onValueChange={(v) => setContractType(v as JobContractType)}>
                 <SelectTrigger id="job-contract">
                   <SelectValue placeholder="Choisir…" />
                 </SelectTrigger>
