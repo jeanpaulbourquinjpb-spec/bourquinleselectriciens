@@ -32,17 +32,20 @@ async function assertAdmin(userId: string) {
   if (!data) throw new Error("Forbidden: admin role required");
 }
 
-export const listJobs = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
-    .from("jobs")
-    .select("*")
-    .order("published_at", { ascending: false });
-  if (error) {
-    console.error("listJobs error:", error);
-    return { jobs: [] as JobDTO[] };
-  }
-  return { jobs: (data ?? []) as JobDTO[] };
-});
+export const listJobs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data, error } = await supabaseAdmin
+      .from("jobs")
+      .select("*")
+      .order("published_at", { ascending: false });
+    if (error) {
+      console.error("listJobs error:", error);
+      return { jobs: [] as JobDTO[] };
+    }
+    return { jobs: (data ?? []) as JobDTO[] };
+  });
 
 const createSchema = z.object({
   title: z.string().trim().min(1).max(300),

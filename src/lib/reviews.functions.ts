@@ -15,7 +15,6 @@ export type GoogleReviewsData = {
   reviews: GoogleReview[];
   url: string;
   place_id: string;
-  raw?: string;
   error?: string;
 };
 
@@ -85,9 +84,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
     try {
       const url = `https://places.googleapis.com/v1/places/${placeId}`;
 
-      console.log("[DEBUG] API Key first 8 chars:", apiKey?.substring(0, 8));
-      console.log("[DEBUG] URL:", url);
-
       const res = await fetch(url, {
         headers: {
           "X-Goog-Api-Key": apiKey,
@@ -98,8 +94,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
 
       const statusCode = res.status;
       const rawText = await res.text();
-      console.log("[DEBUG] Status:", statusCode);
-      console.log("[DEBUG] Raw response:", rawText);
 
       let json: PlacesV1Response = {};
       try {
@@ -107,7 +101,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       } catch {
         return {
           ...fallback,
-          raw: rawText,
           error: `HTTP ${statusCode}: non-JSON response`,
         };
       }
@@ -115,7 +108,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       if (!res.ok) {
         return {
           ...fallback,
-          raw: JSON.stringify(json),
           error: `HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
         };
       }
@@ -137,10 +129,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
           profile_photo_url: r.authorAttribution?.photoUri,
         }));
 
-      if ((json.reviews ?? []).length === 0) {
-        console.log("[GoogleReviews] empty reviews — full raw response:", JSON.stringify(json, null, 2));
-      }
-
       const result: GoogleReviewsData = {
         rating: json.rating ?? 0,
         user_ratings_total: json.userRatingCount ?? 0,
@@ -149,7 +137,6 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
           ? (json as { googleMapsUri?: string }).googleMapsUri!
           : `https://search.google.com/local/writereview?placeid=${placeId}`,
         place_id: placeId,
-        raw: JSON.stringify(json),
       };
       cache = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
       return result;

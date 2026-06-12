@@ -3,25 +3,36 @@ import { z } from "zod";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/brevo";
 
+// 8 MB binary ≈ 10.7 M base64 chars; allow a small headroom per attachment.
+const MAX_ATTACHMENT_CONTENT_CHARS = 11_000_000;
+const MAX_TOTAL_ATTACHMENT_CHARS = 11_000_000;
+
 const attachmentSchema = z.object({
   name: z.string().min(1).max(255),
-  content: z.string().min(1), // base64
+  content: z.string().min(1).max(MAX_ATTACHMENT_CONTENT_CHARS), // base64
 });
 
-const inputSchema = z.object({
-  nom: z.string().trim().min(1).max(100),
-  prenom: z.string().trim().min(1).max(100),
-  adresse: z.string().trim().min(1).max(255),
-  codePostal: z.string().trim().min(1).max(150),
-  etage: z.string().trim().min(1).max(150),
-  adresseCorrespondance: z.string().trim().max(500).optional().default(""),
-  email: z.string().trim().email().max(255),
-  telephone: z.string().trim().min(1).max(50),
-  message: z.string().trim().min(1).max(5000),
-  numeroCompteur: z.string().trim().max(100).optional().default(""),
-  gdpr: z.literal(true),
-  attachments: z.array(attachmentSchema).max(10).optional().default([]),
-});
+const inputSchema = z
+  .object({
+    nom: z.string().trim().min(1).max(100),
+    prenom: z.string().trim().min(1).max(100),
+    adresse: z.string().trim().min(1).max(255),
+    codePostal: z.string().trim().min(1).max(150),
+    etage: z.string().trim().min(1).max(150),
+    adresseCorrespondance: z.string().trim().max(500).optional().default(""),
+    email: z.string().trim().email().max(255),
+    telephone: z.string().trim().min(1).max(50),
+    message: z.string().trim().min(1).max(5000),
+    numeroCompteur: z.string().trim().max(100).optional().default(""),
+    gdpr: z.literal(true),
+    attachments: z.array(attachmentSchema).max(10).optional().default([]),
+  })
+  .refine(
+    (v) =>
+      (v.attachments ?? []).reduce((sum, a) => sum + a.content.length, 0) <=
+      MAX_TOTAL_ATTACHMENT_CHARS,
+    { message: "Attachments exceed maximum total size", path: ["attachments"] },
+  );
 
 export const submitContactForm = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => inputSchema.parse(input))
