@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
@@ -38,8 +38,8 @@ const sponsoringQueryOptions = queryOptions({
 export const Route = createFileRoute("/")({
   component: HomePage,
   loader: async ({ context }) => {
+    context.queryClient.prefetchQuery(articlesQueryOptions);
     await Promise.all([
-      context.queryClient.ensureQueryData(articlesQueryOptions),
       context.queryClient.ensureQueryData(projectsQueryOptions),
       context.queryClient.ensureQueryData(sponsoringQueryOptions),
     ]);
@@ -105,7 +105,7 @@ function formatDate(iso: string | null): string | null {
 
 function HomePage() {
   useHashScroll();
-  const { data: articlesData } = useSuspenseQuery(articlesQueryOptions);
+  const { data: articlesData, isLoading: articlesLoading } = useQuery(articlesQueryOptions);
   const { data: projectsData } = useSuspenseQuery(projectsQueryOptions);
   const { data: sponsoringData } = useSuspenseQuery(sponsoringQueryOptions);
 
@@ -224,7 +224,7 @@ function HomePage() {
         <div className="container-x py-24">
           <p className="eyebrow">Notre actualité</p>
           <h2 className="mt-2 text-3xl md:text-5xl">À la une</h2>
-          <ActualiteSection articles={articlesData.articles} />
+          <ActualiteSection articles={articlesData?.articles ?? []} isLoading={articlesLoading} />
         </div>
       </section>
 

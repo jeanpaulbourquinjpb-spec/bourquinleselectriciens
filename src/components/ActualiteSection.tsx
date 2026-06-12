@@ -143,7 +143,7 @@ function ArticleCard({ a }: { a: ArticleDTO }) {
   );
 }
 
-export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
+export function ActualiteSection({ articles, isLoading }: { articles: ArticleDTO[]; isLoading?: boolean }) {
   const sorted = useMemo(() => {
     return [...articles].sort((a, b) => {
       const da = a.published_at ? new Date(a.published_at).getTime() : 0;
@@ -179,6 +179,15 @@ export function ActualiteSection({ articles }: { articles: ArticleDTO[] }) {
       api.off("reInit", onScroll);
     };
   }, [api]);
+
+  if (isLoading) {
+    return (
+      <div className="mt-12 flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        Chargement de l'actualité…
+      </div>
+    );
+  }
 
   if (!featured) {
     return (
