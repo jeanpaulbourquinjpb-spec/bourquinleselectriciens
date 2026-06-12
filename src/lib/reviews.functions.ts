@@ -146,10 +146,8 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       cache = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
       return result;
     } catch (err) {
-      return {
-        ...fallback,
-        error: err instanceof Error ? err.message : "Unknown error",
-      };
+      console.error("[GoogleReviews] fetch failed:", err);
+      return { ...fallback, error: GENERIC_ERROR };
     }
   },
 );
