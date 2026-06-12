@@ -45,10 +45,15 @@ let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { dat
 
 export const getGoogleMapsEmbedUrl = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ url: string; error?: string }> => {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY ?? process.env.GOOGLE_PLACES_API_KEY;
+    // Use a dedicated Maps Embed key only — never fall back to the Places API key,
+    // which would expose a server-only key to the browser via the iframe URL.
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = "ChIJfS2J5zZljEcREXY9RXGNl_I";
     if (!apiKey) {
-      return { url: "", error: "Missing GOOGLE_MAPS_API_KEY" };
+      // Fallback to keyless embed so the iframe still renders without leaking a key.
+      return {
+        url: `https://www.google.com/maps?q=place_id:${placeId}&output=embed`,
+      };
     }
     return {
       url: `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=place_id:${placeId}&language=fr`,
@@ -74,11 +79,13 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       place_id: placeId ?? "",
     };
 
+    const GENERIC_ERROR = "Avis indisponibles pour le moment.";
+
     if (!apiKey || !placeId) {
-      return {
-        ...fallback,
-        error: `Missing env var: ${!apiKey ? "GOOGLE_PLACES_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
-      };
+      console.error(
+        `[GoogleReviews] Missing env var: ${!apiKey ? "GOOGLE_PLACES_API_KEY " : ""}${!placeId ? "GOOGLE_PLACE_ID" : ""}`.trim(),
+      );
+      return { ...fallback, error: GENERIC_ERROR };
     }
 
     try {
@@ -99,17 +106,15 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       try {
         json = JSON.parse(rawText) as PlacesV1Response;
       } catch {
-        return {
-          ...fallback,
-          error: `HTTP ${statusCode}: non-JSON response`,
-        };
+        console.error(`[GoogleReviews] HTTP ${statusCode}: non-JSON response`, rawText);
+        return { ...fallback, error: GENERIC_ERROR };
       }
 
       if (!res.ok) {
-        return {
-          ...fallback,
-          error: `HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
-        };
+        console.error(
+          `[GoogleReviews] HTTP ${res.status}: ${json?.error?.message ?? res.statusText}`,
+        );
+        return { ...fallback, error: GENERIC_ERROR };
       }
 
       const reviews: GoogleReview[] = (json.reviews ?? [])
@@ -141,10 +146,8 @@ export const getGoogleReviews = createServerFn({ method: "GET" }).handler(
       cache = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
       return result;
     } catch (err) {
-      return {
-        ...fallback,
-        error: err instanceof Error ? err.message : "Unknown error",
-      };
+      console.error("[GoogleReviews] fetch failed:", err);
+      return { ...fallback, error: GENERIC_ERROR };
     }
   },
 );
