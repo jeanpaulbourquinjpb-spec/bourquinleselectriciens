@@ -67,18 +67,30 @@ export function SiteHeader() {
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
-          {sections.map((s) => (
-            <a
-              key={s.hash}
-              href={`/#${s.hash}`}
-              onClick={(e) => handleClick(e, s.hash)}
-              className={`text-sm font-medium transition-colors ${
-                isHome && active === s.hash ? "text-brand" : "hover:text-brand"
-              }`}
-            >
-              {s.label}
-            </a>
-          ))}
+          {sections.map((s) =>
+            s.type === "hash" ? (
+              <a
+                key={s.hash}
+                href={`/#${s.hash}`}
+                onClick={(e) => handleClick(e, s.hash)}
+                className={`text-sm font-medium transition-colors ${
+                  isHome && active === s.hash ? "text-brand" : "hover:text-brand"
+                }`}
+              >
+                {s.label}
+              </a>
+            ) : (
+              <Link
+                key={s.to}
+                to={s.to}
+                onClick={() => setOpen(false)}
+                className="text-sm font-medium transition-colors hover:text-brand"
+                activeProps={{ className: "text-sm font-medium text-brand" }}
+              >
+                {s.label}
+              </Link>
+            ),
+          )}
           <a href="tel:0228498333" className="btn-brand">
             <Phone className="w-4 h-4" /> 022 849 83 33
           </a>
