@@ -45,8 +45,8 @@ export function SiteFooter() {
 
         <div>
           <h4 className="text-sm font-bold mb-4 uppercase tracking-wider">Documents</h4>
-          <Link to="/documents" className="text-sm hover:text-brand inline-flex items-center gap-1">
-            Documents & conditions générales <span>→</span>
+          <Link to="/documents" className="text-sm hover:text-brand">
+            Documents & conditions générales
           </Link>
         </div>
       </div>
