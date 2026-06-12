@@ -45,10 +45,15 @@ let cache: { data: GoogleReviewsData; expiresAt: number } | null = null as { dat
 
 export const getGoogleMapsEmbedUrl = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ url: string; error?: string }> => {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY ?? process.env.GOOGLE_PLACES_API_KEY;
+    // Use a dedicated Maps Embed key only — never fall back to the Places API key,
+    // which would expose a server-only key to the browser via the iframe URL.
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const placeId = "ChIJfS2J5zZljEcREXY9RXGNl_I";
     if (!apiKey) {
-      return { url: "", error: "Missing GOOGLE_MAPS_API_KEY" };
+      // Fallback to keyless embed so the iframe still renders without leaking a key.
+      return {
+        url: `https://www.google.com/maps?q=place_id:${placeId}&output=embed`,
+      };
     }
     return {
       url: `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=place_id:${placeId}&language=fr`,
