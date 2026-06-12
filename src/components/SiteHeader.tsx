@@ -107,18 +107,30 @@ export function SiteHeader() {
       {open && (
         <div className="md:hidden border-t border-[color:var(--line)]">
           <div className="container-x py-4 flex flex-col gap-3">
-            {sections.map((s) => (
-              <a
-                key={s.hash}
-                href={`/#${s.hash}`}
-                onClick={(e) => handleClick(e, s.hash)}
-                className={`py-1 text-sm font-medium ${
-                  isHome && active === s.hash ? "text-brand" : ""
-                }`}
-              >
-                {s.label}
-              </a>
-            ))}
+            {sections.map((s) =>
+              s.type === "hash" ? (
+                <a
+                  key={s.hash}
+                  href={`/#${s.hash}`}
+                  onClick={(e) => handleClick(e, s.hash)}
+                  className={`py-1 text-sm font-medium ${
+                    isHome && active === s.hash ? "text-brand" : ""
+                  }`}
+                >
+                  {s.label}
+                </a>
+              ) : (
+                <Link
+                  key={s.to}
+                  to={s.to}
+                  onClick={() => setOpen(false)}
+                  className="py-1 text-sm font-medium"
+                  activeProps={{ className: "py-1 text-sm font-medium text-brand" }}
+                >
+                  {s.label}
+                </Link>
+              ),
+            )}
             <a href="tel:0228498333" className="btn-brand w-fit mt-2">
               <Phone className="w-4 h-4" /> 022 849 83 33
             </a>
