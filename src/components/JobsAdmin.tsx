@@ -217,7 +217,7 @@ function JobFormDialog({
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="job-category">Catégorie</Label>
-              <Select value={category} onValueChange={(v) => setCategory(v as JobCategory)}>
+              <Select value={category || undefined} onValueChange={(v) => setCategory(v as JobCategory)}>
                 <SelectTrigger id="job-category">
                   <SelectValue placeholder="Choisir…" />
                 </SelectTrigger>
