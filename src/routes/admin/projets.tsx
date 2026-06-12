@@ -66,6 +66,7 @@ import {
   type PartnerDTO,
 } from "@/lib/partners.functions";
 import { JobsAdmin } from "@/components/JobsAdmin";
+import { DocumentsAdmin } from "@/components/DocumentsAdmin";
 
 
 export const Route = createFileRoute("/admin/projets")({
@@ -213,7 +214,9 @@ function AdminTabs({
   onDeleteProject: (id: string) => void;
   onProjectsChanged: () => void;
 }) {
-  const [tab, setTab] = useState<"projets" | "sponsoring" | "partenaires" | "carrieres">("projets");
+  const [tab, setTab] = useState<
+    "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
+  >("projets");
 
   return (
     <div className="mt-8">
@@ -223,6 +226,7 @@ function AdminTabs({
           ["sponsoring", "Sponsoring"],
           ["partenaires", "Associations & Partenariats"],
           ["carrieres", "Carrières"],
+          ["documents", "Documents"],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -261,8 +265,10 @@ function AdminTabs({
         <SponsoringAdmin />
       ) : tab === "partenaires" ? (
         <PartnersAdmin />
-      ) : (
+      ) : tab === "carrieres" ? (
         <JobsAdmin />
+      ) : (
+        <DocumentsAdmin />
       )}
     </div>
   );
