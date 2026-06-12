@@ -53,6 +53,45 @@ export type Database = {
         }
         Relationships: []
       }
+      jobs: {
+        Row: {
+          category: string | null
+          contract_type: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          pdf_url: string | null
+          published_at: string
+          requirements: string | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          contract_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          pdf_url?: string | null
+          published_at?: string
+          requirements?: string | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          contract_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          pdf_url?: string | null
+          published_at?: string
+          requirements?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           created_at: string
