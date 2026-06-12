@@ -17,6 +17,7 @@ import { Route as PresentationRouteImport } from './routes/presentation'
 import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CarrieresRouteImport } from './routes/carrieres'
 import { Route as ActualiteRouteImport } from './routes/actualite'
@@ -65,6 +66,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentsRoute = DocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/documents'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/documents'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/documents'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   ActualiteRoute: typeof ActualiteRoute
   CarrieresRoute: typeof CarrieresRoute
   ContactRoute: typeof ContactRoute
+  DocumentsRoute: typeof DocumentsRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   NosProjetsRoute: typeof NosProjetsRouteWithChildren
@@ -281,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documents': {
+      id: '/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof DocumentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -352,6 +372,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActualiteRoute: ActualiteRoute,
   CarrieresRoute: CarrieresRoute,
   ContactRoute: ContactRoute,
+  DocumentsRoute: DocumentsRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   NosProjetsRoute: NosProjetsRouteWithChildren,
@@ -366,3 +387,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
