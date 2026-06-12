@@ -117,7 +117,7 @@ function HomePage() {
           alt=""
           aria-hidden="true"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
           decoding="async"
           sizes="100vw"
           className="absolute inset-0 w-full h-full object-cover"
