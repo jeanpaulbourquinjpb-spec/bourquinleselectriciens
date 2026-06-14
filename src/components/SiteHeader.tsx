@@ -13,7 +13,6 @@ const sections: readonly NavItem[] = [
   { type: "hash", hash: "services", label: "Services" },
   { type: "hash", hash: "actualite", label: "Actualité" },
   { type: "hash", hash: "nos-projets", label: "Nos Projets" },
-  { type: "route", to: "/projets", label: "Nos Projets" },
   { type: "route", to: "/carrieres", label: "Carrières" },
   { type: "hash", hash: "contact", label: "Contact" },
 ] as const;
