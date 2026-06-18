@@ -19,6 +19,7 @@ import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DocumentsRouteImport } from './routes/documents'
+import { Route as DepannageRouteImport } from './routes/depannage'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CarrieresRouteImport } from './routes/carrieres'
 import { Route as ActualiteRouteImport } from './routes/actualite'
@@ -77,6 +78,11 @@ const DocumentsRoute = DocumentsRouteImport.update({
   path: '/documents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DepannageRoute = DepannageRouteImport.update({
+  id: '/depannage',
+  path: '/depannage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/actualite': typeof ActualiteRoute
   '/carrieres': typeof CarrieresRoute
   '/contact': typeof ContactRoute
+  '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/depannage'
     | '/documents'
     | '/login'
     | '/mentions-legales'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/depannage'
     | '/documents'
     | '/login'
     | '/mentions-legales'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/actualite'
     | '/carrieres'
     | '/contact'
+    | '/depannage'
     | '/documents'
     | '/login'
     | '/mentions-legales'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   ActualiteRoute: typeof ActualiteRoute
   CarrieresRoute: typeof CarrieresRoute
   ContactRoute: typeof ContactRoute
+  DepannageRoute: typeof DepannageRoute
   DocumentsRoute: typeof DocumentsRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocumentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/depannage': {
+      id: '/depannage'
+      path: '/depannage'
+      fullPath: '/depannage'
+      preLoaderRoute: typeof DepannageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActualiteRoute: ActualiteRoute,
   CarrieresRoute: CarrieresRoute,
   ContactRoute: ContactRoute,
+  DepannageRoute: DepannageRoute,
   DocumentsRoute: DocumentsRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
