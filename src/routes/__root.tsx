@@ -85,6 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "https://www.bourquinelectricite.ch/assets/logo-bourquin-BneznNWU.png" },
       { name: "twitter:image", content: "https://www.bourquinelectricite.ch/assets/logo-bourquin-BneznNWU.png" },
       { name: "google-site-verification", content: "D_ZzLhq7ZBslpXXH45ayc6GKL0BQ8qzM8iWt25007RY" },
+      { name: "google-site-verification", content: "xUxILKEwWdNQYJaKuJeaAWzaJCtBWNcVQByUHngWKgM" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
