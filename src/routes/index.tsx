@@ -209,6 +209,7 @@ function HomePage() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((s) => {
               const isDepannage = s.title === "Maintenance & dépannage";
+              const isRenovation = s.title === "Rénovation";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
@@ -216,11 +217,21 @@ function HomePage() {
                   <p className="mt-2 text-sm">{s.text}</p>
                 </>
               );
-              return isDepannage ? (
-                <Link key={s.title} to="/depannage" className="card-soft block no-underline">
-                  {content}
-                </Link>
-              ) : (
+              if (isDepannage) {
+                return (
+                  <Link key={s.title} to="/depannage" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isRenovation) {
+                return (
+                  <Link key={s.title} to="/renovation" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
+              return (
                 <article key={s.title} className="card-soft">
                   {content}
                 </article>
