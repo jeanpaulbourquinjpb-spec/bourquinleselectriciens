@@ -11,6 +11,7 @@ const sections: readonly NavItem[] = [
   { type: "hash", hash: "accueil", label: "Accueil" },
   { type: "hash", hash: "a-propos", label: "À propos" },
   { type: "hash", hash: "services", label: "Services" },
+  { type: "route", to: "/depannage", label: "Dépannage" },
   { type: "hash", hash: "actualite", label: "Actualité" },
   { type: "hash", hash: "nos-projets", label: "Nos Projets" },
   { type: "route", to: "/carrieres", label: "Carrières" },
