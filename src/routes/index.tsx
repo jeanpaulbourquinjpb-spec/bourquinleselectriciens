@@ -207,13 +207,25 @@ function HomePage() {
             et de formateurs, nous prenons en charge tous les aspects de vos installations électriques.
           </p>
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((s) => (
-              <article key={s.title} className="card-soft">
-                <s.icon className="w-7 h-7 text-brand" />
-                <h3 className="mt-5 text-xl">{s.title}</h3>
-                <p className="mt-2 text-sm">{s.text}</p>
-              </article>
-            ))}
+            {services.map((s) => {
+              const isDepannage = s.title === "Maintenance & dépannage";
+              const content = (
+                <>
+                  <s.icon className="w-7 h-7 text-brand" />
+                  <h3 className="mt-5 text-xl">{s.title}</h3>
+                  <p className="mt-2 text-sm">{s.text}</p>
+                </>
+              );
+              return isDepannage ? (
+                <Link key={s.title} to="/depannage" className="card-soft block no-underline">
+                  {content}
+                </Link>
+              ) : (
+                <article key={s.title} className="card-soft">
+                  {content}
+                </article>
+              );
+            })}
           </div>
 
         </div>
