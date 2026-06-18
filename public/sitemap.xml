@@ -16,11 +16,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://www.bourquinelectricite.ch/projets</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://www.bourquinelectricite.ch/mentions-legales</loc>
     <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://www.bourquinelectricite.ch/privacy</loc>
     <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
   </url>
 </urlset>
