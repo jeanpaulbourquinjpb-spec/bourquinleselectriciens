@@ -82,8 +82,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "bourquin les électriciens — Genève" },
       { name: "twitter:description", content: "Entreprise d'électricité générale à Genève depuis 1968. Électricité, télécom, sécurité, dépannage." },
-      { property: "og:image", content: "https://www.bourquinleselectriciens.ch/assets/logo-bourquin-BneznNWU.png" },
-      { name: "twitter:image", content: "https://www.bourquinleselectriciens.ch/assets/logo-bourquin-BneznNWU.png" },
+      { property: "og:image", content: "https://www.bourquinelectricite.ch/assets/logo-bourquin-BneznNWU.png" },
+      { name: "twitter:image", content: "https://www.bourquinelectricite.ch/assets/logo-bourquin-BneznNWU.png" },
       { name: "google-site-verification", content: "D_ZzLhq7ZBslpXXH45ayc6GKL0BQ8qzM8iWt25007RY" },
     ],
     links: [
