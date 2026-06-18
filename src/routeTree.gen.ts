@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RenovationRouteImport } from './routes/renovation'
 import { Route as ProjetsRouteImport } from './routes/projets'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PresentationRouteImport } from './routes/presentation'
@@ -41,6 +42,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RenovationRoute = RenovationRouteImport.update({
+  id: '/renovation',
+  path: '/renovation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjetsRoute = ProjetsRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
+  '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
+  '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
+  '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/projets'
+    | '/renovation'
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/projets'
+    | '/renovation'
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/presentation'
     | '/privacy'
     | '/projets'
+    | '/renovation'
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   PresentationRoute: typeof PresentationRoute
   PrivacyRoute: typeof PrivacyRoute
   ProjetsRoute: typeof ProjetsRoute
+  RenovationRoute: typeof RenovationRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/renovation': {
+      id: '/renovation'
+      path: '/renovation'
+      fullPath: '/renovation'
+      preLoaderRoute: typeof RenovationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projets': {
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   PresentationRoute: PresentationRoute,
   PrivacyRoute: PrivacyRoute,
   ProjetsRoute: ProjetsRoute,
+  RenovationRoute: RenovationRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
