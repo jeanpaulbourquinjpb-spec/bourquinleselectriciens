@@ -43,13 +43,13 @@ export const Route = createFileRoute("/carrieres")({
   component: CarrieresPage,
   head: () => ({
     meta: [
-      { title: "Carrières — Bourquin les électriciens" },
+      { title: "Carrières — bourquin les électriciens" },
       {
         name: "description",
         content:
-          "Rejoignez Bourquin les électriciens à Genève. Offres d'emploi, apprentissage CFC électricien et candidatures spontanées.",
+          "Rejoignez bourquin les électriciens à Genève. Offres d'emploi, apprentissage CFC électricien et candidatures spontanées.",
       },
-      { property: "og:title", content: "Carrières — Bourquin les électriciens" },
+      { property: "og:title", content: "Carrières — bourquin les électriciens" },
       {
         property: "og:description",
         content:
@@ -110,7 +110,7 @@ function CarrieresPage() {
             Rejoignez l'équipe
           </h1>
           <p className="mt-8 text-lg leading-relaxed text-[#54544b]">
-            Depuis 1968, Bourquin les électriciens forme et fait grandir ses
+            Depuis 1968, bourquin les électriciens forme et fait grandir ses
             collaborateurs. Reconnue en 2008 parmi les meilleures entreprises
             formatrices du secteur Construction à Genève, l'entreprise accompagne
             chaque année des apprentis dans la filière CFC électricien de montage,

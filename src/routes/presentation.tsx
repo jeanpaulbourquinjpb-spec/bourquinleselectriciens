@@ -174,7 +174,7 @@ function PresentationPage() {
             <a className="link-brand" href="https://www.instagram.com/bourquinleselectriciens/" target="_blank" rel="noreferrer">Instagram</a>{" "}
             et{" "}
             <a className="link-brand" href="https://www.linkedin.com/company/3612995/admin/" target="_blank" rel="noreferrer">LinkedIn</a>
-            , Bourquin les électriciens.
+            , bourquin les électriciens.
           </p>
         </div>
       </section>
