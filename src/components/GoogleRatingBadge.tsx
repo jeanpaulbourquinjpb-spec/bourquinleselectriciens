@@ -27,7 +27,7 @@ export function GoogleRatingBadge() {
     <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
       <Star className="w-4 h-4" style={{ color: "#ff6633", fill: "#ff6633" }} />
       <span>{rating.toFixed(1)}</span>
-      <span className="text-white/80">· {total} avis Google</span>
+      <span className="text-white/80"> · {total} avis Google</span>
     </span>
   );
 }

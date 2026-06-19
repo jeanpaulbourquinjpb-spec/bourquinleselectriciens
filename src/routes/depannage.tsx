@@ -33,6 +33,12 @@ export const Route = createFileRoute("/depannage")({
         content:
           "Intervention rapide sur tout le canton de Genève. Diagnostic et remise en service par nos électriciens qualifiés.",
       },
+      { name: "twitter:title", content: "Dépannage électrique à Genève — Intervention rapide" },
+      {
+        name: "twitter:description",
+        content:
+          "Intervention rapide sur tout le canton de Genève. Diagnostic et remise en service par nos électriciens qualifiés.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/depannage" }],
   }),
