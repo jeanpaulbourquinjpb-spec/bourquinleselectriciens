@@ -239,7 +239,7 @@ function AdminTabs({
     <div className="mt-8">
       <div className="border-b border-[color:var(--border)] flex gap-2 flex-wrap">
         {([
-          ["projets", "Nos Projets"],
+          ["projets", "Nos projets"],
           ["sponsoring", "Sponsoring"],
           ["partenaires", "Associations & Partenariats"],
           ["carrieres", "Carrières"],
