@@ -951,12 +951,12 @@ function UploadCard({
 
       <div>
         <Label htmlFor="cat">Catégorie</Label>
-        <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
+        <Select value={category} onValueChange={(v) => setCategory(v)}>
           <SelectTrigger id="cat">
-            <SelectValue />
+            <SelectValue placeholder="Sélectionner…" />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIES.map((c) => (
+            {categoryOptions.map((c) => (
               <SelectItem key={c} value={c}>
                 {c}
               </SelectItem>
