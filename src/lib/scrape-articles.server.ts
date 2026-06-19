@@ -107,11 +107,19 @@ function isArticleUrl(url: string): boolean {
     if (!u.pathname.startsWith("/fr/")) return false;
     // Article URLs have 3+ segments under /fr/, e.g. /fr/<category>/<slug>
     const parts = u.pathname.split("/").filter(Boolean);
-    return parts.length >= 3;
+    if (parts.length < 3) return false;
+    // Blocklist: articles that no longer exist on e-tec.swiss
+    if (EXCLUDED_PATHS.has(u.pathname.replace(/\/$/, ""))) return false;
+    return true;
   } catch {
     return false;
   }
 }
+
+// Pathnames (no trailing slash, no query) of articles to exclude permanently.
+const EXCLUDED_PATHS = new Set<string>([
+  "/fr/energies-alternatives/systemes-stockage-tournant-energetique",
+]);
 
 export type ScrapeResult = {
   discovered: number;
