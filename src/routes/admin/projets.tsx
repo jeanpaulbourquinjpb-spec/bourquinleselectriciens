@@ -42,6 +42,9 @@ import {
   reorderProjectPhotos,
   isCurrentUserAdmin,
   listProjectCategories,
+  createProjectCategory,
+  updateProjectCategory,
+  deleteProjectCategory,
   type ProjectDTO,
   type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
