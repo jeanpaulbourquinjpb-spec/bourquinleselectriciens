@@ -26,6 +26,7 @@ export const Route = createFileRoute("/efficience-energetique")({
           "Partenaire certifié éco21. Audit éclairage, remplacement LED et prime jusqu'à 50% du montant investi.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/efficience-energetique" }],
   }),
 });
 
