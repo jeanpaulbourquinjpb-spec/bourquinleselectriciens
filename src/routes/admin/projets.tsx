@@ -1099,10 +1099,8 @@ function SponsoringAdmin() {
 
   return (
     <div className="mt-8 grid lg:grid-cols-[1fr_2fr] gap-10">
-      <SponsoringUploadCard
-        knownCategories={knownCategories}
-        onCreated={invalidate}
-      />
+      <SponsoringUploadCard onCreated={invalidate} />
+
       <div>
         <h2 className="text-xl mb-4">Entrées sponsoring ({entries.length})</h2>
         <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
