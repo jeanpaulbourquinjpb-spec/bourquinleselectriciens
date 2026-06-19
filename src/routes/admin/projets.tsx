@@ -1288,12 +1288,10 @@ function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
 
 function AdminSponsoringCard({
   entry,
-  knownCategories,
   onDelete,
   onChanged,
 }: {
   entry: SponsoringEntryDTO;
-  knownCategories: string[];
   onDelete: () => void;
   onChanged: () => void;
 }) {
@@ -1307,8 +1305,6 @@ function AdminSponsoringCard({
   const [title, setTitle] = useState(entry.title);
   const [description, setDescription] = useState(entry.description ?? "");
   const [category, setCategory] = useState(entry.category);
-  const [addingCustom, setAddingCustom] = useState(false);
-  const [customCat, setCustomCat] = useState("");
   const [busy, setBusy] = useState(false);
   const [photoOrder, setPhotoOrder] = useState<string[]>(entry.photos.map((p) => p.id));
   const [dragPhoto, setDragPhoto] = useState<string | null>(null);
@@ -1328,7 +1324,7 @@ function AdminSponsoringCard({
     .filter(Boolean) as SponsoringPhotoDTO[];
 
   async function saveEdit() {
-    const finalCategory = addingCustom ? customCat.trim() : category;
+    const finalCategory = category;
     if (!title.trim()) {
       toast.error("Titre requis");
       return;
@@ -1348,13 +1344,12 @@ function AdminSponsoringCard({
       });
       toast.success("Entrée mise à jour");
       setEditing(false);
-      setAddingCustom(false);
-      setCustomCat("");
       onChanged();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     }
   }
+
 
   async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
