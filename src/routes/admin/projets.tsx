@@ -554,6 +554,11 @@ function AdminProjectCard({
         <div className="flex-1 min-w-0">
           <p className="text-xs text-[color:var(--muted-foreground)]">{p.category ?? "—"}</p>
           <p className="text-sm font-medium truncate">{p.title}</p>
+          {isEditing && (
+            <p className="text-[10px] uppercase tracking-wider text-primary mt-1 font-semibold">
+              En cours d'édition
+            </p>
+          )}
           <div className="flex items-center gap-3 mt-2">
             {p.instagram_url && (
               <a
@@ -566,6 +571,12 @@ function AdminProjectCard({
               </a>
             )}
             <button
+              onClick={onEdit}
+              className="text-xs inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              <Pencil className="w-3 h-3" /> Éditer
+            </button>
+            <button
               onClick={onDelete}
               className="text-xs inline-flex items-center gap-1 text-destructive hover:underline"
             >
@@ -573,6 +584,7 @@ function AdminProjectCard({
             </button>
           </div>
         </div>
+
       </div>
 
       <div>
