@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ImageIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   Carousel,
   CarouselContent,
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import type { ArticleDTO } from "@/lib/articles.functions";
 
-type FilterKey =
+export type FilterKey =
   | "all"
   | "eclairage"
   | "securite"
@@ -19,7 +20,7 @@ type FilterKey =
   | "installation"
   | "formation";
 
-const FILTERS: { key: FilterKey; label: string; match: (cat: string) => boolean }[] = [
+export const FILTERS: { key: FilterKey; label: string; match: (cat: string) => boolean }[] = [
   { key: "all", label: "Tous", match: () => true },
   { key: "eclairage", label: "Éclairage", match: (c) => /(éclair|eclair)/i.test(c) },
   { key: "securite", label: "Sécurité", match: (c) => /(sécur|secur)/i.test(c) },
@@ -115,7 +116,7 @@ function FeaturedArticle({ a }: { a: ArticleDTO }) {
   );
 }
 
-function ArticleCard({ a }: { a: ArticleDTO }) {
+export function ArticleCard({ a }: { a: ArticleDTO }) {
   const date = formatDate(a.published_at);
   return (
     <a
@@ -143,7 +144,53 @@ function ArticleCard({ a }: { a: ArticleDTO }) {
   );
 }
 
-export function ActualiteSection({ articles, isLoading }: { articles: ArticleDTO[]; isLoading?: boolean }) {
+export function CategoryFilters({
+  filter,
+  onChange,
+}: {
+  filter: FilterKey;
+  onChange: (k: FilterKey) => void;
+}) {
+  return (
+    <div className="relative -mx-4 md:mx-0">
+      <div
+        className="flex gap-2 overflow-x-auto md:flex-wrap px-4 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="tablist"
+        aria-label="Filtrer par catégorie"
+      >
+        {FILTERS.map((f) => {
+          const active = f.key === filter;
+          return (
+            <button
+              key={f.key}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => onChange(f.key)}
+              className={
+                "shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors " +
+                (active
+                  ? "border-transparent bg-[color:var(--foreground)] text-[color:var(--background)]"
+                  : "border-[color:var(--border)] bg-transparent text-[color:var(--foreground)] hover:bg-[color:var(--surface-muted)]")
+              }
+            >
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[color:var(--surface-muted)] to-transparent md:hidden" />
+    </div>
+  );
+}
+
+export function ActualiteSection({
+  articles,
+  isLoading,
+}: {
+  articles: ArticleDTO[];
+  isLoading?: boolean;
+}) {
   const sorted = useMemo(() => {
     return [...articles].sort((a, b) => {
       const da = a.published_at ? new Date(a.published_at).getTime() : 0;
@@ -153,32 +200,7 @@ export function ActualiteSection({ articles, isLoading }: { articles: ArticleDTO
   }, [articles]);
 
   const featured = sorted[0];
-  const rest = useMemo(() => sorted.slice(1), [sorted]);
-
-  const [filter, setFilter] = useState<FilterKey>("all");
-  const matcher = FILTERS.find((f) => f.key === filter)?.match ?? (() => true);
-
-  const [api, setApi] = useState<CarouselApi>();
-  const [progress, setProgress] = useState(0);
-
-  // Re-init embla whenever filter (visible slides) changes so sizing recalculates
-  useEffect(() => {
-    if (!api) return;
-    api.reInit();
-    setProgress(api.scrollProgress());
-  }, [api, filter]);
-
-  useEffect(() => {
-    if (!api) return;
-    const onScroll = () => setProgress(Math.max(0, Math.min(1, api.scrollProgress())));
-    onScroll();
-    api.on("scroll", onScroll);
-    api.on("reInit", onScroll);
-    return () => {
-      api.off("scroll", onScroll);
-      api.off("reInit", onScroll);
-    };
-  }, [api]);
+  const rest = useMemo(() => sorted.slice(1, 4), [sorted]);
 
   if (isLoading) {
     return (
@@ -202,77 +224,85 @@ export function ActualiteSection({ articles, isLoading }: { articles: ArticleDTO
       <FeaturedArticle a={featured} />
 
       {rest.length > 0 && (
-        <>
-          {/* Filtres */}
-          <div
-            className="mt-12 flex gap-2 overflow-x-auto md:flex-wrap -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            role="tablist"
-            aria-label="Filtrer par catégorie"
-          >
-            {FILTERS.map((f) => {
-              const active = f.key === filter;
-              return (
-                <button
-                  key={f.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setFilter(f.key)}
-                  className={
-                    "shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors " +
-                    (active
-                      ? "border-transparent bg-[color:var(--foreground)] text-[color:var(--background)]"
-                      : "border-[color:var(--border)] bg-transparent text-[color:var(--foreground)] hover:bg-[color:var(--surface-muted)]")
-                  }
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((a) => (
+            <ArticleCard key={a.id} a={a} />
+          ))}
+        </div>
+      )}
 
-          {/* Carousel */}
-          <div className="mt-8 px-0 md:px-14">
-            <Carousel
-              setApi={setApi}
-              opts={{ align: "start", containScroll: "trimSnaps" }}
-              className="w-full"
-            >
-              <CarouselContent>
-                {rest.map((a) => {
-                  const visible = matcher(a.category ?? "");
-                  return (
-                    <CarouselItem
-                      key={a.id}
-                      className="basis-full sm:basis-1/2 lg:basis-1/3"
-                      style={visible ? undefined : { display: "none" }}
-                      aria-hidden={visible ? undefined : true}
-                    >
-                      <ArticleCard a={a} />
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
+      <div className="mt-10 flex justify-center">
+        <Link
+          to="/actualites"
+          className="inline-flex items-center gap-2 rounded-full border border-[color:var(--foreground)] bg-[color:var(--foreground)] px-6 py-3 text-sm font-semibold text-[color:var(--background)] transition-opacity hover:opacity-90"
+        >
+          Voir toutes les actualités <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+    </>
+  );
+}
 
-            {/* Barre de progression */}
-            <div
-              className="mt-6 h-1 w-full overflow-hidden rounded-full bg-[color:var(--border)]"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(progress * 100)}
-            >
-              <div
-                className="h-full bg-[color:var(--foreground)] transition-[width] duration-200"
-                style={{ width: `${Math.max(8, progress * 100)}%` }}
-              />
-            </div>
-          </div>
-        </>
+export function ActualiteGrid({
+  articles,
+  isLoading,
+}: {
+  articles: ArticleDTO[];
+  isLoading?: boolean;
+}) {
+  const sorted = useMemo(() => {
+    return [...articles].sort((a, b) => {
+      const da = a.published_at ? new Date(a.published_at).getTime() : 0;
+      const db = b.published_at ? new Date(b.published_at).getTime() : 0;
+      return db - da;
+    });
+  }, [articles]);
+
+  const [filter, setFilter] = useState<FilterKey>("all");
+  const matcher = FILTERS.find((f) => f.key === filter)?.match ?? (() => true);
+  const filtered = useMemo(
+    () => sorted.filter((a) => matcher(a.category ?? "")),
+    [sorted, matcher],
+  );
+
+  if (isLoading) {
+    return (
+      <div className="mt-12 flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        Chargement de l'actualité…
+      </div>
+    );
+  }
+
+  if (sorted.length === 0) {
+    return (
+      <p className="mt-12 text-sm text-muted-foreground">
+        Aucun article pour le moment.
+      </p>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-10">
+        <CategoryFilters filter={filter} onChange={setFilter} />
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="mt-12 text-sm text-muted-foreground">
+          Aucun article dans cette catégorie.
+        </p>
+      ) : (
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((a) => (
+            <ArticleCard key={a.id} a={a} />
+          ))}
+        </div>
       )}
     </>
   );
 }
+
+// Keep Carousel imports referenced to avoid unused warnings if reused later
+export type { CarouselApi };
+export { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useEffect };
