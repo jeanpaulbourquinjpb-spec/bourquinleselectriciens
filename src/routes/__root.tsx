@@ -106,6 +106,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ElectricalContractor",
+          "name": "bourquin les électriciens",
+          "legalName": "Bourquin Jean-Yves SA",
+          "url": "https://bourquinelectricite.ch/",
+          "logo": "https://bourquinelectricite.ch/logo.png",
+          "image": "https://bourquinelectricite.ch/og-image.jpg",
+          "telephone": "+41228498333",
+          "email": "info@bourquinelectricite.ch",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Rue Henri-Blanvalet 21",
+            "addressLocality": "Genève",
+            "postalCode": "1207",
+            "addressCountry": "CH",
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 46.20348,
+            "longitude": 6.15904,
+          },
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "opens": "07:30",
+              "closes": "16:00",
+            },
+          ],
+          "sameAs": ["https://www.linkedin.com/company/bourquin-jean-yves-sa"],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
