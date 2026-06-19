@@ -312,3 +312,77 @@ export const listProjectCategories = createServerFn({ method: "GET" }).handler(a
   }
   return { categories: (data ?? []) as ProjectCategoryDTO[] };
 });
+
+export const createProjectCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ name: z.string().trim().min(1).max(100) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { count } = await supabaseAdmin
+      .from("project_categories")
+      .select("id", { count: "exact", head: true });
+    const { error } = await supabaseAdmin
+      .from("project_categories")
+      .insert({ name: data.name, sort_order: (count ?? 0) * 10 });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateProjectCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ id: z.string().uuid(), name: z.string().trim().min(1).max(100) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    // Find old name to cascade rename on projects
+    const { data: prev } = await supabaseAdmin
+      .from("project_categories")
+      .select("name")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { error } = await supabaseAdmin
+      .from("project_categories")
+      .update({ name: data.name })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    if (prev?.name && prev.name !== data.name) {
+      await supabaseAdmin
+        .from("projects")
+        .update({ category: data.name })
+        .eq("category", prev.name);
+    }
+    return { ok: true };
+  });
+
+export const deleteProjectCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: cat } = await supabaseAdmin
+      .from("project_categories")
+      .select("name")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!cat) throw new Error("Catégorie introuvable");
+    const { count } = await supabaseAdmin
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("category", cat.name);
+    if ((count ?? 0) > 0) {
+      throw new Error(
+        `Impossible de supprimer : ${count} projet(s) utilisent cette catégorie.`,
+      );
+    }
+    const { error } = await supabaseAdmin
+      .from("project_categories")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
