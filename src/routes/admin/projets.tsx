@@ -34,6 +34,7 @@ import {
 import {
   listProjects,
   createProject,
+  updateProject,
   deleteProject,
   addProjectPhoto,
   deleteProjectPhoto,
