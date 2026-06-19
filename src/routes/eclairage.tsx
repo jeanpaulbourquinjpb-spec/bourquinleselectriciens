@@ -26,6 +26,7 @@ export const Route = createFileRoute("/eclairage")({
           "Conception et installation d'éclairage sur mesure à Genève par bourquin les électriciens, avec éclairagiste certifié.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/eclairage" }],
   }),
 });
 
