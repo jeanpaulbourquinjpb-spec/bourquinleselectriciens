@@ -674,11 +674,13 @@ function UploadCard({
   onUpdated,
   editingProject,
   onCancelEdit,
+  categoriesVersion = 0,
 }: {
   onCreated: () => void;
   onUpdated: () => void;
   editingProject: ProjectDTO | null;
   onCancelEdit: () => void;
+  categoriesVersion?: number;
 }) {
   const create = useServerFn(createProject);
   const update = useServerFn(updateProject);
@@ -709,7 +711,7 @@ function UploadCard({
     return () => {
       alive = false;
     };
-  }, [fetchCategories]);
+  }, [fetchCategories, categoriesVersion]);
 
   // Pre-fill / reset when entering or leaving edit mode
   useEffect(() => {
