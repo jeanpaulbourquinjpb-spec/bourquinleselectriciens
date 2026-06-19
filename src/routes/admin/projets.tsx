@@ -452,7 +452,17 @@ async function uploadToStorage(file: File, bucket = "project-photos"): Promise<s
   return pub.publicUrl;
 }
 
-function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void }) {
+function AdminProjectCard({
+  p,
+  onDelete,
+  onEdit,
+  isEditing,
+}: {
+  p: ProjectDTO;
+  onDelete: () => void;
+  onEdit: () => void;
+  isEditing: boolean;
+}) {
   const queryClient = useQueryClient();
   const addPhoto = useServerFn(addProjectPhoto);
   const removePhoto = useServerFn(deleteProjectPhoto);
