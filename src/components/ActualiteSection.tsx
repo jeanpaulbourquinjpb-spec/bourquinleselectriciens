@@ -230,7 +230,7 @@ export function ActualiteSection({
           to="/actualites"
           className="inline-flex items-center gap-2 rounded-md border border-[#ff6633] bg-transparent px-6 py-3 text-sm font-medium text-[#ff6633] transition-colors hover:bg-[#ff6633] hover:text-white"
         >
-          Voir toutes les actualités <ArrowRight className="w-4 h-4" />
+          Voir toutes les actualités
         </Link>
       </div>
     </>
