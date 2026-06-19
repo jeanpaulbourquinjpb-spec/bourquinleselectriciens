@@ -211,6 +211,7 @@ function HomePage() {
               const isDepannage = s.title === "Maintenance & dépannage";
               const isRenovation = s.title === "Rénovation";
               const isEtude = s.title === "Étude, conseil & contrôle";
+              const isEclairage = s.title === "Éclairage";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
@@ -235,6 +236,13 @@ function HomePage() {
               if (isEtude) {
                 return (
                   <Link key={s.title} to="/etude-conseil-controle" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isEclairage) {
+                return (
+                  <Link key={s.title} to="/eclairage" className="card-soft block no-underline">
                     {content}
                   </Link>
                 );
