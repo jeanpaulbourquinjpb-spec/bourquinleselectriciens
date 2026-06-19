@@ -26,6 +26,7 @@ export const Route = createFileRoute("/etude-conseil-controle")({
           "Accompagnement technique de la conception à la réception. Études électriques, conseil et contrôles NIBT/OIBT à Genève.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/etude-conseil-controle" }],
   }),
 });
 
