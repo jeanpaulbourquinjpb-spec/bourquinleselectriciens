@@ -1144,10 +1144,10 @@ function SponsoringAdmin() {
                 </div>
                 <AdminSponsoringCard
                   entry={e}
-                  knownCategories={knownCategories}
                   onDelete={() => handleDelete(e.id)}
                   onChanged={invalidate}
                 />
+
               </div>
             ))}
           </div>
