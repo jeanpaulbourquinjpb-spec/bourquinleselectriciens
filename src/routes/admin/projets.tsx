@@ -1157,29 +1157,16 @@ function SponsoringAdmin() {
   );
 }
 
-function SponsoringUploadCard({
-  knownCategories,
-  onCreated,
-}: {
-  knownCategories: string[];
-  onCreated: () => void;
-}) {
+function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
   const create = useServerFn(createSponsoringEntry);
   const addPhoto = useServerFn(addSponsoringPhoto);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<string>(knownCategories[0] ?? "Équitation");
-  const [addingCustom, setAddingCustom] = useState(false);
-  const [customCat, setCustomCat] = useState("");
+  const [category, setCategory] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!knownCategories.includes(category) && !addingCustom) {
-      setCategory(knownCategories[0] ?? "Équitation");
-    }
-  }, [knownCategories, category, addingCustom]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
