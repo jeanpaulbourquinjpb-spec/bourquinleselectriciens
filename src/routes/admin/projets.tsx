@@ -1178,7 +1178,8 @@ function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
       toast.error("Le titre est requis.");
       return;
     }
-    const finalCategory = addingCustom ? customCat.trim() : category;
+    const finalCategory = category;
+
     if (!finalCategory) {
       toast.error("La catégorie est requise.");
       return;
