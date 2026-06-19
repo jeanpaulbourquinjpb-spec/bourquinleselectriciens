@@ -11,8 +11,8 @@ const sections: readonly NavItem[] = [
   { type: "hash", hash: "accueil", label: "Accueil" },
   { type: "hash", hash: "a-propos", label: "À propos" },
   { type: "hash", hash: "services", label: "Services" },
-  { type: "hash", hash: "actualite", label: "Actualité" },
-  { type: "hash", hash: "nos-projets", label: "Nos Projets" },
+  { type: "route", to: "/actualites", label: "Actualité" },
+  { type: "route", to: "/projets", label: "Nos Projets" },
   { type: "route", to: "/carrieres", label: "Carrières" },
   { type: "hash", hash: "contact", label: "Contact" },
 ] as const;
@@ -59,6 +59,9 @@ export function SiteHeader() {
     }
   };
 
+  const isRouteActive = (to: string) =>
+    pathname === to || pathname.startsWith(to + "/");
+
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-[color:var(--line)]">
       <div className="container-x flex items-center justify-between h-20">
@@ -84,8 +87,9 @@ export function SiteHeader() {
                 key={s.to}
                 to={s.to}
                 onClick={() => setOpen(false)}
-                className="text-sm font-medium transition-colors hover:text-brand"
-                activeProps={{ className: "text-sm font-medium text-brand" }}
+                className={`text-sm font-medium transition-colors ${
+                  isRouteActive(s.to) ? "text-brand" : "hover:text-brand"
+                }`}
               >
                 {s.label}
               </Link>
@@ -124,8 +128,9 @@ export function SiteHeader() {
                   key={s.to}
                   to={s.to}
                   onClick={() => setOpen(false)}
-                  className="py-1 text-sm font-medium"
-                  activeProps={{ className: "py-1 text-sm font-medium text-brand" }}
+                  className={`py-1 text-sm font-medium ${
+                    isRouteActive(s.to) ? "text-brand" : ""
+                  }`}
                 >
                   {s.label}
                 </Link>
