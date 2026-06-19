@@ -244,6 +244,27 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsoring_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       sponsoring_entries: {
         Row: {
           category: string
