@@ -94,7 +94,7 @@ export const listProjects = createServerFn({ method: "GET" }).handler(async () =
 const createSchema = z.object({
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().max(2000).optional().nullable(),
-  category: z.enum(CATEGORIES).optional().nullable(),
+  category: z.string().trim().min(1).max(100).optional().nullable(),
   image_url: z.string().url().max(2000),
   instagram_url: z.string().url().max(500).optional().nullable(),
   source_type: z.enum(["upload", "instagram"]).default("upload"),
