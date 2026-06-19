@@ -246,3 +246,94 @@ export const reorderSponsoringPhotos = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+/* ------------------------- Categories ------------------------- */
+
+export type SponsoringCategoryDTO = { id: string; name: string; sort_order: number };
+
+export const listSponsoringCategories = createServerFn({ method: "GET" }).handler(async () => {
+  const { data, error } = await supabaseAdmin
+    .from("sponsoring_categories")
+    .select("id, name, sort_order")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) {
+    console.error("listSponsoringCategories error:", error);
+    return { categories: [] as SponsoringCategoryDTO[] };
+  }
+  return { categories: (data ?? []) as SponsoringCategoryDTO[] };
+});
+
+export const createSponsoringCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ name: z.string().trim().min(1).max(100) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { count } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .select("id", { count: "exact", head: true });
+    const { error } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .insert({ name: data.name, sort_order: (count ?? 0) * 10 });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateSponsoringCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ id: z.string().uuid(), name: z.string().trim().min(1).max(100) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: prev } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .select("name")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { error } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .update({ name: data.name })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    if (prev?.name && prev.name !== data.name) {
+      await supabaseAdmin
+        .from("sponsoring_entries")
+        .update({ category: data.name })
+        .eq("category", prev.name);
+    }
+    return { ok: true };
+  });
+
+export const deleteSponsoringCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { data: cat } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .select("name")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!cat) throw new Error("Catégorie introuvable");
+    const { count } = await supabaseAdmin
+      .from("sponsoring_entries")
+      .select("id", { count: "exact", head: true })
+      .eq("category", cat.name);
+    if ((count ?? 0) > 0) {
+      throw new Error(
+        `Impossible de supprimer : ${count} entrée(s) utilisent cette catégorie.`,
+      );
+    }
+    const { error } = await supabaseAdmin
+      .from("sponsoring_categories")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
