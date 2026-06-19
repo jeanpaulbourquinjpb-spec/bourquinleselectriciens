@@ -4,14 +4,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import {
   Phone,
   BadgeCheck,
-  Network,
   Cable,
-  Radio,
   PhoneCall,
-  Wifi,
-  Headphones,
   Video,
-  ImageIcon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/telecoms")({
@@ -116,8 +111,7 @@ function TelecomsPage() {
           <p className="mt-6 max-w-3xl text-lg">
             Que vous équipiez un bureau, un call centre ou une infrastructure
             multi-sites, nous déployons des solutions de téléphonie adaptées à
-            vos usages : VoIP, SIP Networking, IP Phone et Softphone,
-            Voicemail, CTI, Unified Communications.
+            vos usages.
           </p>
           <PillList items={telephonie} />
         </div>
@@ -133,7 +127,7 @@ function TelecomsPage() {
           Une infrastructure réseau fiable commence par un câblage bien conçu.
           Nous réalisons le câblage structuré pour réseaux informatiques et
           télécom, le câblage multimédia pour habitations, et le tirage de
-          fibres optiques — certifiés selon les normes suisses et européennes.
+          fibres optiques, certifiés selon les normes suisses et européennes.
         </p>
         <PillList items={cablage} />
       </section>
@@ -148,7 +142,7 @@ function TelecomsPage() {
           <p className="mt-6 max-w-3xl text-lg">
             Pour les immeubles résidentiels, les entreprises et les régies
             immobilières, nous installons des systèmes d'interphonie filaire
-            et sans fil, avec ou sans vidéo — du simple portier au système
+            et sans fil, avec ou sans vidéo, du simple portier au système
             multi-entrées centralisé.
           </p>
           <PillList items={interphonie} />
@@ -163,25 +157,13 @@ function TelecomsPage() {
             Quand les caméras du monde entier comptent sur nous
           </h2>
           <p className="mt-6 max-w-3xl text-lg">
-            Lors de grandes compétitions internationales organisées à Genève
-            — dont des tournois FIBA et des matchs FIFA au Stade de Genève et
-            à la Vaudoise aréna — nos équipes ont déployé l'intégralité de
-            l'infrastructure de câblage data nécessaire à la retransmission
-            télévisée : lignes informatiques haute densité, gestion des flux
-            caméras, coordination avec les équipes de broadcast. Des
-            installations sous contrainte de temps, de fiabilité et de
-            visibilité internationale.
+            Lors de grandes compétitions internationales organisées en Suisse
+            Romande, nos équipes ont déployé l'intégralité de l'infrastructure
+            de câblage data nécessaire à la retransmission télévisée : lignes
+            informatiques haute densité, gestion des flux caméras, coordination
+            avec les équipes de broadcast. Des installations réalisées sous
+            contrainte de temps, de fiabilité et de visibilité internationale.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="aspect-video rounded-xl border border-dashed border-[color:var(--border)] bg-white/60 flex items-center justify-center text-[color:var(--muted-foreground)]"
-              >
-                <ImageIcon className="w-8 h-8 opacity-40" />
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
