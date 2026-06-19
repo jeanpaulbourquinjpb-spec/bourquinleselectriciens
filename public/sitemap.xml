@@ -1,52 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.bourquinelectricite.ch/</loc>
+    <loc>https://bourquinelectricite.ch/</loc>
     <priority>1.0</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/depannage</loc>
+    <loc>https://bourquinelectricite.ch/depannage</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/renovation</loc>
+    <loc>https://bourquinelectricite.ch/renovation</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/etude-conseil-controle</loc>
+    <loc>https://bourquinelectricite.ch/etude-conseil-controle</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/efficience-energetique</loc>
+    <loc>https://bourquinelectricite.ch/eclairage</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/eclairage</loc>
+    <loc>https://bourquinelectricite.ch/efficience-energetique</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/carrieres</loc>
+    <loc>https://bourquinelectricite.ch/securite</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://bourquinelectricite.ch/telecoms</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://bourquinelectricite.ch/carrieres</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/projets</loc>
+    <loc>https://bourquinelectricite.ch/projets</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/mentions-legales</loc>
+    <loc>https://bourquinelectricite.ch/mentions-legales</loc>
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>
   </url>
   <url>
-    <loc>https://www.bourquinelectricite.ch/privacy</loc>
+    <loc>https://bourquinelectricite.ch/privacy</loc>
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>
   </url>
