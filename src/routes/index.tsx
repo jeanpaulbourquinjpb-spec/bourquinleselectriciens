@@ -239,6 +239,13 @@ function HomePage() {
                   </Link>
                 );
               }
+              if (isEclairage) {
+                return (
+                  <Link key={s.title} to="/eclairage" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
               return (
                 <article key={s.title} className="card-soft">
                   {content}
