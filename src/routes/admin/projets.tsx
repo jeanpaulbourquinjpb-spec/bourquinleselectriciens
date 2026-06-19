@@ -218,6 +218,18 @@ function AdminTabs({
   const [tab, setTab] = useState<
     "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
   >("projets");
+  const [editingProject, setEditingProject] = useState<ProjectDTO | null>(null);
+
+  // Keep editingProject in sync with latest data from server (photos may have changed)
+  useEffect(() => {
+    if (!editingProject) return;
+    const fresh = projects.find((p) => p.id === editingProject.id);
+    if (!fresh) {
+      setEditingProject(null);
+    } else if (fresh !== editingProject) {
+      setEditingProject(fresh);
+    }
+  }, [projects, editingProject]);
 
   return (
     <div className="mt-8">
@@ -247,7 +259,15 @@ function AdminTabs({
       {tab === "projets" ? (
         <div className="mt-8">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
-            <UploadCard onCreated={onProjectsChanged} />
+            <UploadCard
+              editingProject={editingProject}
+              onCancelEdit={() => setEditingProject(null)}
+              onCreated={onProjectsChanged}
+              onUpdated={() => {
+                setEditingProject(null);
+                onProjectsChanged();
+              }}
+            />
             <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
@@ -257,7 +277,17 @@ function AdminTabs({
               {projectsLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <ProjectsList projects={projects} onDelete={onDeleteProject} />
+                <ProjectsList
+                  projects={projects}
+                  onDelete={onDeleteProject}
+                  onEdit={(p) => {
+                    setEditingProject(p);
+                    if (typeof window !== "undefined") {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                  editingId={editingProject?.id ?? null}
+                />
               )}
             </div>
           </div>
