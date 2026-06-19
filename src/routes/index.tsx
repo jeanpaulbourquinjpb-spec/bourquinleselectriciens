@@ -55,6 +55,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" },
+      { rel: "canonical", href: "https://bourquinelectricite.ch/" },
     ],
   }),
 });
