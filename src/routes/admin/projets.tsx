@@ -42,6 +42,9 @@ import {
   reorderProjectPhotos,
   isCurrentUserAdmin,
   listProjectCategories,
+  createProjectCategory,
+  updateProjectCategory,
+  deleteProjectCategory,
   type ProjectDTO,
   type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
@@ -219,6 +222,8 @@ function AdminTabs({
     "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
   >("projets");
   const [editingProject, setEditingProject] = useState<ProjectDTO | null>(null);
+  const [categoriesVersion, setCategoriesVersion] = useState(0);
+  const bumpCategories = () => setCategoriesVersion((v) => v + 1);
 
   // Keep editingProject in sync with latest data from server (photos may have changed)
   useEffect(() => {
@@ -259,15 +264,22 @@ function AdminTabs({
       {tab === "projets" ? (
         <div className="mt-8">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
-            <UploadCard
-              editingProject={editingProject}
-              onCancelEdit={() => setEditingProject(null)}
-              onCreated={onProjectsChanged}
-              onUpdated={() => {
-                setEditingProject(null);
-                onProjectsChanged();
-              }}
-            />
+            <div className="space-y-6">
+              <UploadCard
+                editingProject={editingProject}
+                onCancelEdit={() => setEditingProject(null)}
+                onCreated={onProjectsChanged}
+                onUpdated={() => {
+                  setEditingProject(null);
+                  onProjectsChanged();
+                }}
+                categoriesVersion={categoriesVersion}
+              />
+              <CategoriesCard
+                version={categoriesVersion}
+                onChanged={bumpCategories}
+              />
+            </div>
             <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
@@ -665,11 +677,13 @@ function UploadCard({
   onUpdated,
   editingProject,
   onCancelEdit,
+  categoriesVersion = 0,
 }: {
   onCreated: () => void;
   onUpdated: () => void;
   editingProject: ProjectDTO | null;
   onCancelEdit: () => void;
+  categoriesVersion?: number;
 }) {
   const create = useServerFn(createProject);
   const update = useServerFn(updateProject);
@@ -700,7 +714,7 @@ function UploadCard({
     return () => {
       alive = false;
     };
-  }, [fetchCategories]);
+  }, [fetchCategories, categoriesVersion]);
 
   // Pre-fill / reset when entering or leaving edit mode
   useEffect(() => {
@@ -2025,6 +2039,160 @@ function PartnerCard({
           <Trash2 className="w-3.5 h-3.5" />
         </Button>
       </div>
+    </div>
+  );
+}
+
+function CategoriesCard({
+  version,
+  onChanged,
+}: {
+  version: number;
+  onChanged: () => void;
+}) {
+  const fetchCategories = useServerFn(listProjectCategories);
+  const createCat = useServerFn(createProjectCategory);
+  const updateCat = useServerFn(updateProjectCategory);
+  const deleteCat = useServerFn(deleteProjectCategory);
+
+  const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    fetchCategories({})
+      .then((res) => {
+        if (!alive) return;
+        setCats((res.categories ?? []).map((c) => ({ id: c.id, name: c.name })));
+      })
+      .catch(() => {})
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, [fetchCategories, version]);
+
+  function resetForm() {
+    setName("");
+    setEditingId(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error("Le nom est requis.");
+      return;
+    }
+    setSaving(true);
+    try {
+      if (editingId) {
+        await updateCat({ data: { id: editingId, name: trimmed } });
+        toast.success("Catégorie mise à jour.");
+      } else {
+        await createCat({ data: { name: trimmed } });
+        toast.success("Catégorie ajoutée.");
+      }
+      resetForm();
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Supprimer cette catégorie ?")) return;
+    try {
+      await deleteCat({ data: { id } });
+      toast.success("Catégorie supprimée.");
+      if (editingId === id) resetForm();
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  return (
+    <div className="card-soft p-6 space-y-4">
+      <h2 className="text-xl">Gérer les catégories</h2>
+
+      {loading ? (
+        <Loader2 className="animate-spin" />
+      ) : cats.length === 0 ? (
+        <p className="text-sm text-[color:var(--muted-foreground)]">Aucune catégorie.</p>
+      ) : (
+        <ul className="space-y-2">
+          {cats.map((c) => (
+            <li
+              key={c.id}
+              className={cn(
+                "flex items-center justify-between gap-2 px-3 py-2 rounded border",
+                editingId === c.id
+                  ? "border-primary bg-primary/5"
+                  : "border-[color:var(--border)]",
+              )}
+            >
+              <span className="text-sm">{c.name}</span>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingId(c.id);
+                    setName(c.name);
+                  }}
+                >
+                  <Pencil className="w-3 h-3" /> Éditer
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(c.id)}
+                >
+                  <Trash2 className="w-3 h-3" /> Supprimer
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-2 pt-2 border-t border-[color:var(--border)]">
+        <Label htmlFor="cat-name">
+          {editingId ? "Modifier la catégorie" : "Nouvelle catégorie"}
+        </Label>
+        <Input
+          id="cat-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={100}
+          placeholder="Nom de la catégorie"
+        />
+        <div className="flex gap-2">
+          <Button type="submit" disabled={saving} className="flex-1">
+            {saving ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : editingId ? (
+              "Mettre à jour"
+            ) : (
+              "Ajouter"
+            )}
+          </Button>
+          {editingId && (
+            <Button type="button" variant="outline" onClick={resetForm}>
+              Annuler
+            </Button>
+          )}
+        </div>
+      </form>
     </div>
   );
 }
