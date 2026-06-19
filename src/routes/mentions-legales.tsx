@@ -4,7 +4,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/mentions-legales")({
   component: MentionsPage,
-  head: () => ({ meta: [{ title: "Mentions légales — bourquin les électriciens" }] }),
+  head: () => ({
+    meta: [{ title: "Mentions légales — bourquin les électriciens" }],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/mentions-legales" }],
+  }),
 });
 
 function MentionsPage() {
