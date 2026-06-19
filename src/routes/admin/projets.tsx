@@ -277,6 +277,7 @@ function AdminTabs({
                 onChanged={bumpCategories}
               />
             </div>
+            <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
                 Glissez les projets ou utilisez les flèches pour les réordonner. L'ordre est
