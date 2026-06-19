@@ -56,6 +56,7 @@ export const Route = createFileRoute("/carrieres")({
           "Rejoignez une entreprise formatrice genevoise depuis 1968. Offres d'emploi et apprentissage en électricité.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/carrieres" }],
   }),
 });
 
