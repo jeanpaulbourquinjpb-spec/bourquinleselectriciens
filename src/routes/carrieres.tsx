@@ -295,11 +295,14 @@ function CarrieresPage() {
 
               <div className="mt-8 flex justify-end">
                 <Button
-                  type="button"
-                  onClick={scrollToApply}
+                  asChild
                   className="bg-[#ff6633] hover:bg-[#e55a2b] text-white"
                 >
-                  Postuler
+                  <a
+                    href={`mailto:rh@bourquinelectricite.ch?subject=Candidature%20-%20${encodeURIComponent(selected.title)}`}
+                  >
+                    Postuler
+                  </a>
                 </Button>
               </div>
             </>
