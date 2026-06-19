@@ -261,16 +261,22 @@ function AdminTabs({
       {tab === "projets" ? (
         <div className="mt-8">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
-            <UploadCard
-              editingProject={editingProject}
-              onCancelEdit={() => setEditingProject(null)}
-              onCreated={onProjectsChanged}
-              onUpdated={() => {
-                setEditingProject(null);
-                onProjectsChanged();
-              }}
-            />
-            <div>
+            <div className="space-y-6">
+              <UploadCard
+                editingProject={editingProject}
+                onCancelEdit={() => setEditingProject(null)}
+                onCreated={onProjectsChanged}
+                onUpdated={() => {
+                  setEditingProject(null);
+                  onProjectsChanged();
+                }}
+                categoriesVersion={categoriesVersion}
+              />
+              <CategoriesCard
+                version={categoriesVersion}
+                onChanged={bumpCategories}
+              />
+            </div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
                 Glissez les projets ou utilisez les flèches pour les réordonner. L'ordre est
