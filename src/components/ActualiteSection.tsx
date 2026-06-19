@@ -303,6 +303,3 @@ export function ActualiteGrid({
   );
 }
 
-// Keep Carousel imports referenced to avoid unused warnings if reused later
-export type { CarouselApi };
-export { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useEffect };
