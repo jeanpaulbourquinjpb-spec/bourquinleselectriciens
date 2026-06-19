@@ -41,7 +41,7 @@ import {
   reorderProjects,
   reorderProjectPhotos,
   isCurrentUserAdmin,
-  CATEGORIES,
+  listProjectCategories,
   type ProjectDTO,
   type ProjectPhotoDTO,
 } from "@/lib/projects.functions";
@@ -680,37 +680,49 @@ function UploadCard({
   const isEditing = !!editingProject;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Résidentiel");
+  const [category, setCategory] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const fetchCategories = useServerFn(listProjectCategories);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+  useEffect(() => {
+    let alive = true;
+    fetchCategories({})
+      .then((res) => {
+        if (!alive) return;
+        const names = (res.categories ?? []).map((c) => c.name);
+        setCategoryOptions(names);
+        setCategory((prev) => prev || names[0] || "");
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [fetchCategories]);
 
   // Pre-fill / reset when entering or leaving edit mode
   useEffect(() => {
     if (editingProject) {
       setTitle(editingProject.title);
       setDescription(editingProject.description ?? "");
-      const cat = editingProject.category;
-      setCategory(
-        cat && (CATEGORIES as readonly string[]).includes(cat)
-          ? (cat as (typeof CATEGORIES)[number])
-          : "Résidentiel",
-      );
+      setCategory(editingProject.category ?? categoryOptions[0] ?? "");
       setFiles([]);
       if (fileRef.current) fileRef.current.value = "";
     } else {
       setTitle("");
       setDescription("");
-      setCategory("Résidentiel");
+      setCategory(categoryOptions[0] ?? "");
       setFiles([]);
       if (fileRef.current) fileRef.current.value = "";
     }
-  }, [editingProject]);
+  }, [editingProject, categoryOptions]);
 
   function resetForm() {
     setTitle("");
     setDescription("");
-    setCategory("Résidentiel");
+    setCategory(categoryOptions[0] ?? "");
     setFiles([]);
     if (fileRef.current) fileRef.current.value = "";
   }
@@ -938,12 +950,12 @@ function UploadCard({
 
       <div>
         <Label htmlFor="cat">Catégorie</Label>
-        <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
+        <Select value={category} onValueChange={(v) => setCategory(v)}>
           <SelectTrigger id="cat">
-            <SelectValue />
+            <SelectValue placeholder="Sélectionner…" />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIES.map((c) => (
+            {categoryOptions.map((c) => (
               <SelectItem key={c} value={c}>
                 {c}
               </SelectItem>
