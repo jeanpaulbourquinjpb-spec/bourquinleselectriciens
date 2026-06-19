@@ -1,0 +1,1 @@
+DELETE FROM public.articles WHERE url LIKE '%systemes-stockage-tournant-energetique%' OR title ILIKE '%Quelque chose ne tourne pas rond%';

@@ -305,7 +305,7 @@ function HomePage() {
             <p className="text-xl md:text-2xl text-[color:var(--muted-foreground)]">
               Une question ? Un projet ? Nous sommes là.
             </p>
-            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par E-mail.</p>
+            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par email.</p>
             <div className="mt-8">
               <ContactForm />
             </div>
