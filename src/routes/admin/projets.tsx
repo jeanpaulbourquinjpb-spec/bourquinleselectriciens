@@ -672,18 +672,30 @@ function AdminProjectCard({
   );
 }
 
+const PROJECT_CATEGORY_FNS: CategoryFns = {
+  list: listProjectCategories,
+  create: createProjectCategory,
+  update: updateProjectCategory,
+  remove: deleteProjectCategory,
+};
+
+const SPONSORING_CATEGORY_FNS: CategoryFns = {
+  list: listSponsoringCategories,
+  create: createSponsoringCategory,
+  update: updateSponsoringCategory,
+  remove: deleteSponsoringCategory,
+};
+
 function UploadCard({
   onCreated,
   onUpdated,
   editingProject,
   onCancelEdit,
-  categoriesVersion = 0,
 }: {
   onCreated: () => void;
   onUpdated: () => void;
   editingProject: ProjectDTO | null;
   onCancelEdit: () => void;
-  categoriesVersion?: number;
 }) {
   const create = useServerFn(createProject);
   const update = useServerFn(updateProject);
@@ -699,22 +711,8 @@ function UploadCard({
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fetchCategories = useServerFn(listProjectCategories);
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
-  useEffect(() => {
-    let alive = true;
-    fetchCategories({})
-      .then((res) => {
-        if (!alive) return;
-        const names = (res.categories ?? []).map((c) => c.name);
-        setCategoryOptions(names);
-        setCategory((prev) => prev || names[0] || "");
-      })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, [fetchCategories, categoriesVersion]);
+
 
   // Pre-fill / reset when entering or leaving edit mode
   useEffect(() => {
