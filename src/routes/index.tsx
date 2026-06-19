@@ -223,48 +223,48 @@ function HomePage() {
               );
               if (isDepannage) {
                 return (
-                  <Link key={s.title} to="/depannage" className="card-soft block no-underline">
+                  <Link key={s.title} to="/depannage" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               if (isRenovation) {
                 return (
-                  <Link key={s.title} to="/renovation" className="card-soft block no-underline">
+                  <Link key={s.title} to="/renovation" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               if (isEtude) {
                 return (
-                  <Link key={s.title} to="/etude-conseil-controle" className="card-soft block no-underline">
+                  <Link key={s.title} to="/etude-conseil-controle" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               if (isEclairage) {
                 return (
-                  <Link key={s.title} to="/eclairage" className="card-soft block no-underline">
+                  <Link key={s.title} to="/eclairage" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               if (isEfficience) {
                 return (
-                  <Link key={s.title} to="/efficience-energetique" className="card-soft block no-underline">
+                  <Link key={s.title} to="/efficience-energetique" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               if (isTelecom) {
                 return (
-                  <Link key={s.title} to="/telecoms" className="card-soft block no-underline">
+                  <Link key={s.title} to="/telecoms" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
               }
               return (
-                <article key={s.title} className="card-soft">
+                <article key={s.title} className="card-soft min-h-48 md:min-h-56">
                   {content}
                 </article>
               );
@@ -368,24 +368,27 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
 
   return (
     <>
-      <div className="mt-10 flex gap-2 overflow-x-auto md:flex-wrap -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {filters.map((f) => {
-          const active = filter === f.value;
-          return (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={cn(
-                "shrink-0 whitespace-nowrap px-4 py-2 rounded-full border text-sm transition-colors",
-                active
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background border-[color:var(--border)] hover:bg-[color:var(--surface-muted)]",
-              )}
-            >
-              {f.label}
-            </button>
-          );
-        })}
+      <div className="relative mt-10 -mx-4 md:mx-0">
+        <div className="flex gap-2 overflow-x-auto md:flex-wrap px-4 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {filters.map((f) => {
+            const active = filter === f.value;
+            return (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={cn(
+                  "shrink-0 whitespace-nowrap px-4 py-2 rounded-full border text-sm transition-colors",
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-[color:var(--border)] hover:bg-[color:var(--surface-muted)]",
+                )}
+              >
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent md:hidden" />
       </div>
 
       {filtered.length === 0 ? (
