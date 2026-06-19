@@ -38,6 +38,7 @@ export const Route = createFileRoute("/projets")({
         content: "Sélection de projets réalisés à Genève par bourquin les électriciens.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/projets" }],
   }),
 });
 
