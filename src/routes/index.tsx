@@ -213,6 +213,7 @@ function HomePage() {
               const isEtude = s.title === "Étude, conseil & contrôle";
               const isEclairage = s.title === "Éclairage";
               const isEfficience = s.title === "Efficience énergétique";
+              const isTelecom = s.title === "Télécommunications";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
@@ -251,6 +252,13 @@ function HomePage() {
               if (isEfficience) {
                 return (
                   <Link key={s.title} to="/efficience-energetique" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isTelecom) {
+                return (
+                  <Link key={s.title} to="/telecoms" className="card-soft block no-underline">
                     {content}
                   </Link>
                 );

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TelecomsRouteImport } from './routes/telecoms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -32,6 +33,11 @@ import { Route as NosProjetsProjectIdRouteImport } from './routes/nos-projets.$p
 import { Route as AdminProjetsRouteImport } from './routes/admin/projets'
 import { Route as ApiPublicHooksScrapeArticlesRouteImport } from './routes/api/public/hooks/scrape-articles'
 
+const TelecomsRoute = TelecomsRouteImport.update({
+  id: '/telecoms',
+  path: '/telecoms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
+    | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
+    | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/sitemap.xml'
+    | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
     | '/api/public/hooks/scrape-articles'
@@ -312,12 +324,20 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TelecomsRoute: typeof TelecomsRoute
   AdminProjetsRoute: typeof AdminProjetsRoute
   ApiPublicHooksScrapeArticlesRoute: typeof ApiPublicHooksScrapeArticlesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/telecoms': {
+      id: '/telecoms'
+      path: '/telecoms'
+      fullPath: '/telecoms'
+      preLoaderRoute: typeof TelecomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -507,6 +527,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TelecomsRoute: TelecomsRoute,
   AdminProjetsRoute: AdminProjetsRoute,
   ApiPublicHooksScrapeArticlesRoute: ApiPublicHooksScrapeArticlesRoute,
 }
