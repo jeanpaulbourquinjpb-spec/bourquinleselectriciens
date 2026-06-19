@@ -210,6 +210,7 @@ function HomePage() {
             {services.map((s) => {
               const isDepannage = s.title === "Maintenance & dépannage";
               const isRenovation = s.title === "Rénovation";
+              const isEtude = s.title === "Étude, conseil & contrôle";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
@@ -227,6 +228,13 @@ function HomePage() {
               if (isRenovation) {
                 return (
                   <Link key={s.title} to="/renovation" className="card-soft block no-underline">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isEtude) {
+                return (
+                  <Link key={s.title} to="/etude-conseil-controle" className="card-soft block no-underline">
                     {content}
                   </Link>
                 );

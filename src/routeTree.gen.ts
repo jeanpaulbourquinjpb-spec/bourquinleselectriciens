@@ -19,6 +19,7 @@ import { Route as PresentationRouteImport } from './routes/presentation'
 import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EtudeConseilControleRouteImport } from './routes/etude-conseil-controle'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DepannageRouteImport } from './routes/depannage'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -79,6 +80,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudeConseilControleRoute = EtudeConseilControleRouteImport.update({
+  id: '/etude-conseil-controle',
+  path: '/etude-conseil-controle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DepannageRoute: typeof DepannageRoute
   DocumentsRoute: typeof DocumentsRoute
+  EtudeConseilControleRoute: typeof EtudeConseilControleRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   NosProjetsRoute: typeof NosProjetsRouteWithChildren
@@ -347,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etude-conseil-controle': {
+      id: '/etude-conseil-controle'
+      path: '/etude-conseil-controle'
+      fullPath: '/etude-conseil-controle'
+      preLoaderRoute: typeof EtudeConseilControleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/documents': {
@@ -434,6 +454,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DepannageRoute: DepannageRoute,
   DocumentsRoute: DocumentsRoute,
+  EtudeConseilControleRoute: EtudeConseilControleRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   NosProjetsRoute: NosProjetsRouteWithChildren,
@@ -450,13 +471,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
