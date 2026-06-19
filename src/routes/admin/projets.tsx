@@ -277,13 +277,9 @@ function AdminTabs({
                   setEditingProject(null);
                   onProjectsChanged();
                 }}
-                categoriesVersion={categoriesVersion}
-              />
-              <CategoriesCard
-                version={categoriesVersion}
-                onChanged={bumpCategories}
               />
             </div>
+
             <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
