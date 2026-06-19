@@ -1434,50 +1434,14 @@ function AdminSponsoringCard({
                 maxLength={200}
                 placeholder="Titre"
               />
-              {addingCustom ? (
-                <div className="flex gap-1">
-                  <Input
-                    value={customCat}
-                    onChange={(e) => setCustomCat(e.target.value)}
-                    placeholder="Nouvelle catégorie"
-                    maxLength={100}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setAddingCustom(false);
-                      setCustomCat("");
-                    }}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex gap-1">
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {knownCategories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAddingCustom(true)}
-                  >
-                    <Plus className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
+              <CategorySelectWithManager
+                fns={SPONSORING_CATEGORY_FNS}
+                value={category}
+                onValueChange={setCategory}
+                triggerClassName="h-8 text-xs"
+                fallbackCategories={entry.category ? [entry.category] : []}
+              />
+
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
