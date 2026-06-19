@@ -1254,53 +1254,18 @@ function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
       </div>
 
       <div>
-        <Label>Catégorie</Label>
-        {addingCustom ? (
-          <div className="flex gap-2">
-            <Input
-              value={customCat}
-              onChange={(e) => setCustomCat(e.target.value)}
-              placeholder="Nouvelle catégorie"
-              maxLength={100}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setAddingCustom(false);
-                setCustomCat("");
-              }}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {knownCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setAddingCustom(true)}
-              title="Ajouter une catégorie"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
+        <Label htmlFor="sp-cat">Catégorie</Label>
+        <CategorySelectWithManager
+          fns={SPONSORING_CATEGORY_FNS}
+          value={category}
+          onValueChange={setCategory}
+          triggerId="sp-cat"
+          onCategoriesLoaded={(names) =>
+            setCategory((prev) => prev || names[0] || "")
+          }
+        />
       </div>
+
 
       <div>
         <Label htmlFor="sp-desc">Description (optionnel)</Label>
