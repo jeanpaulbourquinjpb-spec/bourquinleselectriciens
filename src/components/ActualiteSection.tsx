@@ -161,12 +161,12 @@ export function CategoryFilters({
               role="tab"
               aria-selected={active}
               onClick={() => onChange(f.key)}
-              className={
-                "shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors " +
-                (active
-                  ? "border-transparent bg-[color:var(--foreground)] text-[color:var(--background)]"
-                  : "border-[color:var(--border)] bg-transparent text-[color:var(--foreground)] hover:bg-[color:var(--surface-muted)]")
-              }
+              className={cn(
+                "shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-colors",
+                active
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background border-[color:var(--border)] hover:bg-[color:var(--surface-muted)]",
+              )}
             >
               {f.label}
             </button>
