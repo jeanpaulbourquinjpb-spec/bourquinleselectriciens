@@ -309,9 +309,13 @@ function AdminTabs({
 function ProjectsList({
   projects,
   onDelete,
+  onEdit,
+  editingId,
 }: {
   projects: ProjectDTO[];
   onDelete: (id: string) => void;
+  onEdit: (p: ProjectDTO) => void;
+  editingId: string | null;
 }) {
   const queryClient = useQueryClient();
   const reorder = useServerFn(reorderProjects);
