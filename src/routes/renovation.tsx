@@ -30,6 +30,7 @@ export const Route = createFileRoute("/renovation")({
           "Transformation et mise aux normes pour tous types de bâtiments par nos électriciens qualifiés.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://bourquinelectricite.ch/renovation" }],
   }),
 });
 
