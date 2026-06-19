@@ -413,7 +413,13 @@ function ProjectsList({
               <ArrowDown className="w-3.5 h-3.5" />
             </button>
           </div>
-          <AdminProjectCard p={p} onDelete={() => onDelete(p.id)} />
+          <AdminProjectCard
+            p={p}
+            onDelete={() => onDelete(p.id)}
+            onEdit={() => onEdit(p)}
+            isEditing={editingId === p.id}
+          />
+
         </div>
       ))}
     </div>
