@@ -57,10 +57,15 @@ import {
   deleteSponsoringPhoto,
   reorderSponsoringEntries,
   reorderSponsoringPhotos,
-  SPONSORING_CATEGORIES,
+  listSponsoringCategories,
+  createSponsoringCategory,
+  updateSponsoringCategory,
+  deleteSponsoringCategory,
   type SponsoringEntryDTO,
   type SponsoringPhotoDTO,
 } from "@/lib/sponsoring.functions";
+import { CategorySelectWithManager, type CategoryFns } from "@/components/CategoryManager";
+
 import {
   listPartners,
   createPartner,
