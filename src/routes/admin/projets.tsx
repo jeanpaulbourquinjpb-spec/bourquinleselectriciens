@@ -34,6 +34,7 @@ import {
 import {
   listProjects,
   createProject,
+  updateProject,
   deleteProject,
   addProjectPhoto,
   deleteProjectPhoto,
@@ -217,6 +218,18 @@ function AdminTabs({
   const [tab, setTab] = useState<
     "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
   >("projets");
+  const [editingProject, setEditingProject] = useState<ProjectDTO | null>(null);
+
+  // Keep editingProject in sync with latest data from server (photos may have changed)
+  useEffect(() => {
+    if (!editingProject) return;
+    const fresh = projects.find((p) => p.id === editingProject.id);
+    if (!fresh) {
+      setEditingProject(null);
+    } else if (fresh !== editingProject) {
+      setEditingProject(fresh);
+    }
+  }, [projects, editingProject]);
 
   return (
     <div className="mt-8">
@@ -246,7 +259,15 @@ function AdminTabs({
       {tab === "projets" ? (
         <div className="mt-8">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-10">
-            <UploadCard onCreated={onProjectsChanged} />
+            <UploadCard
+              editingProject={editingProject}
+              onCancelEdit={() => setEditingProject(null)}
+              onCreated={onProjectsChanged}
+              onUpdated={() => {
+                setEditingProject(null);
+                onProjectsChanged();
+              }}
+            />
             <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
@@ -256,7 +277,17 @@ function AdminTabs({
               {projectsLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <ProjectsList projects={projects} onDelete={onDeleteProject} />
+                <ProjectsList
+                  projects={projects}
+                  onDelete={onDeleteProject}
+                  onEdit={(p) => {
+                    setEditingProject(p);
+                    if (typeof window !== "undefined") {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                  editingId={editingProject?.id ?? null}
+                />
               )}
             </div>
           </div>
@@ -278,9 +309,13 @@ function AdminTabs({
 function ProjectsList({
   projects,
   onDelete,
+  onEdit,
+  editingId,
 }: {
   projects: ProjectDTO[];
   onDelete: (id: string) => void;
+  onEdit: (p: ProjectDTO) => void;
+  editingId: string | null;
 }) {
   const queryClient = useQueryClient();
   const reorder = useServerFn(reorderProjects);
@@ -378,7 +413,13 @@ function ProjectsList({
               <ArrowDown className="w-3.5 h-3.5" />
             </button>
           </div>
-          <AdminProjectCard p={p} onDelete={() => onDelete(p.id)} />
+          <AdminProjectCard
+            p={p}
+            onDelete={() => onDelete(p.id)}
+            onEdit={() => onEdit(p)}
+            isEditing={editingId === p.id}
+          />
+
         </div>
       ))}
     </div>
@@ -411,7 +452,17 @@ async function uploadToStorage(file: File, bucket = "project-photos"): Promise<s
   return pub.publicUrl;
 }
 
-function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void }) {
+function AdminProjectCard({
+  p,
+  onDelete,
+  onEdit,
+  isEditing,
+}: {
+  p: ProjectDTO;
+  onDelete: () => void;
+  onEdit: () => void;
+  isEditing: boolean;
+}) {
   const queryClient = useQueryClient();
   const addPhoto = useServerFn(addProjectPhoto);
   const removePhoto = useServerFn(deleteProjectPhoto);
@@ -503,6 +554,11 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
         <div className="flex-1 min-w-0">
           <p className="text-xs text-[color:var(--muted-foreground)]">{p.category ?? "—"}</p>
           <p className="text-sm font-medium truncate">{p.title}</p>
+          {isEditing && (
+            <p className="text-[10px] uppercase tracking-wider text-primary mt-1 font-semibold">
+              En cours d'édition
+            </p>
+          )}
           <div className="flex items-center gap-3 mt-2">
             {p.instagram_url && (
               <a
@@ -515,6 +571,12 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
               </a>
             )}
             <button
+              onClick={onEdit}
+              className="text-xs inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              <Pencil className="w-3 h-3" /> Éditer
+            </button>
+            <button
               onClick={onDelete}
               className="text-xs inline-flex items-center gap-1 text-destructive hover:underline"
             >
@@ -522,6 +584,7 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
             </button>
           </div>
         </div>
+
       </div>
 
       <div>
@@ -597,9 +660,24 @@ function AdminProjectCard({ p, onDelete }: { p: ProjectDTO; onDelete: () => void
   );
 }
 
-function UploadCard({ onCreated }: { onCreated: () => void }) {
+function UploadCard({
+  onCreated,
+  onUpdated,
+  editingProject,
+  onCancelEdit,
+}: {
+  onCreated: () => void;
+  onUpdated: () => void;
+  editingProject: ProjectDTO | null;
+  onCancelEdit: () => void;
+}) {
   const create = useServerFn(createProject);
+  const update = useServerFn(updateProject);
   const addPhoto = useServerFn(addProjectPhoto);
+  const removePhoto = useServerFn(deleteProjectPhoto);
+  const reorderPhotos = useServerFn(reorderProjectPhotos);
+
+  const isEditing = !!editingProject;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("Résidentiel");
@@ -607,14 +685,96 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Pre-fill / reset when entering or leaving edit mode
+  useEffect(() => {
+    if (editingProject) {
+      setTitle(editingProject.title);
+      setDescription(editingProject.description ?? "");
+      const cat = editingProject.category;
+      setCategory(
+        cat && (CATEGORIES as readonly string[]).includes(cat)
+          ? (cat as (typeof CATEGORIES)[number])
+          : "Résidentiel",
+      );
+      setFiles([]);
+      if (fileRef.current) fileRef.current.value = "";
+    } else {
+      setTitle("");
+      setDescription("");
+      setCategory("Résidentiel");
+      setFiles([]);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }, [editingProject]);
+
+  function resetForm() {
+    setTitle("");
+    setDescription("");
+    setCategory("Résidentiel");
+    setFiles([]);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function handleRemoveExistingPhoto(id: string) {
+    if (!editingProject) return;
+    if (!confirm("Supprimer cette photo ?")) return;
+    try {
+      await removePhoto({ data: { id } });
+      toast.success("Photo supprimée");
+      onUpdatedSilent();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
+  // Refresh list without exiting edit mode
+  function onUpdatedSilent() {
+    // Trigger parent invalidation; the AdminTabs effect keeps editingProject in sync
+    onCreated();
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (files.length === 0) {
-      toast.error("Veuillez sélectionner au moins une photo");
-      return;
-    }
     if (!title.trim()) {
       toast.error("Le titre est requis.");
+      return;
+    }
+
+    if (isEditing && editingProject) {
+      setUploading(true);
+      try {
+        await update({
+          data: {
+            id: editingProject.id,
+            title: title.trim(),
+            description: description.trim() || null,
+            category,
+          },
+        });
+        // Upload any new photos appended in edit mode
+        for (const f of files) {
+          try {
+            const url = await uploadToStorage(f);
+            await addPhoto({ data: { project_id: editingProject.id, url } });
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erreur photo");
+          }
+        }
+        toast.success("Projet mis à jour.");
+        resetForm();
+        onUpdated();
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Erreur inconnue";
+        toast.error(`Échec : ${msg}`);
+      } finally {
+        setUploading(false);
+      }
+      return;
+    }
+
+    // Create mode
+    if (files.length === 0) {
+      toast.error("Veuillez sélectionner au moins une photo");
       return;
     }
 
@@ -639,10 +799,7 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
         }
       }
       toast.success(`Projet créé avec ${files.length} photo(s).`);
-      setTitle("");
-      setDescription("");
-      setFiles([]);
-      if (fileRef.current) fileRef.current.value = "";
+      resetForm();
       onCreated();
     } catch (e) {
       console.error("Upload error:", e);
@@ -653,12 +810,106 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
     }
   }
 
+  // Existing photos shown in edit mode (with reorder + delete)
+  const existingPhotos = editingProject?.photos ?? [];
+  const [photoOrder, setPhotoOrder] = useState<string[]>(existingPhotos.map((p) => p.id));
+  const [dragPhoto, setDragPhoto] = useState<string | null>(null);
+  useEffect(() => {
+    setPhotoOrder(existingPhotos.map((p) => p.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingProject?.id, existingPhotos.length, existingPhotos.map((p) => p.id).join(",")]);
+
+  const photosById = new Map<string, ProjectPhotoDTO>(existingPhotos.map((p) => [p.id, p]));
+  const orderedPhotos = photoOrder
+    .map((id) => photosById.get(id))
+    .filter(Boolean) as ProjectPhotoDTO[];
+
+  function onPhotoDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragPhoto || dragPhoto === overId) return;
+    setPhotoOrder((prev) => {
+      const next = [...prev];
+      const from = next.indexOf(dragPhoto);
+      const to = next.indexOf(overId);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragPhoto);
+      return next;
+    });
+  }
+  async function onPhotoDragEnd() {
+    const ids = photoOrder;
+    setDragPhoto(null);
+    if (!editingProject || ids.length < 2) return;
+    try {
+      await reorderPhotos({ data: { project_id: editingProject.id, photo_ids: ids } });
+      toast.success("Ordre des photos enregistré");
+      onUpdatedSilent();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="card-soft p-6 space-y-4 h-fit sticky top-24">
-      <h2 className="text-xl">Ajouter un projet</h2>
+      <h2 className="text-xl">{isEditing ? "Éditer le projet" : "Ajouter un projet"}</h2>
+
+      {isEditing && orderedPhotos.length > 0 && (
+        <div>
+          <Label>Photos existantes (glisser pour réordonner)</Label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {orderedPhotos.map((ph, i) => (
+              <div
+                key={ph.id}
+                draggable
+                onDragStart={(e) => {
+                  e.stopPropagation();
+                  setDragPhoto(ph.id);
+                }}
+                onDragOver={(e) => onPhotoDragOver(e, ph.id)}
+                onDragEnd={onPhotoDragEnd}
+                className={cn(
+                  "relative group cursor-grab",
+                  dragPhoto === ph.id && "opacity-50",
+                )}
+              >
+                <img
+                  src={ph.url}
+                  alt=""
+                  className={cn(
+                    "w-16 h-16 object-cover rounded border-2",
+                    i === 0 ? "border-primary" : "border-transparent",
+                  )}
+                />
+                {i === 0 && (
+                  <span className="absolute -top-1 -left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1 rounded">
+                    COUV
+                  </span>
+                )}
+                <button
+                  type="button"
+                  title="Supprimer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveExistingPhoto(ph.id);
+                  }}
+                  className="absolute -top-1 -right-1 bg-white border rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3 h-3 text-destructive" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
-        <Label htmlFor="file">Photos (jpg, png, webp — la première sera la couverture)</Label>
+        <Label htmlFor="file">
+          {isEditing
+            ? "Ajouter des photos (optionnel)"
+            : "Photos (jpg, png, webp — la première sera la couverture)"}
+        </Label>
         <Input
           ref={fileRef}
           id="file"
@@ -713,12 +964,34 @@ function UploadCard({ onCreated }: { onCreated: () => void }) {
       </div>
 
       <Button type="submit" disabled={uploading} className="w-full">
-        {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-        Ajouter
+        {uploading ? (
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        ) : isEditing ? (
+          <Check className="w-4 h-4 mr-2" />
+        ) : (
+          <Upload className="w-4 h-4 mr-2" />
+        )}
+        {isEditing ? "Mettre à jour" : "Ajouter"}
       </Button>
+
+      {isEditing && (
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full"
+          onClick={() => {
+            resetForm();
+            onCancelEdit();
+          }}
+          disabled={uploading}
+        >
+          Annuler
+        </Button>
+      )}
     </form>
   );
 }
+
 
 /* ============================== SPONSORING ============================== */
 
