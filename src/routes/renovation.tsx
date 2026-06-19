@@ -9,6 +9,7 @@ import {
   Search,
   FileText,
   Hammer,
+  ClipboardCheck,
   BadgeCheck,
 } from "lucide-react";
 
@@ -36,31 +37,32 @@ const typesBatiments = [
   {
     icon: Home,
     title: "Résidentiel",
-    text: "Appartements, villas et immeubles d'habitation — rénovation complète ou partielle, mise aux normes et modernisation de votre installation électrique.",
+    text: "Appartements, villas et immeubles d'habitation. Rénovation complète ou partielle, mise aux normes et modernisation de votre installation électrique.",
   },
   {
     icon: Building2,
     title: "Commercial et institutionnel",
-    text: "Bureaux, commerces, hôtels, restaurants, écoles et crèches — travaux électriques adaptés à vos contraintes d'exploitation et aux normes en vigueur.",
+    text: "Bureaux, commerces, hôtels, restaurants, écoles, crèches, musées et salles de spectacle. Nos électriciens s'adaptent à vos contraintes d'exploitation et aux exigences spécifiques de chaque type d'établissement.",
   },
   {
     icon: Factory,
-    title: "Industriel et technique",
-    text: "Garages, industries et espaces extérieurs — électricité industrielle, éclairage de parcs et jardins, mise aux normes de vos locaux techniques.",
+    title: "Industriel et extérieur",
+    text: "Garages, industries, gares, parcs et jardins. Électricité industrielle, éclairage extérieur et mise aux normes de vos locaux techniques.",
   },
 ];
 
 const etapes = [
-  { icon: Search, title: "Analyse", text: "Diagnostic de votre installation et définition précise de vos besoins" },
-  { icon: FileText, title: "Proposition", text: "Offre détaillée adaptée à votre projet et à votre bâtiment" },
-  { icon: Hammer, title: "Réalisation", text: "Travaux exécutés par nos électriciens qualifiés, dans les délais convenus" },
+  { icon: Search, title: "Analyse sur place", text: "Un responsable de projets clients se déplace chez vous pour évaluer votre installation existante et comprendre vos besoins." },
+  { icon: FileText, title: "Offre sur mesure", text: "Une proposition claire et détaillée, adaptée à votre espace et à vos contraintes." },
+  { icon: Hammer, title: "Réalisation", text: "Nos électriciens qualifiés exécutent les travaux dans les délais convenus." },
+  { icon: ClipboardCheck, title: "Contrôle final", text: "Une vérification complète de l'installation réalisée, conformément aux normes NIBT/OIBT, avant la remise des clés." },
 ];
 
 const avantages = [
   "Entreprise familiale genevoise depuis 1968",
-  "Électriciens qualifiés et certifiés",
+  "Responsables de projets clients dédiés",
   "Résidentiel, commercial et institutionnel",
-  "Conformité aux normes NIBT/OIBT garantie",
+  "Normes NIBT/OIBT respectées et contrôlées sur chaque chantier",
 ];
 
 function RenovationPage() {
@@ -78,10 +80,7 @@ function RenovationPage() {
           Transformation et mise aux normes pour tous types de bâtiments
         </p>
         <p className="mt-6 max-w-2xl text-lg">
-          Appartement, villa, immeuble de bureaux ou établissement
-          commercial — nos électriciens qualifiés interviennent sur tous vos
-          projets de transformation et rénovation électrique, du diagnostic
-          jusqu'à la mise en service.
+          Une rénovation électrique, c'est bien plus que changer des prises. Nos responsables de projets clients analysent votre installation existante, définissent les meilleures solutions de câblage et de distribution, puis nos électriciens qualifiés réalisent l'ensemble des travaux, du passage des tubes aux raccordements finaux.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="tel:0228498333" className="btn-brand">
@@ -93,20 +92,14 @@ function RenovationPage() {
         </div>
       </section>
 
-      {/* NOS INTERVENTIONS */}
+      {/* TOUS TYPES DE BÂTIMENTS */}
       <section className="py-20 bg-[color:var(--surface-muted)]">
         <div className="container-x">
           <h2 className="text-3xl md:text-4xl max-w-3xl">
-            Tous types de bâtiments, tous types de projets
+            Tous types de bâtiments
           </h2>
           <p className="mt-6 max-w-3xl text-lg">
-            Nos électriciens qualifiés interviennent aussi bien dans le
-            résidentiel que dans le commercial et l'institutionnel.
-            Appartements, villas, immeubles d'habitation, immeubles de
-            bureaux, commerces, hôtels et restaurants, écoles, crèches,
-            garages et industries — chaque chantier est abordé avec le même
-            niveau d'exigence, qu'il s'agisse d'une transformation partielle
-            ou d'une rénovation complète de l'installation électrique.
+            Que ce soit un appartement à rafraîchir, un immeuble de bureaux à moderniser ou un restaurant à remettre aux normes, nous intervenons sur tous types de bâtiments résidentiels, commerciaux et institutionnels dans tout le canton de Genève.
           </p>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {typesBatiments.map((b) => (
@@ -120,18 +113,13 @@ function RenovationPage() {
         </div>
       </section>
 
-      {/* NOTRE APPROCHE */}
+      {/* COMMENT ON TRAVAILLE */}
       <section className="container-x py-20">
-        <h2 className="text-3xl md:text-4xl max-w-3xl">Un projet mené de A à Z</h2>
+        <h2 className="text-3xl md:text-4xl max-w-3xl">Simple et clair, du premier contact aux travaux terminés</h2>
         <p className="mt-6 max-w-3xl text-lg">
-          Chaque rénovation commence par une analyse approfondie de votre
-          installation existante. Nos électriciens établissent un diagnostic
-          précis avant de vous proposer une solution adaptée à vos besoins.
-          Les travaux sont ensuite réalisés dans le respect strict des normes
-          NIBT/OIBT en vigueur en Suisse, avec un suivi rigoureux jusqu'à la
-          réception du chantier.
+          Un responsable de projets clients se déplace chez vous pour analyser votre installation et comprendre vos besoins. Il établit ensuite une offre détaillée adaptée à votre espace et à vos contraintes. Ce sont nos électriciens qualifiés qui réalisent les travaux, dans le respect des normes NIBT/OIBT en vigueur en Suisse.
         </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {etapes.map((e) => (
             <div key={e.title} className="card-soft text-center">
               <e.icon className="w-8 h-8 text-brand mx-auto" />
@@ -142,7 +130,7 @@ function RenovationPage() {
         </div>
       </section>
 
-      {/* POURQUOI NOUS CHOISIR */}
+      {/* CE QUI FAIT LA DIFFÉRENCE */}
       <section className="py-20 bg-[color:var(--surface-muted)]">
         <div className="container-x">
           <h2 className="text-3xl md:text-4xl text-center">Ce qui fait la différence</h2>
@@ -162,8 +150,7 @@ function RenovationPage() {
         <div className="container-x py-20 text-center">
           <h2 className="text-3xl md:text-4xl text-white">Un projet de rénovation ?</h2>
           <p className="mt-4 max-w-xl mx-auto text-lg text-white/90">
-            Nos électriciens analysent votre installation et vous proposent
-            la solution la mieux adaptée à votre bâtiment.
+            Un appartement des années 70 à remettre aux normes, un restaurant à rénover sans interruption d'activité, des bureaux à reconfigurer. Chaque projet a ses contraintes. Nos responsables de projets clients les anticipent pour vous.
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <a
