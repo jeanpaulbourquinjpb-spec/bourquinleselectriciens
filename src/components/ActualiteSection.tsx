@@ -228,7 +228,7 @@ export function ActualiteSection({
       <div className="mt-10 flex justify-center">
         <Link
           to="/actualites"
-          className="inline-flex items-center gap-2 rounded-full border border-[color:var(--foreground)] bg-[color:var(--foreground)] px-6 py-3 text-sm font-semibold text-[color:var(--background)] transition-opacity hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-md border border-[#ff6633] bg-transparent px-6 py-3 text-sm font-medium text-[#ff6633] transition-colors hover:bg-[#ff6633] hover:text-white"
         >
           Voir toutes les actualités <ArrowRight className="w-4 h-4" />
         </Link>
