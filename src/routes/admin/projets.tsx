@@ -962,19 +962,19 @@ function UploadCard({
 
       <div>
         <Label htmlFor="cat">Catégorie</Label>
-        <Select value={category} onValueChange={(v) => setCategory(v)}>
-          <SelectTrigger id="cat">
-            <SelectValue placeholder="Sélectionner…" />
-          </SelectTrigger>
-          <SelectContent>
-            {categoryOptions.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <CategorySelectWithManager
+          fns={PROJECT_CATEGORY_FNS}
+          value={category}
+          onValueChange={setCategory}
+          triggerId="cat"
+          onCategoriesLoaded={(names) => {
+            setCategoryOptions(names);
+            setCategory((prev) => prev || names[0] || "");
+          }}
+          fallbackCategories={editingProject?.category ? [editingProject.category] : []}
+        />
       </div>
+
 
       <div>
         <Label htmlFor="desc">Description (optionnel)</Label>
