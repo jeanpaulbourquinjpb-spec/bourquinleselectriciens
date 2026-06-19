@@ -227,8 +227,6 @@ function AdminTabs({
     "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
   >("projets");
   const [editingProject, setEditingProject] = useState<ProjectDTO | null>(null);
-  const [categoriesVersion, setCategoriesVersion] = useState(0);
-  const bumpCategories = () => setCategoriesVersion((v) => v + 1);
 
   // Keep editingProject in sync with latest data from server (photos may have changed)
   useEffect(() => {
@@ -240,6 +238,7 @@ function AdminTabs({
       setEditingProject(fresh);
     }
   }, [projects, editingProject]);
+
 
   return (
     <div className="mt-8">
