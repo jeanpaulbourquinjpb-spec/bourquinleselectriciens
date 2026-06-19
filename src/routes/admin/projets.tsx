@@ -8,13 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -57,10 +52,15 @@ import {
   deleteSponsoringPhoto,
   reorderSponsoringEntries,
   reorderSponsoringPhotos,
-  SPONSORING_CATEGORIES,
+  listSponsoringCategories,
+  createSponsoringCategory,
+  updateSponsoringCategory,
+  deleteSponsoringCategory,
   type SponsoringEntryDTO,
   type SponsoringPhotoDTO,
 } from "@/lib/sponsoring.functions";
+import { CategorySelectWithManager, type CategoryFns } from "@/components/CategoryManager";
+
 import {
   listPartners,
   createPartner,
@@ -222,8 +222,6 @@ function AdminTabs({
     "projets" | "sponsoring" | "partenaires" | "carrieres" | "documents"
   >("projets");
   const [editingProject, setEditingProject] = useState<ProjectDTO | null>(null);
-  const [categoriesVersion, setCategoriesVersion] = useState(0);
-  const bumpCategories = () => setCategoriesVersion((v) => v + 1);
 
   // Keep editingProject in sync with latest data from server (photos may have changed)
   useEffect(() => {
@@ -235,6 +233,7 @@ function AdminTabs({
       setEditingProject(fresh);
     }
   }, [projects, editingProject]);
+
 
   return (
     <div className="mt-8">
@@ -273,13 +272,9 @@ function AdminTabs({
                   setEditingProject(null);
                   onProjectsChanged();
                 }}
-                categoriesVersion={categoriesVersion}
-              />
-              <CategoriesCard
-                version={categoriesVersion}
-                onChanged={bumpCategories}
               />
             </div>
+
             <div>
               <h2 className="text-xl mb-4">Projets ({projects.length})</h2>
               <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
@@ -672,18 +667,30 @@ function AdminProjectCard({
   );
 }
 
+const PROJECT_CATEGORY_FNS: CategoryFns = {
+  list: listProjectCategories,
+  create: createProjectCategory,
+  update: updateProjectCategory,
+  remove: deleteProjectCategory,
+};
+
+const SPONSORING_CATEGORY_FNS: CategoryFns = {
+  list: listSponsoringCategories,
+  create: createSponsoringCategory,
+  update: updateSponsoringCategory,
+  remove: deleteSponsoringCategory,
+};
+
 function UploadCard({
   onCreated,
   onUpdated,
   editingProject,
   onCancelEdit,
-  categoriesVersion = 0,
 }: {
   onCreated: () => void;
   onUpdated: () => void;
   editingProject: ProjectDTO | null;
   onCancelEdit: () => void;
-  categoriesVersion?: number;
 }) {
   const create = useServerFn(createProject);
   const update = useServerFn(updateProject);
@@ -699,22 +706,8 @@ function UploadCard({
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fetchCategories = useServerFn(listProjectCategories);
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
-  useEffect(() => {
-    let alive = true;
-    fetchCategories({})
-      .then((res) => {
-        if (!alive) return;
-        const names = (res.categories ?? []).map((c) => c.name);
-        setCategoryOptions(names);
-        setCategory((prev) => prev || names[0] || "");
-      })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, [fetchCategories, categoriesVersion]);
+
 
   // Pre-fill / reset when entering or leaving edit mode
   useEffect(() => {
@@ -964,19 +957,19 @@ function UploadCard({
 
       <div>
         <Label htmlFor="cat">Catégorie</Label>
-        <Select value={category} onValueChange={(v) => setCategory(v)}>
-          <SelectTrigger id="cat">
-            <SelectValue placeholder="Sélectionner…" />
-          </SelectTrigger>
-          <SelectContent>
-            {categoryOptions.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <CategorySelectWithManager
+          fns={PROJECT_CATEGORY_FNS}
+          value={category}
+          onValueChange={setCategory}
+          triggerId="cat"
+          onCategoriesLoaded={(names) => {
+            setCategoryOptions(names);
+            setCategory((prev) => prev || names[0] || "");
+          }}
+          fallbackCategories={editingProject?.category ? [editingProject.category] : []}
+        />
       </div>
+
 
       <div>
         <Label htmlFor="desc">Description (optionnel)</Label>
@@ -1030,12 +1023,8 @@ function SponsoringAdmin() {
   const q = useQuery({ queryKey: ["sponsoring-entries"], queryFn: () => listFn() });
   const entries: SponsoringEntryDTO[] = q.data?.entries ?? [];
 
-  // Collected categories = default + any custom from existing entries
-  const knownCategories = useMemo(() => {
-    const set = new Set<string>(SPONSORING_CATEGORIES);
-    for (const e of entries) set.add(e.category);
-    return Array.from(set);
-  }, [entries]);
+
+
 
   const [order, setOrder] = useState<string[]>(entries.map((e) => e.id));
   const [dragId, setDragId] = useState<string | null>(null);
@@ -1105,10 +1094,8 @@ function SponsoringAdmin() {
 
   return (
     <div className="mt-8 grid lg:grid-cols-[1fr_2fr] gap-10">
-      <SponsoringUploadCard
-        knownCategories={knownCategories}
-        onCreated={invalidate}
-      />
+      <SponsoringUploadCard onCreated={invalidate} />
+
       <div>
         <h2 className="text-xl mb-4">Entrées sponsoring ({entries.length})</h2>
         <p className="text-xs text-[color:var(--muted-foreground)] mb-4">
@@ -1152,10 +1139,10 @@ function SponsoringAdmin() {
                 </div>
                 <AdminSponsoringCard
                   entry={e}
-                  knownCategories={knownCategories}
                   onDelete={() => handleDelete(e.id)}
                   onChanged={invalidate}
                 />
+
               </div>
             ))}
           </div>
@@ -1165,29 +1152,16 @@ function SponsoringAdmin() {
   );
 }
 
-function SponsoringUploadCard({
-  knownCategories,
-  onCreated,
-}: {
-  knownCategories: string[];
-  onCreated: () => void;
-}) {
+function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
   const create = useServerFn(createSponsoringEntry);
   const addPhoto = useServerFn(addSponsoringPhoto);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<string>(knownCategories[0] ?? "Équitation");
-  const [addingCustom, setAddingCustom] = useState(false);
-  const [customCat, setCustomCat] = useState("");
+  const [category, setCategory] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!knownCategories.includes(category) && !addingCustom) {
-      setCategory(knownCategories[0] ?? "Équitation");
-    }
-  }, [knownCategories, category, addingCustom]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1199,7 +1173,8 @@ function SponsoringUploadCard({
       toast.error("Le titre est requis.");
       return;
     }
-    const finalCategory = addingCustom ? customCat.trim() : category;
+    const finalCategory = category;
+
     if (!finalCategory) {
       toast.error("La catégorie est requise.");
       return;
@@ -1230,10 +1205,9 @@ function SponsoringUploadCard({
       setTitle("");
       setDescription("");
       setFiles([]);
-      setCustomCat("");
-      setAddingCustom(false);
       if (fileRef.current) fileRef.current.value = "";
       onCreated();
+
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur inconnue";
       toast.error(`Échec : ${msg}`);
@@ -1275,53 +1249,18 @@ function SponsoringUploadCard({
       </div>
 
       <div>
-        <Label>Catégorie</Label>
-        {addingCustom ? (
-          <div className="flex gap-2">
-            <Input
-              value={customCat}
-              onChange={(e) => setCustomCat(e.target.value)}
-              placeholder="Nouvelle catégorie"
-              maxLength={100}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setAddingCustom(false);
-                setCustomCat("");
-              }}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {knownCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setAddingCustom(true)}
-              title="Ajouter une catégorie"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
+        <Label htmlFor="sp-cat">Catégorie</Label>
+        <CategorySelectWithManager
+          fns={SPONSORING_CATEGORY_FNS}
+          value={category}
+          onValueChange={setCategory}
+          triggerId="sp-cat"
+          onCategoriesLoaded={(names) =>
+            setCategory((prev) => prev || names[0] || "")
+          }
+        />
       </div>
+
 
       <div>
         <Label htmlFor="sp-desc">Description (optionnel)</Label>
@@ -1344,12 +1283,10 @@ function SponsoringUploadCard({
 
 function AdminSponsoringCard({
   entry,
-  knownCategories,
   onDelete,
   onChanged,
 }: {
   entry: SponsoringEntryDTO;
-  knownCategories: string[];
   onDelete: () => void;
   onChanged: () => void;
 }) {
@@ -1363,8 +1300,6 @@ function AdminSponsoringCard({
   const [title, setTitle] = useState(entry.title);
   const [description, setDescription] = useState(entry.description ?? "");
   const [category, setCategory] = useState(entry.category);
-  const [addingCustom, setAddingCustom] = useState(false);
-  const [customCat, setCustomCat] = useState("");
   const [busy, setBusy] = useState(false);
   const [photoOrder, setPhotoOrder] = useState<string[]>(entry.photos.map((p) => p.id));
   const [dragPhoto, setDragPhoto] = useState<string | null>(null);
@@ -1384,7 +1319,7 @@ function AdminSponsoringCard({
     .filter(Boolean) as SponsoringPhotoDTO[];
 
   async function saveEdit() {
-    const finalCategory = addingCustom ? customCat.trim() : category;
+    const finalCategory = category;
     if (!title.trim()) {
       toast.error("Titre requis");
       return;
@@ -1404,13 +1339,12 @@ function AdminSponsoringCard({
       });
       toast.success("Entrée mise à jour");
       setEditing(false);
-      setAddingCustom(false);
-      setCustomCat("");
       onChanged();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     }
   }
+
 
   async function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -1495,50 +1429,14 @@ function AdminSponsoringCard({
                 maxLength={200}
                 placeholder="Titre"
               />
-              {addingCustom ? (
-                <div className="flex gap-1">
-                  <Input
-                    value={customCat}
-                    onChange={(e) => setCustomCat(e.target.value)}
-                    placeholder="Nouvelle catégorie"
-                    maxLength={100}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setAddingCustom(false);
-                      setCustomCat("");
-                    }}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex gap-1">
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {knownCategories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAddingCustom(true)}
-                  >
-                    <Plus className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
+              <CategorySelectWithManager
+                fns={SPONSORING_CATEGORY_FNS}
+                value={category}
+                onValueChange={setCategory}
+                triggerClassName="h-8 text-xs"
+                fallbackCategories={entry.category ? [entry.category] : []}
+              />
+
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -2043,156 +1941,3 @@ function PartnerCard({
   );
 }
 
-function CategoriesCard({
-  version,
-  onChanged,
-}: {
-  version: number;
-  onChanged: () => void;
-}) {
-  const fetchCategories = useServerFn(listProjectCategories);
-  const createCat = useServerFn(createProjectCategory);
-  const updateCat = useServerFn(updateProjectCategory);
-  const deleteCat = useServerFn(deleteProjectCategory);
-
-  const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    fetchCategories({})
-      .then((res) => {
-        if (!alive) return;
-        setCats((res.categories ?? []).map((c) => ({ id: c.id, name: c.name })));
-      })
-      .catch(() => {})
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [fetchCategories, version]);
-
-  function resetForm() {
-    setName("");
-    setEditingId(null);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = name.trim();
-    if (!trimmed) {
-      toast.error("Le nom est requis.");
-      return;
-    }
-    setSaving(true);
-    try {
-      if (editingId) {
-        await updateCat({ data: { id: editingId, name: trimmed } });
-        toast.success("Catégorie mise à jour.");
-      } else {
-        await createCat({ data: { name: trimmed } });
-        toast.success("Catégorie ajoutée.");
-      }
-      resetForm();
-      onChanged();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm("Supprimer cette catégorie ?")) return;
-    try {
-      await deleteCat({ data: { id } });
-      toast.success("Catégorie supprimée.");
-      if (editingId === id) resetForm();
-      onChanged();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erreur");
-    }
-  }
-
-  return (
-    <div className="card-soft p-6 space-y-4">
-      <h2 className="text-xl">Gérer les catégories</h2>
-
-      {loading ? (
-        <Loader2 className="animate-spin" />
-      ) : cats.length === 0 ? (
-        <p className="text-sm text-[color:var(--muted-foreground)]">Aucune catégorie.</p>
-      ) : (
-        <ul className="space-y-2">
-          {cats.map((c) => (
-            <li
-              key={c.id}
-              className={cn(
-                "flex items-center justify-between gap-2 px-3 py-2 rounded border",
-                editingId === c.id
-                  ? "border-primary bg-primary/5"
-                  : "border-[color:var(--border)]",
-              )}
-            >
-              <span className="text-sm">{c.name}</span>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setEditingId(c.id);
-                    setName(c.name);
-                  }}
-                >
-                  <Pencil className="w-3 h-3" /> Éditer
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(c.id)}
-                >
-                  <Trash2 className="w-3 h-3" /> Supprimer
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-2 pt-2 border-t border-[color:var(--border)]">
-        <Label htmlFor="cat-name">
-          {editingId ? "Modifier la catégorie" : "Nouvelle catégorie"}
-        </Label>
-        <Input
-          id="cat-name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={100}
-          placeholder="Nom de la catégorie"
-        />
-        <div className="flex gap-2">
-          <Button type="submit" disabled={saving} className="flex-1">
-            {saving ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : editingId ? (
-              "Mettre à jour"
-            ) : (
-              "Ajouter"
-            )}
-          </Button>
-          {editingId && (
-            <Button type="button" variant="outline" onClick={resetForm}>
-              Annuler
-            </Button>
-          )}
-        </div>
-      </form>
-    </div>
-  );
-}
