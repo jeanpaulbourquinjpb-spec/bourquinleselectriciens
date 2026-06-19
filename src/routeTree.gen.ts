@@ -20,6 +20,7 @@ import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EtudeConseilControleRouteImport } from './routes/etude-conseil-controle'
+import { Route as EfficienceEnergetiqueRouteImport } from './routes/efficience-energetique'
 import { Route as EclairageRouteImport } from './routes/eclairage'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DepannageRouteImport } from './routes/depannage'
@@ -86,6 +87,11 @@ const EtudeConseilControleRoute = EtudeConseilControleRouteImport.update({
   path: '/etude-conseil-controle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EfficienceEnergetiqueRoute = EfficienceEnergetiqueRouteImport.update({
+  id: '/efficience-energetique',
+  path: '/efficience-energetique',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EclairageRoute = EclairageRouteImport.update({
   id: '/eclairage',
   path: '/eclairage',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/eclairage': typeof EclairageRoute
+  '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/eclairage': typeof EclairageRoute
+  '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
   '/eclairage': typeof EclairageRoute
+  '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/depannage'
     | '/documents'
     | '/eclairage'
+    | '/efficience-energetique'
     | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/depannage'
     | '/documents'
     | '/eclairage'
+    | '/efficience-energetique'
     | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/depannage'
     | '/documents'
     | '/eclairage'
+    | '/efficience-energetique'
     | '/etude-conseil-controle'
     | '/login'
     | '/mentions-legales'
@@ -288,6 +300,7 @@ export interface RootRouteChildren {
   DepannageRoute: typeof DepannageRoute
   DocumentsRoute: typeof DocumentsRoute
   EclairageRoute: typeof EclairageRoute
+  EfficienceEnergetiqueRoute: typeof EfficienceEnergetiqueRoute
   EtudeConseilControleRoute: typeof EtudeConseilControleRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -380,6 +393,13 @@ declare module '@tanstack/react-router' {
       path: '/etude-conseil-controle'
       fullPath: '/etude-conseil-controle'
       preLoaderRoute: typeof EtudeConseilControleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/efficience-energetique': {
+      id: '/efficience-energetique'
+      path: '/efficience-energetique'
+      fullPath: '/efficience-energetique'
+      preLoaderRoute: typeof EfficienceEnergetiqueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eclairage': {
@@ -475,6 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   DepannageRoute: DepannageRoute,
   DocumentsRoute: DocumentsRoute,
   EclairageRoute: EclairageRoute,
+  EfficienceEnergetiqueRoute: EfficienceEnergetiqueRoute,
   EtudeConseilControleRoute: EtudeConseilControleRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
