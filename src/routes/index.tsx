@@ -211,6 +211,7 @@ function HomePage() {
               const isDepannage = s.title === "Maintenance & dépannage";
               const isRenovation = s.title === "Rénovation";
               const isEtude = s.title === "Étude, conseil & contrôle";
+              const isEclairage = s.title === "Éclairage";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
