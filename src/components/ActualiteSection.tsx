@@ -1,15 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, ImageIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from "@/components/ui/carousel";
 import type { ArticleDTO } from "@/lib/articles.functions";
+
 
 export type FilterKey =
   | "all"
