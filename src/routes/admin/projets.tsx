@@ -1210,10 +1210,9 @@ function SponsoringUploadCard({ onCreated }: { onCreated: () => void }) {
       setTitle("");
       setDescription("");
       setFiles([]);
-      setCustomCat("");
-      setAddingCustom(false);
       if (fileRef.current) fileRef.current.value = "";
       onCreated();
+
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur inconnue";
       toast.error(`Échec : ${msg}`);
