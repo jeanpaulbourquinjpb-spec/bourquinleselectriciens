@@ -1028,12 +1028,8 @@ function SponsoringAdmin() {
   const q = useQuery({ queryKey: ["sponsoring-entries"], queryFn: () => listFn() });
   const entries: SponsoringEntryDTO[] = q.data?.entries ?? [];
 
-  // Collected categories = default + any custom from existing entries
-  const knownCategories = useMemo(() => {
-    const set = new Set<string>(SPONSORING_CATEGORIES);
-    for (const e of entries) set.add(e.category);
-    return Array.from(set);
-  }, [entries]);
+
+
 
   const [order, setOrder] = useState<string[]>(entries.map((e) => e.id));
   const [dragId, setDragId] = useState<string | null>(null);
