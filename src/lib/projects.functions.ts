@@ -297,3 +297,18 @@ export const setCoverPhoto = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export type ProjectCategoryDTO = { id: string; name: string; sort_order: number };
+
+export const listProjectCategories = createServerFn({ method: "GET" }).handler(async () => {
+  const { data, error } = await supabaseAdmin
+    .from("project_categories")
+    .select("id, name, sort_order")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) {
+    console.error("listProjectCategories error:", error);
+    return { categories: [] as ProjectCategoryDTO[] };
+  }
+  return { categories: (data ?? []) as ProjectCategoryDTO[] };
+});
