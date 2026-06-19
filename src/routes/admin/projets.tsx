@@ -41,7 +41,6 @@ import {
   reorderProjects,
   reorderProjectPhotos,
   isCurrentUserAdmin,
-  CATEGORIES,
   listProjectCategories,
   type ProjectDTO,
   type ProjectPhotoDTO,
