@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TelecomsRouteImport } from './routes/telecoms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SecuriteRouteImport } from './routes/securite'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RenovationRouteImport } from './routes/renovation'
 import { Route as ProjetsRouteImport } from './routes/projets'
@@ -49,6 +50,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecuriteRoute = SecuriteRouteImport.update({
+  id: '/securite',
+  path: '/securite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/projets': typeof ProjetsRoute
   '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/securite': typeof SecuriteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/telecoms': typeof TelecomsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/projets': typeof ProjetsRoute
   '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/securite': typeof SecuriteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/telecoms': typeof TelecomsRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/projets': typeof ProjetsRoute
   '/renovation': typeof RenovationRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/securite': typeof SecuriteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/telecoms': typeof TelecomsRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/projets'
     | '/renovation'
     | '/reset-password'
+    | '/securite'
     | '/services'
     | '/sitemap.xml'
     | '/telecoms'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/projets'
     | '/renovation'
     | '/reset-password'
+    | '/securite'
     | '/services'
     | '/sitemap.xml'
     | '/telecoms'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/projets'
     | '/renovation'
     | '/reset-password'
+    | '/securite'
     | '/services'
     | '/sitemap.xml'
     | '/telecoms'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   ProjetsRoute: typeof ProjetsRoute
   RenovationRoute: typeof RenovationRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SecuriteRoute: typeof SecuriteRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TelecomsRoute: typeof TelecomsRoute
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/securite': {
+      id: '/securite'
+      path: '/securite'
+      fullPath: '/securite'
+      preLoaderRoute: typeof SecuriteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -588,6 +608,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjetsRoute: ProjetsRoute,
   RenovationRoute: RenovationRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SecuriteRoute: SecuriteRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TelecomsRoute: TelecomsRoute,
