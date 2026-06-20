@@ -85,7 +85,17 @@ export function SiteHeader() {
   const isRouteActive = (to: string) =>
     pathname === to || pathname.startsWith(to + "/");
 
-  const isServicesActive = servicesItems.some((it) => isRouteActive(it.to));
+  const serviceRoutes = [
+    "/etude-conseil-controle",
+    "/depannage",
+    "/renovation",
+    "/eclairage",
+    "/efficience-energetique",
+    "/telecoms",
+    "/securite",
+  ];
+
+  const isServicesActive = serviceRoutes.some((route) => isRouteActive(route));
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-[color:var(--line)]">
