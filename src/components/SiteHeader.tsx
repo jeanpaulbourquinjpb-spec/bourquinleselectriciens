@@ -15,6 +15,8 @@ const servicesItems = [
   { to: "/eclairage", label: "Éclairage" },
   { to: "/efficience-energetique", label: "Efficience énergétique" },
   { to: "/telecoms", label: "Télécommunications" },
+  { to: "/domotique", label: "Domotique" },
+  { to: "/e-mobility", label: "E-Mobility" },
 ];
 
 const sections: readonly NavItem[] = [
