@@ -296,27 +296,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============================== CONTACT ============================== */}
-      <section id="contact" className="scroll-mt-20 bg-[color:var(--surface-muted)]">
-        <div className="container-x py-24">
-          <p className="eyebrow">Infos pratiques</p>
-          <h2 className="mt-3 text-4xl md:text-5xl">Contactez-nous</h2>
-          <div className="mt-12 max-w-3xl">
-            <p className="text-xl md:text-2xl text-[color:var(--muted-foreground)]">
-              Une question ? Un projet ? Nous sommes là.
-            </p>
-            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par email.</p>
-            <div className="mt-8">
-              <ContactForm />
-            </div>
-          </div>
-
-        </div>
-
-        <GoogleReviewsSection />
-
-        <SiteFooter />
-      </section>
+      <SiteFooter />
     </div>
   );
 }
