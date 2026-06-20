@@ -4,12 +4,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringSection } from "@/components/SponsoringSection";
 import { listSponsoringEntries } from "@/lib/sponsoring.functions";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
-import { ContactForm } from "@/components/ContactForm";
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
