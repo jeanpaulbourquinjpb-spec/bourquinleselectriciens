@@ -9,7 +9,7 @@ import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringSection } from "@/components/SponsoringSection";
 import { listSponsoringEntries } from "@/lib/sponsoring.functions";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
-import { ContactForm } from "@/components/ContactForm";
+
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
@@ -149,9 +149,9 @@ function HomePage() {
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-            <a href="#contact" className="btn-brand justify-center sm:justify-start">
+            <Link to="/contact" className="btn-brand justify-center sm:justify-start">
               Contactez-nous
-            </a>
+            </Link>
             <a
               href="#services"
               className="inline-flex items-center justify-center gap-2 rounded-md border border-white/70 px-5 py-2.5 text-sm font-medium text-white hover:bg-white hover:text-black transition-colors"
@@ -296,27 +296,16 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============================== CONTACT ============================== */}
-      <section id="contact" className="scroll-mt-20 bg-[color:var(--surface-muted)]">
-        <div className="container-x py-24">
-          <p className="eyebrow">Infos pratiques</p>
-          <h2 className="mt-3 text-4xl md:text-5xl">Contactez-nous</h2>
-          <div className="mt-12 max-w-3xl">
-            <p className="text-xl md:text-2xl text-[color:var(--muted-foreground)]">
-              Une question ? Un projet ? Nous sommes là.
-            </p>
-            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par email.</p>
-            <div className="mt-8">
-              <ContactForm />
-            </div>
-          </div>
-
+      {/* ============================== AVIS GOOGLE ============================== */}
+      <section className="bg-[color:var(--surface-muted)] py-24">
+        <div className="container-x">
+          <p className="eyebrow">Avis Google</p>
+          <h2 className="mt-3 text-3xl md:text-5xl">Ce que disent nos clients</h2>
         </div>
-
         <GoogleReviewsSection />
-
-        <SiteFooter />
       </section>
+
+      <SiteFooter />
     </div>
   );
 }
