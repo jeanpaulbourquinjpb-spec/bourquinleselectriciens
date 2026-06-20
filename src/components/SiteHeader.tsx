@@ -24,7 +24,7 @@ const sections: readonly NavItem[] = [
   { type: "route", to: "/actualites", label: "Actualité" },
   { type: "route", to: "/projets", label: "Nos projets" },
   { type: "route", to: "/carrieres", label: "Carrières" },
-  { type: "hash", hash: "contact", label: "Contact" },
+  { type: "route", to: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteHeader() {

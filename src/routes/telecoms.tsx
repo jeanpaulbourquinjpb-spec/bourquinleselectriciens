@@ -92,7 +92,7 @@ function TelecomsPage() {
           Swisscom Business Gold Partner
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a href="/#contact" className="btn-brand">
+          <a href="/contact" className="btn-brand">
             Demander un devis
           </a>
           <a href="tel:0228498333" className="btn-outline">
@@ -177,7 +177,7 @@ function TelecomsPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <a
-              href="/#contact"
+              href="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-brand font-semibold hover:bg-white/90 transition"
             >
               Nous contacter
