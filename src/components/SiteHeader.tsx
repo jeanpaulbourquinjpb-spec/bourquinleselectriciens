@@ -132,20 +132,30 @@ export function SiteHeader() {
                 onMouseEnter={() => setServicesOpen(true)}
                 onMouseLeave={() => setServicesOpen(false)}
               >
-                <button
-                  type="button"
-                  onClick={() => setServicesOpen((v) => !v)}
-                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                    isServicesActive ? "text-brand" : "hover:text-brand"
-                  }`}
-                  aria-haspopup="true"
-                  aria-expanded={servicesOpen}
-                >
-                  {s.label}
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                <div className="flex items-center gap-1">
+                  <a
+                    href="/#services"
+                    onClick={(e) => handleClick(e, "services")}
+                    className={`text-sm font-medium transition-colors ${
+                      isServicesActive ? "text-brand" : "hover:text-brand"
+                    }`}
+                  >
+                    {s.label}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setServicesOpen((v) => !v)}
+                    className={`flex items-center text-sm font-medium transition-colors ${
+                      isServicesActive ? "text-brand" : "hover:text-brand"
+                    }`}
+                    aria-haspopup="true"
+                    aria-expanded={servicesOpen}
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                </div>
                 <div
                   className={`absolute left-0 top-full pt-2 transition-all duration-200 ${
                     servicesOpen
