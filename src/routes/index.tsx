@@ -215,6 +215,7 @@ function HomePage() {
               const isEclairage = s.title === "Éclairage";
               const isEfficience = s.title === "Efficience énergétique";
               const isTelecom = s.title === "Télécommunications";
+              const isSecurite = s.title === "Sécurité";
               const isDomotique = s.title === "Domotique";
               const isEMobility = s.title === "E-Mobility";
               const content = (
