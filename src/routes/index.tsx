@@ -69,6 +69,8 @@ const services = [
   { icon: Zap, title: "Efficience énergétique", text: "Solutions électriques durables pour votre sécurité, votre confort et votre efficience énergétique. Partenaire éco21 certifié." },
   { icon: Network, title: "Télécommunications", text: "Câblage cuivre et fibre, réseaux informatiques, téléphonie. Partenaire Swisscom Business Gold." },
   { icon: Shield, title: "Sécurité", text: "Installations haute technologie : contrôle d'accès, vidéosurveillance, interphonie, biométrie." },
+  { icon: Home, title: "Domotique", text: "Nous concevons et installons des systèmes domotiques sur mesure pour votre confort, votre sécurité et vos économies d'énergie. Nos installations s'appuient sur les protocoles professionnels les plus récents, du filaire pérenne au sans-fil compatible avec les grands écosystèmes Apple, Google et Amazon." },
+  { icon: BatteryCharging, title: "E-Mobility", text: "Votre voiture électrique mérite mieux qu'une prise de courant. Nous installons des bornes de recharge adaptées à votre usage, que ce soit pour une maison, une entreprise ou un parking collectif, pour recharger vite, en toute sécurité et garder le contrôle sur votre consommation." },
 ];
 
 
