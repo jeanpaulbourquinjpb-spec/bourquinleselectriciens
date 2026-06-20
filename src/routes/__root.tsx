@@ -172,15 +172,22 @@ function RootComponent() {
     const hash = window.location.hash;
     if (!hash) return;
 
-    const scrollToHash = () => {
+    let attempts = 0;
+    const maxAttempts = 20;
+
+    const tryScroll = () => {
       const el = document.querySelector(hash);
       if (el) {
         el.scrollIntoView({ behavior: 'instant', block: 'start' });
+        return;
+      }
+      attempts++;
+      if (attempts < maxAttempts) {
+        setTimeout(tryScroll, 100);
       }
     };
 
-    const timeout = setTimeout(scrollToHash, 100);
-    return () => clearTimeout(timeout);
+    setTimeout(tryScroll, 100);
   }, []);
 
   return (
