@@ -4,7 +4,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ContactForm } from "@/components/ContactForm";
 import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 
-
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
   head: () => ({
@@ -19,24 +18,24 @@ function ContactPage() {
   return (
     <div>
       <SiteHeader />
-      <section className="container-x py-20">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-5xl">Contactez-nous</h1>
-          <p className="mt-4 text-xl md:text-2xl text-[color:var(--muted)]">
-            Une question ? Un projet ? Nous sommes là.
-          </p>
-          <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par E-mail.</p>
-          <div className="mt-8">
-            <ContactForm />
+
+      <section id="contact" className="scroll-mt-20 bg-[color:var(--surface-muted)]">
+        <div className="container-x py-24">
+          <p className="eyebrow">Infos pratiques</p>
+          <h2 className="mt-3 text-4xl md:text-5xl">Contactez-nous</h2>
+          <div className="mt-12 max-w-3xl">
+            <p className="text-xl md:text-2xl text-[color:var(--muted-foreground)]">
+              Une question ? Un projet ? Nous sommes là.
+            </p>
+            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par email.</p>
+            <div className="mt-8">
+              <ContactForm />
+            </div>
           </div>
         </div>
 
-        <div className="mt-20">
-          <GoogleReviewsSection />
-        </div>
-
+        <GoogleReviewsSection />
       </section>
-
 
       <SiteFooter />
     </div>
