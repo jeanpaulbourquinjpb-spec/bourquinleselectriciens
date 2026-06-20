@@ -95,6 +95,8 @@ export function SiteHeader() {
     "/efficience-energetique",
     "/telecoms",
     "/securite",
+    "/domotique",
+    "/e-mobility",
   ];
 
   const isServicesActive = serviceRoutes.some((route) => isRouteActive(route));
