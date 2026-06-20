@@ -132,20 +132,30 @@ export function SiteHeader() {
                 onMouseEnter={() => setServicesOpen(true)}
                 onMouseLeave={() => setServicesOpen(false)}
               >
-                <button
-                  type="button"
-                  onClick={() => setServicesOpen((v) => !v)}
-                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                    isServicesActive ? "text-brand" : "hover:text-brand"
-                  }`}
-                  aria-haspopup="true"
-                  aria-expanded={servicesOpen}
-                >
-                  {s.label}
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                <div className="flex items-center gap-1">
+                  <a
+                    href="/#services"
+                    onClick={(e) => handleClick(e, "services")}
+                    className={`text-sm font-medium transition-colors ${
+                      isServicesActive ? "text-brand" : "hover:text-brand"
+                    }`}
+                  >
+                    {s.label}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setServicesOpen((v) => !v)}
+                    className={`flex items-center text-sm font-medium transition-colors ${
+                      isServicesActive ? "text-brand" : "hover:text-brand"
+                    }`}
+                    aria-haspopup="true"
+                    aria-expanded={servicesOpen}
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                </div>
                 <div
                   className={`absolute left-0 top-full pt-2 transition-all duration-200 ${
                     servicesOpen
@@ -218,19 +228,29 @@ export function SiteHeader() {
               }
               return (
                 <div key={s.label} className="flex flex-col">
-                  <button
-                    type="button"
-                    onClick={() => setMobileServicesOpen((v) => !v)}
-                    className={`flex items-center justify-between py-1 text-sm font-medium ${
-                      isServicesActive ? "text-brand" : ""
-                    }`}
-                    aria-expanded={mobileServicesOpen}
-                  >
-                    <span>{s.label}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
+                  <div className="flex items-center justify-between py-1">
+                    <a
+                      href="/#services"
+                      onClick={(e) => handleClick(e, "services")}
+                      className={`flex-1 text-sm font-medium ${
+                        isServicesActive ? "text-brand" : ""
+                      }`}
+                    >
+                      {s.label}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setMobileServicesOpen((v) => !v)}
+                      className={`p-1 ${
+                        isServicesActive ? "text-brand" : ""
+                      }`}
+                      aria-expanded={mobileServicesOpen}
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  </div>
                   {mobileServicesOpen && (
                     <div
                       className="mt-1 ml-2 flex flex-col rounded-lg bg-white shadow-lg border border-gray-100 py-2"
