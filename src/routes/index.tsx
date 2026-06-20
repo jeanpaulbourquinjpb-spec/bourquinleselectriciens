@@ -11,6 +11,7 @@ import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
+  Home, BatteryCharging,
   ArrowRight, Phone, Mail, MapPin, Clock, Linkedin, Facebook, Instagram, ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
