@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { useEffect } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -166,6 +167,19 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace("#", "");
+    if (hash && window.location.pathname === "/") {
+      const el = document.getElementById(hash);
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: "instant", block: "start" });
+        });
+      }
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
