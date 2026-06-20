@@ -215,6 +215,7 @@ function HomePage() {
               const isEclairage = s.title === "Éclairage";
               const isEfficience = s.title === "Efficience énergétique";
               const isTelecom = s.title === "Télécommunications";
+              const isSecurite = s.title === "Sécurité";
               const isDomotique = s.title === "Domotique";
               const isEMobility = s.title === "E-Mobility";
               const content = (
@@ -262,6 +263,13 @@ function HomePage() {
               if (isTelecom) {
                 return (
                   <Link key={s.title} to="/telecoms" className="card-soft block no-underline min-h-48 md:min-h-56">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isSecurite) {
+                return (
+                  <Link key={s.title} to="/securite" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );
