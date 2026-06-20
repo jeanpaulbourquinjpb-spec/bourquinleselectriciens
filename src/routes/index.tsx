@@ -267,6 +267,13 @@ function HomePage() {
                   </Link>
                 );
               }
+              if (isSecurite) {
+                return (
+                  <Link key={s.title} to="/securite" className="card-soft block no-underline min-h-48 md:min-h-56">
+                    {content}
+                  </Link>
+                );
+              }
               if (isDomotique) {
                 return (
                   <Link key={s.title} to="/domotique" className="card-soft block no-underline min-h-48 md:min-h-56">
