@@ -169,16 +169,18 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash.replace("#", "");
-    if (hash && window.location.pathname === "/") {
-      const el = document.getElementById(hash);
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const scrollToHash = () => {
+      const el = document.querySelector(hash);
       if (el) {
-        requestAnimationFrame(() => {
-          el.scrollIntoView({ behavior: "instant", block: "start" });
-        });
+        el.scrollIntoView({ behavior: 'instant', block: 'start' });
       }
-    }
+    };
+
+    const timeout = setTimeout(scrollToHash, 100);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
