@@ -273,20 +273,27 @@ export function SiteHeader() {
                       className="mt-1 ml-2 flex flex-col rounded-lg bg-white shadow-lg border border-gray-100 py-2"
                       style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                     >
-                      {s.items.map((it) => (
-                        <Link
-                          key={it.to}
-                          to={it.to}
-                          onClick={() => {
-                            setMobileServicesOpen(false);
-                            setOpen(false);
-                          }}
-                          className="block py-2 px-4 text-sm font-medium transition-colors hover:bg-[#fff5f2] hover:text-[#ff6633]"
-                          style={{ color: "#54544b" }}
-                        >
-                          {it.label}
-                        </Link>
-                      ))}
+                      {s.items.map((it) => {
+                        const isActive = pathname === it.to;
+                        return (
+                          <Link
+                            key={it.to}
+                            to={it.to}
+                            onClick={() => {
+                              setMobileServicesOpen(false);
+                              setOpen(false);
+                            }}
+                            className={`block py-2 px-4 text-sm font-medium transition-colors hover:bg-[#fff5f2] hover:text-[#ff6633] ${
+                              isActive
+                                ? "text-[#ff6633] bg-[#fff5f2] border-l-2 border-[#ff6633]"
+                                : ""
+                            }`}
+                            style={{ color: isActive ? undefined : "#54544b" }}
+                          >
+                            {it.label}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
