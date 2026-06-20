@@ -68,9 +68,7 @@
   * {
     border-color: var(--color-border);
   }
-  html {
-    scroll-behavior: smooth;
-  }
+  /* html { scroll-behavior: smooth; } -- removed for instant anchor scroll */
   body {
     background-color: var(--background);
     color: var(--body);
@@ -149,9 +147,7 @@
   }
 }
 
-@layer base {
-  html { scroll-behavior: smooth; }
-}
+/* @layer base { html { scroll-behavior: smooth; } } -- removed for instant anchor scroll */
 
 @layer utilities {
   @keyframes marquee {

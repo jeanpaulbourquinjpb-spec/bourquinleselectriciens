@@ -70,9 +70,9 @@ export function SiteHeader() {
     setOpen(false);
     if (isHome) {
       e.preventDefault();
-      const el = document.getElementById(hash);
+      const el = document.querySelector(`#${hash}`);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.scrollIntoView({ behavior: "instant", block: "start" });
         history.replaceState(null, "", `#${hash}`);
         setActive(hash);
       }
