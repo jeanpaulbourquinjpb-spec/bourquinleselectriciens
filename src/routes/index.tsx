@@ -69,8 +69,8 @@ const services = [
   { icon: Zap, title: "Efficience énergétique", text: "Solutions électriques durables pour votre sécurité, votre confort et votre efficience énergétique. Partenaire éco21 certifié." },
   { icon: Network, title: "Télécommunications", text: "Câblage cuivre et fibre, réseaux informatiques, téléphonie. Partenaire Swisscom Business Gold." },
   { icon: Shield, title: "Sécurité", text: "Installations haute technologie : contrôle d'accès, vidéosurveillance, interphonie, biométrie." },
-  { icon: Home, title: "Domotique", text: "Nous concevons et installons des systèmes domotiques sur mesure pour votre confort, votre sécurité et vos économies d'énergie. Nos installations s'appuient sur les protocoles professionnels les plus récents, du filaire pérenne au sans-fil compatible avec les grands écosystèmes Apple, Google et Amazon." },
-  { icon: BatteryCharging, title: "E-Mobility", text: "Votre voiture électrique mérite mieux qu'une prise de courant. Nous installons des bornes de recharge adaptées à votre usage, que ce soit pour une maison, une entreprise ou un parking collectif, pour recharger vite, en toute sécurité et garder le contrôle sur votre consommation." },
+  { icon: Home, title: "Domotique", text: "Confort intelligent : pilotez l'éclairage, les stores, le chauffage et la sécurité de votre bâtiment depuis un seul système, compatible avec les grands écosystèmes connectés." },
+  { icon: BatteryCharging, title: "E-Mobility", text: "Installation de bornes de recharge pour véhicules électriques, adaptées à votre usage résidentiel, commercial ou collectif." },
 ];
 
 
@@ -215,6 +215,8 @@ function HomePage() {
               const isEclairage = s.title === "Éclairage";
               const isEfficience = s.title === "Efficience énergétique";
               const isTelecom = s.title === "Télécommunications";
+              const isDomotique = s.title === "Domotique";
+              const isEMobility = s.title === "E-Mobility";
               const content = (
                 <>
                   <s.icon className="w-7 h-7 text-brand" />
@@ -260,6 +262,20 @@ function HomePage() {
               if (isTelecom) {
                 return (
                   <Link key={s.title} to="/telecoms" className="card-soft block no-underline min-h-48 md:min-h-56">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isDomotique) {
+                return (
+                  <Link key={s.title} to="/domotique" className="card-soft block no-underline min-h-48 md:min-h-56">
+                    {content}
+                  </Link>
+                );
+              }
+              if (isEMobility) {
+                return (
+                  <Link key={s.title} to="/e-mobility" className="card-soft block no-underline min-h-48 md:min-h-56">
                     {content}
                   </Link>
                 );

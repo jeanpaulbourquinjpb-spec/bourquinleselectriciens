@@ -23,6 +23,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EtudeConseilControleRouteImport } from './routes/etude-conseil-controle'
 import { Route as EfficienceEnergetiqueRouteImport } from './routes/efficience-energetique'
 import { Route as EclairageRouteImport } from './routes/eclairage'
+import { Route as EMobilityRouteImport } from './routes/e-mobility'
+import { Route as DomotiqueRouteImport } from './routes/domotique'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DepannageRouteImport } from './routes/depannage'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -104,6 +106,16 @@ const EclairageRoute = EclairageRouteImport.update({
   path: '/eclairage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EMobilityRoute = EMobilityRouteImport.update({
+  id: '/e-mobility',
+  path: '/e-mobility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DomotiqueRoute = DomotiqueRouteImport.update({
+  id: '/domotique',
+  path: '/domotique',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -164,6 +176,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/domotique': typeof DomotiqueRoute
+  '/e-mobility': typeof EMobilityRoute
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
@@ -190,6 +204,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/domotique': typeof DomotiqueRoute
+  '/e-mobility': typeof EMobilityRoute
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
@@ -217,6 +233,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/depannage': typeof DepannageRoute
   '/documents': typeof DocumentsRoute
+  '/domotique': typeof DomotiqueRoute
+  '/e-mobility': typeof EMobilityRoute
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
@@ -245,6 +263,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/domotique'
+    | '/e-mobility'
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
@@ -271,6 +291,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/domotique'
+    | '/e-mobility'
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
@@ -297,6 +319,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/depannage'
     | '/documents'
+    | '/domotique'
+    | '/e-mobility'
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
@@ -324,6 +348,8 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DepannageRoute: typeof DepannageRoute
   DocumentsRoute: typeof DocumentsRoute
+  DomotiqueRoute: typeof DomotiqueRoute
+  EMobilityRoute: typeof EMobilityRoute
   EclairageRoute: typeof EclairageRoute
   EfficienceEnergetiqueRoute: typeof EfficienceEnergetiqueRoute
   EtudeConseilControleRoute: typeof EtudeConseilControleRoute
@@ -442,6 +468,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EclairageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/e-mobility': {
+      id: '/e-mobility'
+      path: '/e-mobility'
+      fullPath: '/e-mobility'
+      preLoaderRoute: typeof EMobilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/domotique': {
+      id: '/domotique'
+      path: '/domotique'
+      fullPath: '/domotique'
+      preLoaderRoute: typeof DomotiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/documents': {
       id: '/documents'
       path: '/documents'
@@ -535,6 +575,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DepannageRoute: DepannageRoute,
   DocumentsRoute: DocumentsRoute,
+  DomotiqueRoute: DomotiqueRoute,
+  EMobilityRoute: EMobilityRoute,
   EclairageRoute: EclairageRoute,
   EfficienceEnergetiqueRoute: EfficienceEnergetiqueRoute,
   EtudeConseilControleRoute: EtudeConseilControleRoute,
