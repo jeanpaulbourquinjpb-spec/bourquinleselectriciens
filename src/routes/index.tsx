@@ -4,12 +4,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { GoogleReviewsSection } from "@/components/GoogleReviewsSection";
 import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringSection } from "@/components/SponsoringSection";
 import { listSponsoringEntries } from "@/lib/sponsoring.functions";
 import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
-import { ContactForm } from "@/components/ContactForm";
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
@@ -296,27 +294,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============================== CONTACT ============================== */}
-      <section id="contact" className="scroll-mt-20 bg-[color:var(--surface-muted)]">
-        <div className="container-x py-24">
-          <p className="eyebrow">Infos pratiques</p>
-          <h2 className="mt-3 text-4xl md:text-5xl">Contactez-nous</h2>
-          <div className="mt-12 max-w-3xl">
-            <p className="text-xl md:text-2xl text-[color:var(--muted-foreground)]">
-              Une question ? Un projet ? Nous sommes là.
-            </p>
-            <p className="mt-6">Utilisez le formulaire ci-dessous pour nous contacter par email.</p>
-            <div className="mt-8">
-              <ContactForm />
-            </div>
-          </div>
-
-        </div>
-
-        <GoogleReviewsSection />
-
-        <SiteFooter />
-      </section>
+      <SiteFooter />
     </div>
   );
 }
