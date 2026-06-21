@@ -143,7 +143,14 @@ function HomePage() {
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap items-start gap-3">
-            <GoogleRatingBadge />
+            <a
+              href="https://www.google.com/maps/place/?q=place_id:ChIJfS2J5zZljEcREXY9RXGNl_I"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer inline-flex"
+            >
+              <GoogleRatingBadge />
+            </a>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
               Trois générations de savoir-faire
             </span>
