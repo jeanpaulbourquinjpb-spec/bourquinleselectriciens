@@ -190,32 +190,45 @@ function SponsoringCard({
   onOpenLightbox: (index: number) => void;
 }) {
   const photos = entry.photos;
-  const [index, setIndex] = useState(0);
+  const hasPhotos = photos.length > 0;
+  const [index, setIndex] = useState<number | null>(hasPhotos ? 0 : null);
+  const [firstLoaded, setFirstLoaded] = useState(false);
   const hasMany = photos.length > 1;
+
+  useEffect(() => {
+    if (hasPhotos && index === null) setIndex(0);
+  }, [hasPhotos, index]);
 
   const go = useCallback(
     (dir: 1 | -1) => {
-      setIndex((i) => (i + dir + photos.length) % photos.length);
+      setIndex((i) => (((i ?? 0) + dir + photos.length) % photos.length));
     },
     [photos.length],
   );
 
+  const activeIndex = index ?? 0;
+
   return (
     <button
       type="button"
-      onClick={() => photos.length > 0 && onOpenLightbox(index)}
+      onClick={() => hasPhotos && firstLoaded && onOpenLightbox(activeIndex)}
       className="group relative block w-full text-left aspect-[4/3] bg-[color:var(--surface-muted)] overflow-hidden rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand)]"
     >
-      {photos.length > 0 ? (
+      {!firstLoaded && hasPhotos && (
+        <div className="absolute inset-0 bg-neutral-800 animate-pulse" aria-hidden />
+      )}
+      {hasPhotos ? (
         photos.map((ph, i) => (
           <img
             key={ph.id}
             src={ph.url}
             alt={entry.title}
-            loading="lazy"
+            loading="eager"
+            decoding="async"
+            onLoad={() => i === 0 && setFirstLoaded(true)}
             className={cn(
               "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
-              i === index ? "opacity-100" : "opacity-0",
+              i === activeIndex && firstLoaded ? "opacity-100" : "opacity-0",
             )}
           />
         ))
