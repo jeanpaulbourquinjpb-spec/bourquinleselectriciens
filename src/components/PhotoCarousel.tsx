@@ -15,9 +15,10 @@ type Props = {
   images: PhotoCarouselImage[];
   onSlideClick?: (index: number) => void;
   className?: string;
+  hideDots?: boolean;
 };
 
-export function PhotoCarousel({ images, onSlideClick, className }: Props) {
+export function PhotoCarousel({ images, onSlideClick, className, hideDots }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [index, setIndex] = useState(0);
@@ -207,8 +208,9 @@ export function PhotoCarousel({ images, onSlideClick, className }: Props) {
         )}
       </div>
 
-      {total > 1 && (
-        <div className="mt-3 flex justify-center gap-1.5">
+      {total > 1 && !hideDots && (
+        <div className="mt-2 flex justify-center gap-1.5">
+
           {images.map((_, i) => (
             <button
               key={i}
