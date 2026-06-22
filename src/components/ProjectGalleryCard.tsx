@@ -1,123 +1,68 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
 import type { ProjectDTO } from "@/lib/projects.functions";
 
 export function ProjectGalleryCard({ p }: { p: ProjectDTO }) {
-  const photos = p.photos.length > 0 ? p.photos : p.image_url ? [{ id: "_", url: p.image_url, is_cover: true, sort_order: 0 }] : [];
-  const [index, setIndex] = useState(0);
-  const [lightbox, setLightbox] = useState(false);
+  const photos = p.photos.length > 0
+    ? p.photos
+    : p.image_url
+      ? [{ id: "_", url: p.image_url, is_cover: true, sort_order: 0 }]
+      : [];
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const hasMany = photos.length > 1;
-
-  const go = useCallback(
-    (dir: 1 | -1) => {
-      setIndex((i) => (i + dir + photos.length) % photos.length);
-    },
-    [photos.length],
-  );
 
   return (
     <>
       <div className="card-soft overflow-hidden p-0 flex flex-col">
-        <button
-          type="button"
-          onClick={() => photos.length > 0 && setLightbox(true)}
-          className="relative aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          {photos.length > 0 ? (
-            <>
-              {photos.map((ph, i) => (
-                <img
-                  key={ph.id}
-                  src={ph.url}
-                  alt={p.title}
-                  loading="lazy"
-                  className={cn(
-                    "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
-                    i === index ? "opacity-100" : "opacity-0",
-                  )}
-                />
-              ))}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                {p.category && (
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/80">
-                    {p.category}
-                  </p>
-                )}
-                <p className="mt-1 text-white text-base font-medium leading-snug line-clamp-2 text-left">
-                  {p.title}
-                </p>
-              </div>
-            </>
-          ) : (
+        {photos.length === 0 ? (
+          <div className="relative aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center">
             <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
-          )}
-
-          {hasMany && (
-            <>
-              <span
-                role="button"
-                tabIndex={0}
-                aria-label="Photo précédente"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  go(-1);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    go(-1);
-                  }
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </span>
-              <span
-                role="button"
-                tabIndex={0}
-                aria-label="Photo suivante"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  go(1);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    go(1);
-                  }
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </span>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-                {photos.map((_, i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      "h-1.5 w-1.5 rounded-full transition-colors",
-                      i === index ? "bg-white" : "bg-white/40",
-                    )}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </button>
-
+          </div>
+        ) : hasMany ? (
+          <PhotoCarousel
+            images={photos.map((ph) => ({
+              id: ph.id,
+              url: ph.url,
+              alt: p.title,
+              category: p.category ?? undefined,
+              title: p.title,
+            }))}
+            onSlideClick={(i) => setLightbox(i)}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setLightbox(0)}
+            className="relative aspect-[4/5] md:aspect-square bg-neutral-900 overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+          >
+            <img
+              src={photos[0].url}
+              alt={p.title}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/30 to-transparent flex flex-col justify-end p-4">
+              {p.category && (
+                <p className="text-[11px] uppercase tracking-[0.18em] font-medium text-[#ff6633]">
+                  {p.category}
+                </p>
+              )}
+              <p className="mt-1 text-white text-base font-bold leading-snug line-clamp-2 text-left">
+                {p.title}
+              </p>
+            </div>
+          </button>
+        )}
       </div>
 
-
-      {lightbox && photos.length > 0 && (
+      {lightbox !== null && photos.length > 0 && (
         <Lightbox
           photos={photos}
-          startIndex={index}
+          startIndex={lightbox}
           title={p.title}
-          onClose={() => setLightbox(false)}
-          onIndexChange={setIndex}
+          onClose={() => setLightbox(null)}
         />
       )}
     </>
@@ -129,25 +74,19 @@ function Lightbox({
   startIndex,
   title,
   onClose,
-  onIndexChange,
 }: {
   photos: { id: string; url: string }[];
   startIndex: number;
   title: string;
   onClose: () => void;
-  onIndexChange: (i: number) => void;
 }) {
   const [index, setIndex] = useState(startIndex);
   const hasMany = photos.length > 1;
   const touchStartX = useRef<number | null>(null);
 
   const setI = useCallback(
-    (i: number) => {
-      const next = (i + photos.length) % photos.length;
-      setIndex(next);
-      onIndexChange(next);
-    },
-    [photos.length, onIndexChange],
+    (i: number) => setIndex(((i % photos.length) + photos.length) % photos.length),
+    [photos.length],
   );
 
   useEffect(() => {
@@ -186,10 +125,7 @@ function Lightbox({
         <>
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setI(index - 1);
-            }}
+            onClick={(e) => { e.stopPropagation(); setI(index - 1); }}
             aria-label="Photo précédente"
             className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center z-10"
           >
@@ -197,10 +133,7 @@ function Lightbox({
           </button>
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setI(index + 1);
-            }}
+            onClick={(e) => { e.stopPropagation(); setI(index + 1); }}
             aria-label="Photo suivante"
             className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center z-10"
           >
@@ -212,9 +145,7 @@ function Lightbox({
       <div
         className="relative w-full h-full flex items-center justify-center p-4 md:p-12"
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => {
-          touchStartX.current = e.touches[0].clientX;
-        }}
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           if (touchStartX.current == null || !hasMany) return;
           const dx = e.changedTouches[0].clientX - touchStartX.current;
