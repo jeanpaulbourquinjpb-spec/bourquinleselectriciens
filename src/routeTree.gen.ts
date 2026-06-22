@@ -18,9 +18,12 @@ import { Route as RenovationRouteImport } from './routes/renovation'
 import { Route as ProjetsRouteImport } from './routes/projets'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PresentationRouteImport } from './routes/presentation'
+import { Route as NousContacterRouteImport } from './routes/nous-contacter'
 import { Route as NosProjetsRouteImport } from './routes/nos-projets'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GalerieVideosGaleriePhotosRouteImport } from './routes/galerie-videos-galerie-photos'
+import { Route as FormationEmploiRouteImport } from './routes/formation-emploi'
 import { Route as EtudeConseilControleRouteImport } from './routes/etude-conseil-controle'
 import { Route as EfficienceEnergetiqueRouteImport } from './routes/efficience-energetique'
 import { Route as EclairageRouteImport } from './routes/eclairage'
@@ -33,6 +36,13 @@ import { Route as CarrieresRouteImport } from './routes/carrieres'
 import { Route as ActualitesRouteImport } from './routes/actualites'
 import { Route as ActualiteRouteImport } from './routes/actualite'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServiceslectricitServicesElectriciteTelecommunicationsRouteImport } from './routes/serviceslectricit.services-electricite-telecommunications'
+import { Route as ServiceslectricitServicesElectriciteSecuriteRouteImport } from './routes/serviceslectricit.services-electricite-securite'
+import { Route as ServiceslectricitServicesElectriciteObjetsDinterventionRouteImport } from './routes/serviceslectricit.services-electricite-objets-dintervention'
+import { Route as ServiceslectricitServicesElectriciteExpertisesRouteImport } from './routes/serviceslectricit.services-electricite-expertises'
+import { Route as ServiceslectricitServicesElectriciteElectriciteDomotiqueRouteImport } from './routes/serviceslectricit.services-electricite-electricite-domotique'
+import { Route as ServiceslectricitServicesElectriciteEfficienceEnergetiqueRouteImport } from './routes/serviceslectricit.services-electricite-efficience-energetique'
+import { Route as ServiceslectricitServicesElectriciteAudiovisuelRouteImport } from './routes/serviceslectricit.services-electricite-audiovisuel'
 import { Route as NosProjetsProjectIdRouteImport } from './routes/nos-projets.$projectId'
 import { Route as AdminProjetsRouteImport } from './routes/admin/projets'
 import { Route as ApiPublicHooksScrapeArticlesRouteImport } from './routes/api/public/hooks/scrape-articles'
@@ -82,6 +92,11 @@ const PresentationRoute = PresentationRouteImport.update({
   path: '/presentation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NousContacterRoute = NousContacterRouteImport.update({
+  id: '/nous-contacter',
+  path: '/nous-contacter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NosProjetsRoute = NosProjetsRouteImport.update({
   id: '/nos-projets',
   path: '/nos-projets',
@@ -95,6 +110,17 @@ const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalerieVideosGaleriePhotosRoute =
+  GalerieVideosGaleriePhotosRouteImport.update({
+    id: '/galerie-videos-galerie-photos',
+    path: '/galerie-videos-galerie-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FormationEmploiRoute = FormationEmploiRouteImport.update({
+  id: '/formation-emploi',
+  path: '/formation-emploi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EtudeConseilControleRoute = EtudeConseilControleRouteImport.update({
@@ -157,6 +183,48 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServiceslectricitServicesElectriciteTelecommunicationsRoute =
+  ServiceslectricitServicesElectriciteTelecommunicationsRouteImport.update({
+    id: '/serviceslectricit/services-electricite-telecommunications',
+    path: '/serviceslectricit/services-electricite-telecommunications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteSecuriteRoute =
+  ServiceslectricitServicesElectriciteSecuriteRouteImport.update({
+    id: '/serviceslectricit/services-electricite-securite',
+    path: '/serviceslectricit/services-electricite-securite',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteObjetsDinterventionRoute =
+  ServiceslectricitServicesElectriciteObjetsDinterventionRouteImport.update({
+    id: '/serviceslectricit/services-electricite-objets-dintervention',
+    path: '/serviceslectricit/services-electricite-objets-dintervention',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteExpertisesRoute =
+  ServiceslectricitServicesElectriciteExpertisesRouteImport.update({
+    id: '/serviceslectricit/services-electricite-expertises',
+    path: '/serviceslectricit/services-electricite-expertises',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute =
+  ServiceslectricitServicesElectriciteElectriciteDomotiqueRouteImport.update({
+    id: '/serviceslectricit/services-electricite-electricite-domotique',
+    path: '/serviceslectricit/services-electricite-electricite-domotique',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute =
+  ServiceslectricitServicesElectriciteEfficienceEnergetiqueRouteImport.update({
+    id: '/serviceslectricit/services-electricite-efficience-energetique',
+    path: '/serviceslectricit/services-electricite-efficience-energetique',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ServiceslectricitServicesElectriciteAudiovisuelRoute =
+  ServiceslectricitServicesElectriciteAudiovisuelRouteImport.update({
+    id: '/serviceslectricit/services-electricite-audiovisuel',
+    path: '/serviceslectricit/services-electricite-audiovisuel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NosProjetsProjectIdRoute = NosProjetsProjectIdRouteImport.update({
   id: '/$projectId',
   path: '/$projectId',
@@ -187,9 +255,12 @@ export interface FileRoutesByFullPath {
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
+  '/formation-emploi': typeof FormationEmploiRoute
+  '/galerie-videos-galerie-photos': typeof GalerieVideosGaleriePhotosRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
+  '/nous-contacter': typeof NousContacterRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
@@ -201,6 +272,13 @@ export interface FileRoutesByFullPath {
   '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
+  '/serviceslectricit/services-electricite-audiovisuel': typeof ServiceslectricitServicesElectriciteAudiovisuelRoute
+  '/serviceslectricit/services-electricite-efficience-energetique': typeof ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute
+  '/serviceslectricit/services-electricite-electricite-domotique': typeof ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute
+  '/serviceslectricit/services-electricite-expertises': typeof ServiceslectricitServicesElectriciteExpertisesRoute
+  '/serviceslectricit/services-electricite-objets-dintervention': typeof ServiceslectricitServicesElectriciteObjetsDinterventionRoute
+  '/serviceslectricit/services-electricite-securite': typeof ServiceslectricitServicesElectriciteSecuriteRoute
+  '/serviceslectricit/services-electricite-telecommunications': typeof ServiceslectricitServicesElectriciteTelecommunicationsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesByTo {
@@ -216,9 +294,12 @@ export interface FileRoutesByTo {
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
+  '/formation-emploi': typeof FormationEmploiRoute
+  '/galerie-videos-galerie-photos': typeof GalerieVideosGaleriePhotosRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
+  '/nous-contacter': typeof NousContacterRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
@@ -230,6 +311,13 @@ export interface FileRoutesByTo {
   '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
+  '/serviceslectricit/services-electricite-audiovisuel': typeof ServiceslectricitServicesElectriciteAudiovisuelRoute
+  '/serviceslectricit/services-electricite-efficience-energetique': typeof ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute
+  '/serviceslectricit/services-electricite-electricite-domotique': typeof ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute
+  '/serviceslectricit/services-electricite-expertises': typeof ServiceslectricitServicesElectriciteExpertisesRoute
+  '/serviceslectricit/services-electricite-objets-dintervention': typeof ServiceslectricitServicesElectriciteObjetsDinterventionRoute
+  '/serviceslectricit/services-electricite-securite': typeof ServiceslectricitServicesElectriciteSecuriteRoute
+  '/serviceslectricit/services-electricite-telecommunications': typeof ServiceslectricitServicesElectriciteTelecommunicationsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRoutesById {
@@ -246,9 +334,12 @@ export interface FileRoutesById {
   '/eclairage': typeof EclairageRoute
   '/efficience-energetique': typeof EfficienceEnergetiqueRoute
   '/etude-conseil-controle': typeof EtudeConseilControleRoute
+  '/formation-emploi': typeof FormationEmploiRoute
+  '/galerie-videos-galerie-photos': typeof GalerieVideosGaleriePhotosRoute
   '/login': typeof LoginRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/nos-projets': typeof NosProjetsRouteWithChildren
+  '/nous-contacter': typeof NousContacterRoute
   '/presentation': typeof PresentationRoute
   '/privacy': typeof PrivacyRoute
   '/projets': typeof ProjetsRoute
@@ -260,6 +351,13 @@ export interface FileRoutesById {
   '/telecoms': typeof TelecomsRoute
   '/admin/projets': typeof AdminProjetsRoute
   '/nos-projets/$projectId': typeof NosProjetsProjectIdRoute
+  '/serviceslectricit/services-electricite-audiovisuel': typeof ServiceslectricitServicesElectriciteAudiovisuelRoute
+  '/serviceslectricit/services-electricite-efficience-energetique': typeof ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute
+  '/serviceslectricit/services-electricite-electricite-domotique': typeof ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute
+  '/serviceslectricit/services-electricite-expertises': typeof ServiceslectricitServicesElectriciteExpertisesRoute
+  '/serviceslectricit/services-electricite-objets-dintervention': typeof ServiceslectricitServicesElectriciteObjetsDinterventionRoute
+  '/serviceslectricit/services-electricite-securite': typeof ServiceslectricitServicesElectriciteSecuriteRoute
+  '/serviceslectricit/services-electricite-telecommunications': typeof ServiceslectricitServicesElectriciteTelecommunicationsRoute
   '/api/public/hooks/scrape-articles': typeof ApiPublicHooksScrapeArticlesRoute
 }
 export interface FileRouteTypes {
@@ -277,9 +375,12 @@ export interface FileRouteTypes {
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
+    | '/formation-emploi'
+    | '/galerie-videos-galerie-photos'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
+    | '/nous-contacter'
     | '/presentation'
     | '/privacy'
     | '/projets'
@@ -291,6 +392,13 @@ export interface FileRouteTypes {
     | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
+    | '/serviceslectricit/services-electricite-audiovisuel'
+    | '/serviceslectricit/services-electricite-efficience-energetique'
+    | '/serviceslectricit/services-electricite-electricite-domotique'
+    | '/serviceslectricit/services-electricite-expertises'
+    | '/serviceslectricit/services-electricite-objets-dintervention'
+    | '/serviceslectricit/services-electricite-securite'
+    | '/serviceslectricit/services-electricite-telecommunications'
     | '/api/public/hooks/scrape-articles'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -306,9 +414,12 @@ export interface FileRouteTypes {
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
+    | '/formation-emploi'
+    | '/galerie-videos-galerie-photos'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
+    | '/nous-contacter'
     | '/presentation'
     | '/privacy'
     | '/projets'
@@ -320,6 +431,13 @@ export interface FileRouteTypes {
     | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
+    | '/serviceslectricit/services-electricite-audiovisuel'
+    | '/serviceslectricit/services-electricite-efficience-energetique'
+    | '/serviceslectricit/services-electricite-electricite-domotique'
+    | '/serviceslectricit/services-electricite-expertises'
+    | '/serviceslectricit/services-electricite-objets-dintervention'
+    | '/serviceslectricit/services-electricite-securite'
+    | '/serviceslectricit/services-electricite-telecommunications'
     | '/api/public/hooks/scrape-articles'
   id:
     | '__root__'
@@ -335,9 +453,12 @@ export interface FileRouteTypes {
     | '/eclairage'
     | '/efficience-energetique'
     | '/etude-conseil-controle'
+    | '/formation-emploi'
+    | '/galerie-videos-galerie-photos'
     | '/login'
     | '/mentions-legales'
     | '/nos-projets'
+    | '/nous-contacter'
     | '/presentation'
     | '/privacy'
     | '/projets'
@@ -349,6 +470,13 @@ export interface FileRouteTypes {
     | '/telecoms'
     | '/admin/projets'
     | '/nos-projets/$projectId'
+    | '/serviceslectricit/services-electricite-audiovisuel'
+    | '/serviceslectricit/services-electricite-efficience-energetique'
+    | '/serviceslectricit/services-electricite-electricite-domotique'
+    | '/serviceslectricit/services-electricite-expertises'
+    | '/serviceslectricit/services-electricite-objets-dintervention'
+    | '/serviceslectricit/services-electricite-securite'
+    | '/serviceslectricit/services-electricite-telecommunications'
     | '/api/public/hooks/scrape-articles'
   fileRoutesById: FileRoutesById
 }
@@ -365,9 +493,12 @@ export interface RootRouteChildren {
   EclairageRoute: typeof EclairageRoute
   EfficienceEnergetiqueRoute: typeof EfficienceEnergetiqueRoute
   EtudeConseilControleRoute: typeof EtudeConseilControleRoute
+  FormationEmploiRoute: typeof FormationEmploiRoute
+  GalerieVideosGaleriePhotosRoute: typeof GalerieVideosGaleriePhotosRoute
   LoginRoute: typeof LoginRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   NosProjetsRoute: typeof NosProjetsRouteWithChildren
+  NousContacterRoute: typeof NousContacterRoute
   PresentationRoute: typeof PresentationRoute
   PrivacyRoute: typeof PrivacyRoute
   ProjetsRoute: typeof ProjetsRoute
@@ -378,6 +509,13 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TelecomsRoute: typeof TelecomsRoute
   AdminProjetsRoute: typeof AdminProjetsRoute
+  ServiceslectricitServicesElectriciteAudiovisuelRoute: typeof ServiceslectricitServicesElectriciteAudiovisuelRoute
+  ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute: typeof ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute
+  ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute: typeof ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute
+  ServiceslectricitServicesElectriciteExpertisesRoute: typeof ServiceslectricitServicesElectriciteExpertisesRoute
+  ServiceslectricitServicesElectriciteObjetsDinterventionRoute: typeof ServiceslectricitServicesElectriciteObjetsDinterventionRoute
+  ServiceslectricitServicesElectriciteSecuriteRoute: typeof ServiceslectricitServicesElectriciteSecuriteRoute
+  ServiceslectricitServicesElectriciteTelecommunicationsRoute: typeof ServiceslectricitServicesElectriciteTelecommunicationsRoute
   ApiPublicHooksScrapeArticlesRoute: typeof ApiPublicHooksScrapeArticlesRoute
 }
 
@@ -446,6 +584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PresentationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nous-contacter': {
+      id: '/nous-contacter'
+      path: '/nous-contacter'
+      fullPath: '/nous-contacter'
+      preLoaderRoute: typeof NousContacterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nos-projets': {
       id: '/nos-projets'
       path: '/nos-projets'
@@ -465,6 +610,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/galerie-videos-galerie-photos': {
+      id: '/galerie-videos-galerie-photos'
+      path: '/galerie-videos-galerie-photos'
+      fullPath: '/galerie-videos-galerie-photos'
+      preLoaderRoute: typeof GalerieVideosGaleriePhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formation-emploi': {
+      id: '/formation-emploi'
+      path: '/formation-emploi'
+      fullPath: '/formation-emploi'
+      preLoaderRoute: typeof FormationEmploiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/etude-conseil-controle': {
@@ -551,6 +710,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/serviceslectricit/services-electricite-telecommunications': {
+      id: '/serviceslectricit/services-electricite-telecommunications'
+      path: '/serviceslectricit/services-electricite-telecommunications'
+      fullPath: '/serviceslectricit/services-electricite-telecommunications'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteTelecommunicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-securite': {
+      id: '/serviceslectricit/services-electricite-securite'
+      path: '/serviceslectricit/services-electricite-securite'
+      fullPath: '/serviceslectricit/services-electricite-securite'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteSecuriteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-objets-dintervention': {
+      id: '/serviceslectricit/services-electricite-objets-dintervention'
+      path: '/serviceslectricit/services-electricite-objets-dintervention'
+      fullPath: '/serviceslectricit/services-electricite-objets-dintervention'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteObjetsDinterventionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-expertises': {
+      id: '/serviceslectricit/services-electricite-expertises'
+      path: '/serviceslectricit/services-electricite-expertises'
+      fullPath: '/serviceslectricit/services-electricite-expertises'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteExpertisesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-electricite-domotique': {
+      id: '/serviceslectricit/services-electricite-electricite-domotique'
+      path: '/serviceslectricit/services-electricite-electricite-domotique'
+      fullPath: '/serviceslectricit/services-electricite-electricite-domotique'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteElectriciteDomotiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-efficience-energetique': {
+      id: '/serviceslectricit/services-electricite-efficience-energetique'
+      path: '/serviceslectricit/services-electricite-efficience-energetique'
+      fullPath: '/serviceslectricit/services-electricite-efficience-energetique'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteEfficienceEnergetiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/serviceslectricit/services-electricite-audiovisuel': {
+      id: '/serviceslectricit/services-electricite-audiovisuel'
+      path: '/serviceslectricit/services-electricite-audiovisuel'
+      fullPath: '/serviceslectricit/services-electricite-audiovisuel'
+      preLoaderRoute: typeof ServiceslectricitServicesElectriciteAudiovisuelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nos-projets/$projectId': {
       id: '/nos-projets/$projectId'
       path: '/$projectId'
@@ -600,9 +808,12 @@ const rootRouteChildren: RootRouteChildren = {
   EclairageRoute: EclairageRoute,
   EfficienceEnergetiqueRoute: EfficienceEnergetiqueRoute,
   EtudeConseilControleRoute: EtudeConseilControleRoute,
+  FormationEmploiRoute: FormationEmploiRoute,
+  GalerieVideosGaleriePhotosRoute: GalerieVideosGaleriePhotosRoute,
   LoginRoute: LoginRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   NosProjetsRoute: NosProjetsRouteWithChildren,
+  NousContacterRoute: NousContacterRoute,
   PresentationRoute: PresentationRoute,
   PrivacyRoute: PrivacyRoute,
   ProjetsRoute: ProjetsRoute,
@@ -613,6 +824,20 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TelecomsRoute: TelecomsRoute,
   AdminProjetsRoute: AdminProjetsRoute,
+  ServiceslectricitServicesElectriciteAudiovisuelRoute:
+    ServiceslectricitServicesElectriciteAudiovisuelRoute,
+  ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute:
+    ServiceslectricitServicesElectriciteEfficienceEnergetiqueRoute,
+  ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute:
+    ServiceslectricitServicesElectriciteElectriciteDomotiqueRoute,
+  ServiceslectricitServicesElectriciteExpertisesRoute:
+    ServiceslectricitServicesElectriciteExpertisesRoute,
+  ServiceslectricitServicesElectriciteObjetsDinterventionRoute:
+    ServiceslectricitServicesElectriciteObjetsDinterventionRoute,
+  ServiceslectricitServicesElectriciteSecuriteRoute:
+    ServiceslectricitServicesElectriciteSecuriteRoute,
+  ServiceslectricitServicesElectriciteTelecommunicationsRoute:
+    ServiceslectricitServicesElectriciteTelecommunicationsRoute,
   ApiPublicHooksScrapeArticlesRoute: ApiPublicHooksScrapeArticlesRoute,
 }
 export const routeTree = rootRouteImport
