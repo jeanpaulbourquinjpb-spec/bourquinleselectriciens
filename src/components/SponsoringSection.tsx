@@ -107,13 +107,20 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
               <div
                 ref={trackRef}
                 onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
-                onTouchEnd={(e) => {
-                  if (touchStartX.current == null) return;
-                  const dx = e.changedTouches[0].clientX - touchStartX.current;
-                  if (Math.abs(dx) > 50) scrollByCards(dx < 0 ? 1 : -1);
+                onTouchEnd={() => {
+                  const track = trackRef.current;
+                  if (!track) return;
+                  const first = itemRefs.current.find(Boolean);
+                  const slideWidth = first
+                    ? first.getBoundingClientRect().width + 24
+                    : track.clientWidth;
+                  if (slideWidth <= 0) return;
+                  const targetX = Math.round(track.scrollLeft / slideWidth) * slideWidth;
+                  track.scrollTo({ left: targetX, behavior: "smooth" });
                   touchStartX.current = null;
                 }}
-                className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                style={{ scrollSnapType: "x mandatory" }}
+                className="flex gap-6 overflow-x-auto scroll-smooth pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {sorted.map((entry, i) => (
                   <div
@@ -121,7 +128,8 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
                     ref={(el) => {
                       itemRefs.current[i] = el;
                     }}
-                    className="snap-center shrink-0 basis-full md:basis-[calc(50%-12px)]"
+                    style={{ scrollSnapAlign: "center", scrollSnapStop: "always", flexShrink: 0 }}
+                    className="basis-full md:basis-[calc(50%-12px)]"
                   >
                     <SponsoringCard
                       entry={entry}
