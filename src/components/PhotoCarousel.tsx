@@ -18,7 +18,7 @@ type Props = {
   hideDots?: boolean;
 };
 
-export function PhotoCarousel({ images, onSlideClick, className }: Props) {
+export function PhotoCarousel({ images, onSlideClick, className, hideDots }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [index, setIndex] = useState(0);
