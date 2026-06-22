@@ -45,21 +45,49 @@ export const Route = createFileRoute("/projets")({
 
 type Filter = (typeof CATEGORIES)[number] | "all";
 
+type ProjectGroup = {
+  key: string;
+  title: string;
+  category: string | null;
+  photos: { id: string; url: string }[];
+};
+
+function groupProjects(projects: ProjectDTO[]): ProjectGroup[] {
+  const map = new Map<string, ProjectGroup>();
+  for (const p of projects) {
+    const key = (p.title ?? "").trim().toLowerCase() || p.id;
+    const existing = map.get(key);
+    const photos = p.photos.length > 0
+      ? p.photos.map((ph) => ({ id: ph.id, url: ph.url }))
+      : p.image_url
+        ? [{ id: `legacy-${p.id}`, url: p.image_url }]
+        : [];
+    if (existing) {
+      existing.photos.push(...photos);
+    } else {
+      map.set(key, { key, title: p.title, category: p.category, photos });
+    }
+  }
+  return Array.from(map.values());
+}
+
 function ProjetsPage() {
   const { data } = useSuspenseQuery(projectsQueryOptions);
   const projects = data.projects;
 
   const [filter, setFilter] = useState<Filter>("all");
-  const [lightboxProject, setLightboxProject] = useState<ProjectDTO | null>(null);
+  const [lightboxGroup, setLightboxGroup] = useState<ProjectGroup | null>(null);
+
+  const grouped = useMemo(() => groupProjects(projects), [projects]);
 
   const filtered = useMemo(
-    () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
-    [filter, projects],
+    () => (filter === "all" ? grouped : grouped.filter((g) => g.category === filter)),
+    [filter, grouped],
   );
 
   const availableCategories = useMemo(
-    () => CATEGORIES.filter((c) => projects.some((p) => p.category === c)),
-    [projects],
+    () => CATEGORIES.filter((c) => grouped.some((g) => g.category === c)),
+    [grouped],
   );
 
   const filters: { label: string; value: Filter }[] = [
@@ -69,12 +97,12 @@ function ProjetsPage() {
 
   const slides: PhotoCarouselImage[] = useMemo(
     () =>
-      filtered.map((p) => ({
-        id: p.id,
-        url: p.photos[0]?.url ?? p.image_url,
-        alt: p.title,
-        category: p.category ?? undefined,
-        title: p.title,
+      filtered.map((g) => ({
+        id: g.key,
+        url: g.photos[0]?.url ?? "",
+        alt: g.title,
+        category: g.category ?? undefined,
+        title: g.title,
       })),
     [filtered],
   );
@@ -126,18 +154,18 @@ function ProjetsPage() {
             <div className="mt-10 mx-auto max-w-xl">
               <PhotoCarousel
                 images={slides}
-                onSlideClick={(i) => setLightboxProject(filtered[i] ?? null)}
+                onSlideClick={(i) => setLightboxGroup(filtered[i] ?? null)}
               />
             </div>
           )}
         </div>
       </section>
 
-      {lightboxProject && (
+      {lightboxGroup && (
         <PhotoLightbox
-          photos={lightboxProject.photos}
-          title={lightboxProject.title}
-          onClose={() => setLightboxProject(null)}
+          photos={lightboxGroup.photos}
+          title={lightboxGroup.title}
+          onClose={() => setLightboxGroup(null)}
         />
       )}
 
