@@ -251,7 +251,7 @@ export function SiteHeader() {
                     to={s.to}
                     onClick={() => setOpen(false)}
                     className={`py-1 text-sm font-medium ${
-                      isRouteActive(s.to) ? "text-brand" : ""
+                      isRouteNavActive(s.to) ? "text-brand" : ""
                     }`}
                   >
                     {s.label}
