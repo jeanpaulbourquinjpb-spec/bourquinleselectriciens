@@ -107,13 +107,20 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
               <div
                 ref={trackRef}
                 onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
-                onTouchEnd={(e) => {
-                  if (touchStartX.current == null) return;
-                  const dx = e.changedTouches[0].clientX - touchStartX.current;
-                  if (Math.abs(dx) > 50) scrollByCards(dx < 0 ? 1 : -1);
+                onTouchEnd={() => {
+                  const track = trackRef.current;
+                  if (!track) return;
+                  const first = itemRefs.current.find(Boolean);
+                  const slideWidth = first
+                    ? first.getBoundingClientRect().width + 24
+                    : track.clientWidth;
+                  if (slideWidth <= 0) return;
+                  const targetX = Math.round(track.scrollLeft / slideWidth) * slideWidth;
+                  track.scrollTo({ left: targetX, behavior: "smooth" });
                   touchStartX.current = null;
                 }}
-                className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                style={{ scrollSnapType: "x mandatory" }}
+                className="flex gap-6 overflow-x-auto scroll-smooth pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {sorted.map((entry, i) => (
                   <div
@@ -121,7 +128,8 @@ export function SponsoringSection({ entries }: { entries: SponsoringEntryDTO[] }
                     ref={(el) => {
                       itemRefs.current[i] = el;
                     }}
-                    className="snap-center shrink-0 basis-full md:basis-[calc(50%-12px)]"
+                    style={{ scrollSnapAlign: "center", scrollSnapStop: "always", flexShrink: 0 }}
+                    className="basis-full md:basis-[calc(50%-12px)]"
                   >
                     <SponsoringCard
                       entry={entry}
@@ -182,32 +190,45 @@ function SponsoringCard({
   onOpenLightbox: (index: number) => void;
 }) {
   const photos = entry.photos;
-  const [index, setIndex] = useState(0);
+  const hasPhotos = photos.length > 0;
+  const [index, setIndex] = useState<number | null>(hasPhotos ? 0 : null);
+  const [firstLoaded, setFirstLoaded] = useState(false);
   const hasMany = photos.length > 1;
+
+  useEffect(() => {
+    if (hasPhotos && index === null) setIndex(0);
+  }, [hasPhotos, index]);
 
   const go = useCallback(
     (dir: 1 | -1) => {
-      setIndex((i) => (i + dir + photos.length) % photos.length);
+      setIndex((i) => (((i ?? 0) + dir + photos.length) % photos.length));
     },
     [photos.length],
   );
 
+  const activeIndex = index ?? 0;
+
   return (
     <button
       type="button"
-      onClick={() => photos.length > 0 && onOpenLightbox(index)}
+      onClick={() => hasPhotos && firstLoaded && onOpenLightbox(activeIndex)}
       className="group relative block w-full text-left aspect-[4/3] bg-[color:var(--surface-muted)] overflow-hidden rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand)]"
     >
-      {photos.length > 0 ? (
+      {!firstLoaded && hasPhotos && (
+        <div className="absolute inset-0 bg-neutral-800 animate-pulse" aria-hidden />
+      )}
+      {hasPhotos ? (
         photos.map((ph, i) => (
           <img
             key={ph.id}
             src={ph.url}
             alt={entry.title}
-            loading="lazy"
+            loading="eager"
+            decoding="async"
+            onLoad={() => i === 0 && setFirstLoaded(true)}
             className={cn(
               "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
-              i === index ? "opacity-100" : "opacity-0",
+              i === activeIndex && firstLoaded ? "opacity-100" : "opacity-0",
             )}
           />
         ))
@@ -279,7 +300,7 @@ function SponsoringCard({
                 key={i}
                 className={cn(
                   "h-1.5 w-1.5 rounded-full transition-colors",
-                  i === index ? "bg-white" : "bg-white/40",
+                  i === activeIndex ? "bg-white" : "bg-white/40",
                 )}
               />
             ))}
