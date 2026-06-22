@@ -142,7 +142,7 @@ export function SiteHeader() {
                   to={s.to}
                   onClick={() => setOpen(false)}
                   className={`text-sm font-medium transition-colors ${
-                    isRouteActive(s.to) ? "text-brand" : "hover:text-brand"
+                    isRouteNavActive(s.to) ? "text-brand" : "hover:text-brand"
                   }`}
                 >
                   {s.label}
