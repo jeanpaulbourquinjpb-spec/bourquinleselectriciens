@@ -3,9 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
+import { PhotoCarousel, type PhotoCarouselImage } from "@/components/PhotoCarousel";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { cn } from "@/lib/utils";
-import { listProjects, CATEGORIES } from "@/lib/projects.functions";
+import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
 
 const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
@@ -43,14 +44,13 @@ export const Route = createFileRoute("/projets")({
 });
 
 type Filter = (typeof CATEGORIES)[number] | "all";
-const PAGE_SIZE = 12;
 
 function ProjetsPage() {
   const { data } = useSuspenseQuery(projectsQueryOptions);
   const projects = data.projects;
 
   const [filter, setFilter] = useState<Filter>("all");
-  const [page, setPage] = useState(1);
+  const [lightboxProject, setLightboxProject] = useState<ProjectDTO | null>(null);
 
   const filtered = useMemo(
     () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
@@ -67,9 +67,17 @@ function ProjetsPage() {
     ...availableCategories.map((c) => ({ label: c, value: c })),
   ];
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const slides: PhotoCarouselImage[] = useMemo(
+    () =>
+      filtered.map((p) => ({
+        id: p.id,
+        url: p.photos[0]?.url ?? p.image_url,
+        alt: p.title,
+        category: p.category ?? undefined,
+        title: p.title,
+      })),
+    [filtered],
+  );
 
   return (
     <div>
@@ -96,10 +104,7 @@ function ProjetsPage() {
               return (
                 <button
                   key={f.value}
-                  onClick={() => {
-                    setFilter(f.value);
-                    setPage(1);
-                  }}
+                  onClick={() => setFilter(f.value)}
                   className={cn(
                     "shrink-0 whitespace-nowrap px-4 py-2 rounded-full border text-sm transition-colors",
                     active
@@ -113,41 +118,29 @@ function ProjetsPage() {
             })}
           </div>
 
-          {pageItems.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="mt-16 text-center text-[color:var(--muted-foreground)]">
               <p>Aucun projet à afficher pour le moment.</p>
             </div>
           ) : (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {pageItems.map((p) => (
-                <ProjectGalleryCard key={p.id} p={p} />
-              ))}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="mt-12 flex items-center justify-center gap-4">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-md border border-[color:var(--border)] text-sm hover:bg-[color:var(--surface-muted)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                ← Précédent
-              </button>
-              <span className="text-sm text-[color:var(--muted-foreground)]">
-                Page {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-md border border-[color:var(--border)] text-sm hover:bg-[color:var(--surface-muted)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Suivant →
-              </button>
+            <div className="mt-10 mx-auto max-w-xl">
+              <PhotoCarousel
+                images={slides}
+                onSlideClick={(i) => setLightboxProject(filtered[i] ?? null)}
+              />
             </div>
           )}
         </div>
       </section>
+
+      {lightboxProject && (
+        <PhotoLightbox
+          photos={lightboxProject.photos}
+          title={lightboxProject.title}
+          onClose={() => setLightboxProject(null)}
+        />
+      )}
+
       <SiteFooter />
     </div>
   );
