@@ -15,6 +15,7 @@ type Props = {
   images: PhotoCarouselImage[];
   onSlideClick?: (index: number) => void;
   className?: string;
+  hideDots?: boolean;
 };
 
 export function PhotoCarousel({ images, onSlideClick, className }: Props) {
