@@ -3,9 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
+import { PhotoCarousel, type PhotoCarouselImage } from "@/components/PhotoCarousel";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { cn } from "@/lib/utils";
-import { listProjects, CATEGORIES } from "@/lib/projects.functions";
+import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
 
 const projectsQueryOptions = queryOptions({
   queryKey: ["projects"],
@@ -45,6 +46,7 @@ type Filter = (typeof CATEGORIES)[number] | "all";
 
 function NosProjetsPage() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [lightboxProject, setLightboxProject] = useState<ProjectDTO | null>(null);
   const { data } = useSuspenseQuery(projectsQueryOptions);
   const projects = data.projects;
 
@@ -57,6 +59,18 @@ function NosProjetsPage() {
     { label: "Tous les projets", value: "all" },
     ...CATEGORIES.map((c) => ({ label: c, value: c })),
   ];
+
+  const slides: PhotoCarouselImage[] = useMemo(
+    () =>
+      filtered.map((p) => ({
+        id: p.id,
+        url: p.photos[0]?.url ?? p.image_url,
+        alt: p.title,
+        category: p.category ?? undefined,
+        title: p.title,
+      })),
+    [filtered],
+  );
 
   return (
     <div>
@@ -95,14 +109,24 @@ function NosProjetsPage() {
               <p>Aucun projet à afficher pour le moment.</p>
             </div>
           ) : (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((p) => (
-                <ProjectGalleryCard key={p.id} p={p} />
-              ))}
+            <div className="mt-10 mx-auto max-w-xl">
+              <PhotoCarousel
+                images={slides}
+                onSlideClick={(i) => setLightboxProject(filtered[i] ?? null)}
+              />
             </div>
           )}
         </div>
       </section>
+
+      {lightboxProject && (
+        <PhotoLightbox
+          photos={lightboxProject.photos}
+          title={lightboxProject.title}
+          onClose={() => setLightboxProject(null)}
+        />
+      )}
+
       <SiteFooter />
     </div>
   );
