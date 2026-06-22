@@ -208,8 +208,9 @@ export function PhotoCarousel({ images, onSlideClick, className, hideDots }: Pro
         )}
       </div>
 
-      {total > 1 && (
-        <div className="mt-3 flex justify-center gap-1.5">
+      {total > 1 && !hideDots && (
+        <div className="mt-2 flex justify-center gap-1.5">
+
           {images.map((_, i) => (
             <button
               key={i}
