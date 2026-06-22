@@ -51,9 +51,9 @@ export function SiteHeader() {
       },
       { rootMargin: "-30% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
-    sections.forEach((s) => {
-      if (s.type !== "hash") return;
-      const el = document.getElementById(s.hash);
+    const ids = ["accueil", "a-propos", "services", "actualite", "nos-projets"];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
@@ -89,6 +89,7 @@ export function SiteHeader() {
     pathname === to || pathname.startsWith(to + "/");
 
   const serviceRoutes = [
+    "/services",
     "/etude-conseil-controle",
     "/depannage",
     "/renovation",
@@ -100,7 +101,16 @@ export function SiteHeader() {
     "/e-mobility",
   ];
 
-  const isServicesActive = serviceRoutes.some((route) => isRouteActive(route));
+  const isServicesActive =
+    serviceRoutes.some((route) => isRouteActive(route)) ||
+    (isHome && active === "services");
+
+  const routeToSectionId: Record<string, string> = {
+    "/actualites": "actualite",
+    "/projets": "nos-projets",
+  };
+  const isRouteNavActive = (to: string) =>
+    isRouteActive(to) || (isHome && active === routeToSectionId[to]);
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-[color:var(--line)]">
@@ -132,7 +142,7 @@ export function SiteHeader() {
                   to={s.to}
                   onClick={() => setOpen(false)}
                   className={`text-sm font-medium transition-colors ${
-                    isRouteActive(s.to) ? "text-brand" : "hover:text-brand"
+                    isRouteNavActive(s.to) ? "text-brand" : "hover:text-brand"
                   }`}
                 >
                   {s.label}
@@ -241,7 +251,7 @@ export function SiteHeader() {
                     to={s.to}
                     onClick={() => setOpen(false)}
                     className={`py-1 text-sm font-medium ${
-                      isRouteActive(s.to) ? "text-brand" : ""
+                      isRouteNavActive(s.to) ? "text-brand" : ""
                     }`}
                   >
                     {s.label}
