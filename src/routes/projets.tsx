@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { PhotoCarousel, type PhotoCarouselImage } from "@/components/PhotoCarousel";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { cn } from "@/lib/utils";
 import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
