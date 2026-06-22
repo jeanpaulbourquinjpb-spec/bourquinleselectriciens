@@ -194,7 +194,6 @@ export function ActualiteSection({
   }, [articles]);
 
   const featured = sorted[0];
-  const rest = useMemo(() => sorted.slice(1, 4), [sorted]);
 
   if (isLoading) {
     return (
@@ -216,14 +215,6 @@ export function ActualiteSection({
   return (
     <>
       <FeaturedArticle a={featured} />
-
-      {rest.length > 0 && (
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map((a) => (
-            <ArticleCard key={a.id} a={a} />
-          ))}
-        </div>
-      )}
 
       <div className="mt-10 flex justify-center">
         <Link
