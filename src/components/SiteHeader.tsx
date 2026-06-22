@@ -89,6 +89,7 @@ export function SiteHeader() {
     pathname === to || pathname.startsWith(to + "/");
 
   const serviceRoutes = [
+    "/services",
     "/etude-conseil-controle",
     "/depannage",
     "/renovation",
@@ -100,7 +101,16 @@ export function SiteHeader() {
     "/e-mobility",
   ];
 
-  const isServicesActive = serviceRoutes.some((route) => isRouteActive(route));
+  const isServicesActive =
+    serviceRoutes.some((route) => isRouteActive(route)) ||
+    (isHome && active === "services");
+
+  const routeToSectionId: Record<string, string> = {
+    "/actualites": "actualite",
+    "/projets": "nos-projets",
+  };
+  const isRouteNavActive = (to: string) =>
+    isRouteActive(to) || (isHome && active === routeToSectionId[to]);
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-[color:var(--line)]">
