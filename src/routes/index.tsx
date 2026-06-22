@@ -371,46 +371,67 @@ function HomePage() {
 
 type Filter = (typeof CATEGORIES)[number] | "all";
 
+type ProjectGroup = {
+  key: string;
+  title: string;
+  category: string | null;
+  photos: { id: string; url: string }[];
+};
+
+function groupProjects(projects: ProjectDTO[]): ProjectGroup[] {
+  const map = new Map<string, ProjectGroup>();
+  for (const p of projects) {
+    const key = (p.title ?? "").trim().toLowerCase() || p.id;
+    const existing = map.get(key);
+    const photos = p.photos.length > 0
+      ? p.photos.map((ph) => ({ id: ph.id, url: ph.url }))
+      : p.image_url
+        ? [{ id: `legacy-${p.id}`, url: p.image_url }]
+        : [];
+    if (existing) {
+      existing.photos.push(...photos);
+    } else {
+      map.set(key, {
+        key,
+        title: p.title,
+        category: p.category,
+        photos,
+      });
+    }
+  }
+  return Array.from(map.values());
+}
+
 function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
   const [filter, setFilter] = useState<Filter>("all");
-  const isMobile = useIsMobile();
+  const [lightboxGroup, setLightboxGroup] = useState<ProjectGroup | null>(null);
+
+  const grouped = useMemo(() => groupProjects(projects), [projects]);
   const filtered = useMemo(
-    () => (filter === "all" ? projects : projects.filter((p) => p.category === filter)),
-    [filter, projects],
+    () => (filter === "all" ? grouped : grouped.filter((g) => g.category === filter)),
+    [filter, grouped],
   );
   const availableCategories = useMemo(
-    () => CATEGORIES.filter((c) => projects.some((p) => p.category === c)),
-    [projects],
+    () => CATEGORIES.filter((c) => grouped.some((g) => g.category === c)),
+    [grouped],
   );
   const filters: { label: string; value: Filter }[] = [
     { label: "Tous les projets", value: "all" },
     ...availableCategories.map((c) => ({ label: c, value: c })),
   ];
 
-  // Desktop shows max 6; mobile carousel (filter=all) shows up to 6 swipeable
-  const useCarousel = isMobile && filter === "all";
-  const displayed = useCarousel ? filtered.slice(0, 6) : filtered.slice(0, 6);
-
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  useEffect(() => {
-    if (!useCarousel) return;
-    const el = scrollerRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      const i = Math.round(el.scrollLeft / el.clientWidth);
-      setActiveSlide(i);
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, [useCarousel]);
-
-  const scrollToSlide = (i: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
-  };
+  const displayed = filtered.slice(0, 6);
+  const slides = useMemo(
+    () =>
+      displayed.map((g) => ({
+        id: g.key,
+        url: g.photos[0]?.url ?? "",
+        alt: g.title,
+        category: g.category ?? undefined,
+        title: g.title,
+      })),
+    [displayed],
+  );
 
   return (
     <>
@@ -441,38 +462,21 @@ function ProjetsContent({ projects }: { projects: ProjectDTO[] }) {
         <div className="mt-16 text-center text-[color:var(--muted-foreground)]">
           <p>Aucun projet à afficher pour le moment.</p>
         </div>
-      ) : useCarousel ? (
-        <div className="mt-10">
-          <div
-            ref={scrollerRef}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {displayed.map((p) => (
-              <div key={p.id} className="snap-center shrink-0 w-full">
-                <ProjectGalleryCard p={p} />
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex justify-center gap-2">
-            {displayed.map((_, i) => (
-              <button
-                key={i}
-                aria-label={`Aller au projet ${i + 1}`}
-                onClick={() => scrollToSlide(i)}
-                className={cn(
-                  "h-2 w-2 rounded-full transition-colors",
-                  i === activeSlide ? "bg-[#ff6633]" : "bg-[color:var(--border)]",
-                )}
-              />
-            ))}
-          </div>
-        </div>
       ) : (
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayed.map((p) => (
-            <ProjectGalleryCard key={p.id} p={p} />
-          ))}
+        <div className="mt-10 mx-auto max-w-xl">
+          <PhotoCarousel
+            images={slides}
+            onSlideClick={(i) => setLightboxGroup(displayed[i] ?? null)}
+          />
         </div>
+      )}
+
+      {lightboxGroup && (
+        <PhotoLightbox
+          photos={lightboxGroup.photos}
+          title={lightboxGroup.title}
+          onClose={() => setLightboxGroup(null)}
+        />
       )}
 
       <div className="mt-10 flex justify-center">
