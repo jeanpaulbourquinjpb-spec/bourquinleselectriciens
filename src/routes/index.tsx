@@ -214,7 +214,41 @@ function HomePage() {
             Grâce à notre équipe d'électriciens, de télématiciens, de contrôleurs, de conseillers en sécurité
             et de formateurs, nous prenons en charge tous les aspects de vos installations électriques.
           </p>
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Mobile compact grid (2 cols) */}
+          <div className="mt-10 md:hidden">
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { icon: ClipboardCheck, label: "Étude & conseil", to: "/etude-conseil-controle" },
+                { icon: HeadphonesIcon, label: "Dépannage", to: "/depannage" },
+                { icon: Wrench, label: "Rénovation", to: "/renovation" },
+                { icon: Lightbulb, label: "Éclairage", to: "/eclairage" },
+                { icon: Zap, label: "Efficience", to: "/efficience-energetique" },
+                { icon: Network, label: "Télécoms", to: "/telecoms" },
+                { icon: Shield, label: "Sécurité", to: "/securite" },
+                { icon: Home, label: "Domotique", to: "/domotique" },
+                { icon: BatteryCharging, label: "E-Mobility", to: "/e-mobility" },
+              ] as const).map((s) => (
+                <Link
+                  key={s.label}
+                  to={s.to}
+                  className="flex flex-col items-center justify-center gap-2 rounded-xl bg-neutral-800/50 p-4 no-underline"
+                >
+                  <s.icon className="w-6 h-6" style={{ color: "#ff6633" }} />
+                  <span className="text-xs font-medium text-white text-center leading-tight">
+                    {s.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-center">
+              <Link to="/services" className="btn-brand">
+                Découvrir nos services
+              </Link>
+            </div>
+          </div>
+
+          {/* Desktop grid (md+) — unchanged */}
+          <div className="mt-16 hidden md:grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((s) => {
               const isDepannage = s.title === "Maintenance & dépannage";
               const isRenovation = s.title === "Rénovation";
