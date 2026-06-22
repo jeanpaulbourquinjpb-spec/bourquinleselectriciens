@@ -231,10 +231,10 @@ function HomePage() {
                 <Link
                   key={s.label}
                   to={s.to}
-                  className="flex flex-col items-center justify-center gap-2 rounded-xl bg-neutral-900 p-4 no-underline"
+                  className="card-soft flex flex-col items-center justify-center gap-2 p-4 no-underline"
                 >
                   <s.icon className="w-6 h-6" style={{ color: "#ff6633" }} />
-                  <span className="text-xs font-medium text-white text-center leading-tight">
+                  <span className="text-xs font-medium text-foreground text-center leading-tight">
                     {s.label}
                   </span>
                 </Link>
