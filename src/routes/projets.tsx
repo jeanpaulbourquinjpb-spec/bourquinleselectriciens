@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { PhotoCarousel, type PhotoCarouselImage } from "@/components/PhotoCarousel";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { cn } from "@/lib/utils";
 import { listProjects, CATEGORIES, type ProjectDTO } from "@/lib/projects.functions";
@@ -95,18 +94,6 @@ function ProjetsPage() {
     ...availableCategories.map((c) => ({ label: c, value: c })),
   ];
 
-  const slides: PhotoCarouselImage[] = useMemo(
-    () =>
-      filtered.map((g) => ({
-        id: g.key,
-        url: g.photos[0]?.url ?? "",
-        alt: g.title,
-        category: g.category ?? undefined,
-        title: g.title,
-      })),
-    [filtered],
-  );
-
   return (
     <div>
       <SiteHeader />
@@ -151,15 +138,37 @@ function ProjetsPage() {
               <p>Aucun projet à afficher pour le moment.</p>
             </div>
           ) : (
-            <div className="mt-10 mx-auto max-w-xl">
-              <PhotoCarousel
-                images={slides}
-                onSlideClick={(i) => setLightboxGroup(filtered[i] ?? null)}
-              />
+            <div className="mt-10 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((g) => (
+                <button
+                  key={g.key}
+                  type="button"
+                  onClick={() => setLightboxGroup(g)}
+                  className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-lg bg-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <img
+                    src={g.photos[0]?.url ?? ""}
+                    alt={g.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-4 text-left">
+                    {g.category && (
+                      <p className="text-[11px] uppercase tracking-[0.18em] font-medium text-[#ff6633]">
+                        {g.category}
+                      </p>
+                    )}
+                    <p className="mt-1 text-white text-base font-bold leading-snug line-clamp-2">
+                      {g.title}
+                    </p>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
         </div>
       </section>
+
 
       {lightboxGroup && (
         <PhotoLightbox
