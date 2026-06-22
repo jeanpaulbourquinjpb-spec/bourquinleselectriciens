@@ -7,7 +7,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { PartnersCarousel } from "@/components/PartnersCarousel";
 import { SponsoringSection } from "@/components/SponsoringSection";
 import { listSponsoringEntries } from "@/lib/sponsoring.functions";
-import { ProjectGalleryCard } from "@/components/ProjectGalleryCard";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { ActualiteSection } from "@/components/ActualiteSection";
 import {
   Lightbulb, Shield, Tv, Wrench, Zap, Network, ClipboardCheck, HeadphonesIcon,
