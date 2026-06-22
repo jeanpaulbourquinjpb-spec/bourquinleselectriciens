@@ -15,7 +15,7 @@ export function ProjectGalleryCard({ p }: { p: ProjectDTO }) {
 
   return (
     <>
-      <div className="card-soft overflow-hidden p-0 flex flex-col">
+      <div className="overflow-hidden bg-transparent pb-0 flex flex-col">
         {photos.length === 0 ? (
           <div className="relative aspect-[4/3] bg-[color:var(--surface-muted)] flex items-center justify-center">
             <ImageIcon className="w-10 h-10 text-[color:var(--muted-foreground)]" />
@@ -30,6 +30,7 @@ export function ProjectGalleryCard({ p }: { p: ProjectDTO }) {
               title: p.title,
             }))}
             onSlideClick={(i) => setLightbox(i)}
+            hideDots
           />
         ) : (
           <button
