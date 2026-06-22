@@ -300,7 +300,7 @@ function SponsoringCard({
                 key={i}
                 className={cn(
                   "h-1.5 w-1.5 rounded-full transition-colors",
-                  i === index ? "bg-white" : "bg-white/40",
+                  i === activeIndex ? "bg-white" : "bg-white/40",
                 )}
               />
             ))}
