@@ -35,14 +35,6 @@ function MentionsPage() {
           fonctionnalités de ce site peuvent éventuellement ne plus être disponibles.
         </p>
 
-        <p className="mt-10 text-sm">
-          © 2024 Réalisé par{" "}
-          <a className="link-brand" href="https://www.localsearch.ch/fr" target="_blank" rel="noreferrer">localsearch.ch</a>
-        </p>
-        <p className="mt-2 text-sm">
-          Vers nos inscriptions{" "}
-          <a className="link-brand" href="http://yellow.local.ch/d/QbbhlplxqNNLktIM41RMfg" target="_blank" rel="noreferrer">local.ch</a>
-        </p>
       </section>
       <SiteFooter />
     </div>
