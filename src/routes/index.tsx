@@ -174,18 +174,43 @@ function HomePage() {
       {/* ============================== À PROPOS ============================== */}
       <section id="a-propos" className="scroll-mt-20">
         <div className="container-x py-24">
-          <p className="eyebrow">Présentation</p>
-          <h2 className="mt-3 text-3xl md:text-5xl">bourquin les électriciens à Genève</h2>
-          <p className="mt-6 text-lg max-w-3xl">
-            Entreprise d'électricité générale active depuis 1968 à Genève.
-          </p>
-          <p className="mt-6 max-w-3xl">
-            Fondée à Genève en 1968, l'entreprise familiale incarne 3 générations de savoir-faire et de passion.
-            Elle perpétue cet héritage tout en adoptant une vision moderne et dynamique. Elle offre des solutions
-            innovantes et durables, alliant sécurité, confort, et efficience énergétique, à une clientèle
-            institutionnelle, commerciale et privée.
-          </p>
+          <div className="grid gap-12 md:grid-cols-[55fr_45fr] md:items-center">
+            <div>
+              <p className="eyebrow">Présentation</p>
+              <h2 className="mt-3 text-3xl md:text-5xl">bourquin les électriciens à Genève</h2>
+              <p className="mt-4 text-xl md:text-2xl italic" style={{ color: "#ff6633" }}>
+                Père et fils. Genève depuis 1968.
+              </p>
+              <p className="mt-6 max-w-3xl">
+                Fondée à Genève par Jean-Pierre Bourquin en 1968, l'entreprise est aujourd'hui conduite par la troisième génération. Jean-Yves est maître électricien fédéral. Jean-Paul, son fils, titulaire d'un Master in Sustainability and Energy Management de l'Università Bocconi, a rejoint la direction des opérations en 2024. Ce que nous apportons à chaque projet, c'est la rigueur du terrain et une vision ancrée dans les enjeux énergétiques d'aujourd'hui.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] border border-[color:var(--border)] px-4 py-2 text-sm font-medium">
+                  Depuis 1968
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] border border-[color:var(--border)] px-4 py-2 text-sm font-medium">
+                  3 générations
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] border border-[color:var(--border)] px-4 py-2 text-sm font-medium">
+                  ★ 4.9 · 154 avis Google
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <img
+                src="/jean-yves-jean-paul.png"
+                alt="Jean-Yves et Jean-Paul Bourquin"
+                loading="lazy"
+                className="rounded-full aspect-square object-cover object-top w-full max-w-[260px] md:max-w-[380px] shadow-2xl"
+              />
+              <div className="mt-4 text-center">
+                <p className="font-bold text-sm">Jean-Yves &amp; Jean-Paul Bourquin</p>
+                <p className="text-xs text-gray-500">Maître électricien fédéral · Directeur des opérations</p>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         <div className="pt-8 pb-16">
           <PartnersCarousel />
