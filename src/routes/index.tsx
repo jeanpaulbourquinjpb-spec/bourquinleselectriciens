@@ -184,22 +184,6 @@ function HomePage() {
               <p className="mt-6 max-w-3xl">
                 Fondée à Genève par Jean-Pierre Bourquin en 1968, l'entreprise est aujourd'hui conduite par la troisième génération. Jean-Yves est maître électricien fédéral. Jean-Paul, son fils, titulaire d'un Master in Sustainability and Energy Management de l'Università Bocconi, a rejoint la direction des opérations en 2024. Ce que nous apportons à chaque projet, c'est la rigueur du terrain et une vision ancrée dans les enjeux énergétiques d'aujourd'hui.
               </p>
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] border border-[color:var(--border)] px-4 py-2 text-sm font-medium">
-                  Depuis 1968
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] border border-[color:var(--border)] px-4 py-2 text-sm font-medium">
-                  3 générations
-                </span>
-                <a
-                  href="https://www.google.com/maps/place/?q=place_id:ChIJfS2J5zZljEcREXY9RXGNl_I"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cursor-pointer inline-flex"
-                >
-                  <GoogleRatingBadge />
-                </a>
-              </div>
             </div>
             <div className="flex flex-col items-center">
               <img
