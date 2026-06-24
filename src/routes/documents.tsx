@@ -33,6 +33,7 @@ export const Route = createFileRoute("/documents")({
   head: () => ({
     meta: [
       { title: "Documents & conditions générales — bourquin les électriciens" },
+      { name: "robots", content: "noindex, nofollow" },
       {
         name: "description",
         content:
