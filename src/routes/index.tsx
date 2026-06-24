@@ -152,9 +152,17 @@ function HomePage() {
             >
               <GoogleRatingBadge />
             </a>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white">
+            <a
+              href="#a-propos"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById("a-propos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                history.replaceState(null, "", "#a-propos");
+              }}
+              className="cursor-pointer inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/25 px-4 py-2 text-sm font-medium text-white"
+            >
               Trois générations de savoir-faire
-            </span>
+            </a>
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-3">
