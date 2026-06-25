@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitContactForm } from "@/lib/contact.functions";
 
@@ -23,11 +23,20 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (success) {
+      successRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [success]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     const fd = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
 
     const totalBytes = files.reduce((s, f) => s + f.size, 0);
     if (totalBytes > MAX_TOTAL_MB * 1024 * 1024) {
@@ -58,6 +67,9 @@ export function ContactForm() {
         },
       });
       setSuccess(true);
+      formEl.reset();
+      setFiles([]);
+      setHasAltAddress(false);
     } catch (err) {
       console.error(err);
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -66,22 +78,23 @@ export function ContactForm() {
     }
   }
 
-  if (success) {
-    return (
-      <div className="card-soft">
-        <p className="text-brand text-lg font-medium">
-          Merci ! Nous avons bien reçu votre message et vous répondrons rapidement.
-        </p>
-      </div>
-    );
-  }
+
 
   const inputCls =
     "w-full rounded-md border border-[color:var(--line)] bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-brand/40";
   const labelCls = "block text-sm mb-1.5";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
+      {success && (
+        <div ref={successRef} className="card-soft">
+          <p className="text-brand text-lg font-medium">
+            Merci ! Nous avons bien reçu votre message et vous répondrons rapidement.
+          </p>
+        </div>
+      )}
+
+
 
 
       <div className="grid gap-5 sm:grid-cols-2">
