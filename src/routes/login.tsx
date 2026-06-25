@@ -17,7 +17,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,20 +55,9 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin/projets` },
-        });
-        if (error) throw error;
-        toast.success("Compte créé. Vous pouvez vous connecter.");
-        setMode("signin");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/admin/projets" });
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/admin/projets" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur d'authentification");
     } finally {
@@ -83,7 +71,7 @@ function LoginPage() {
       <section className="py-24">
         <div className="container-x max-w-md">
           <p className="eyebrow">Espace administrateur</p>
-          <h1 className="mt-2 text-3xl">{mode === "signin" ? "Connexion" : "Créer un compte"}</h1>
+          <h1 className="mt-2 text-3xl">Connexion</h1>
           <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">
             Réservé à l'administrateur du site.
           </p>
@@ -108,45 +96,28 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                autoComplete="current-password"
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Patientez…" : mode === "signin" ? "Se connecter" : "Créer le compte"}
+              {loading ? "Patientez…" : "Se connecter"}
             </Button>
           </form>
-          {mode === "signin" && (
-            <div className="mt-4 text-sm">
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={resetting}
-                className="underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {resetting ? "Envoi…" : "Mot de passe oublié ?"}
-              </button>
-              {resetMessage && (
-                <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">
-                  {resetMessage}
-                </p>
-              )}
-            </div>
-          )}
-          <p className="mt-6 text-sm text-[color:var(--muted-foreground)]">
-            {mode === "signin" ? (
-              <>
-                Premier accès ?{" "}
-                <button type="button" onClick={() => setMode("signup")} className="underline">
-                  Créer un compte
-                </button>{" "}
-                (le premier compte créé devient administrateur).
-              </>
-            ) : (
-              <button type="button" onClick={() => setMode("signin")} className="underline">
-                J'ai déjà un compte
-              </button>
+          <div className="mt-4 text-sm">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetting}
+              className="underline text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resetting ? "Envoi…" : "Mot de passe oublié ?"}
+            </button>
+            {resetMessage && (
+              <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">
+                {resetMessage}
+              </p>
             )}
-          </p>
+          </div>
           <p className="mt-8 text-xs text-[color:var(--muted-foreground)]">
             <Link to="/">Retour au site</Link>
           </p>
