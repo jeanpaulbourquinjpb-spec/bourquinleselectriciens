@@ -85,7 +85,16 @@ export function ContactForm() {
   const labelCls = "block text-sm mb-1.5";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
+      {success && (
+        <div ref={successRef} className="card-soft">
+          <p className="text-brand text-lg font-medium">
+            Merci ! Nous avons bien reçu votre message et vous répondrons rapidement.
+          </p>
+        </div>
+      )}
+
+
 
 
       <div className="grid gap-5 sm:grid-cols-2">
