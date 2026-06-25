@@ -67,6 +67,9 @@ export function ContactForm() {
         },
       });
       setSuccess(true);
+      formEl.reset();
+      setFiles([]);
+      setHasAltAddress(false);
     } catch (err) {
       console.error(err);
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -75,15 +78,7 @@ export function ContactForm() {
     }
   }
 
-  if (success) {
-    return (
-      <div className="card-soft">
-        <p className="text-brand text-lg font-medium">
-          Merci ! Nous avons bien reçu votre message et vous répondrons rapidement.
-        </p>
-      </div>
-    );
-  }
+
 
   const inputCls =
     "w-full rounded-md border border-[color:var(--line)] bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-brand/40";
