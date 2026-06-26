@@ -61,7 +61,7 @@ function PillList({ items }: { items: string[] }) {
       {items.map((i) => (
         <li
           key={i}
-          className="rounded-full border border-[color:var(--border)] bg-white px-4 py-2 text-sm"
+          className="cursor-default rounded-full border border-[color:var(--border)] bg-white px-4 py-2 text-sm focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:ring-0"
         >
           {i}
         </li>
