@@ -133,7 +133,7 @@ function EfficiencePage() {
               href="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white/10 transition"
             >
-              Formulaire de contact
+              Envoyer une demande
             </a>
           </div>
         </div>
