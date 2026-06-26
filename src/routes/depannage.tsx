@@ -84,9 +84,9 @@ function DepannagePage() {
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="tel:0228498333" className="btn-brand">
-            <Phone className="w-4 h-4" /> Appeler le 022 849 83 33
+            <Phone className="w-4 h-4" /> 022 849 83 33
           </a>
-          <a href="/#contact" className="btn-outline">Envoyer une demande</a>
+          <a href="/contact" className="btn-outline">Envoyer une demande</a>
         </div>
       </section>
 
@@ -164,7 +164,7 @@ function DepannagePage() {
               <Phone className="w-4 h-4" /> 022 849 83 33
             </a>
             <a
-              href="https://www.bourquinelectricite.ch/#contact"
+              href="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white/10 transition"
             >
               Formulaire de contact
