@@ -76,9 +76,9 @@ function EtudeConseilControlePage() {
           <a href="tel:0228498333" className="btn-brand">
             <Phone className="w-4 h-4" /> 022 849 83 33
           </a>
-          <a href="/contact" className="btn-outline">
+          <Link to="/contact" className="btn-outline">
             Envoyer une demande
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -137,12 +137,11 @@ function EtudeConseilControlePage() {
             >
               <Phone className="w-4 h-4" /> 022 849 83 33
             </a>
-            <a
-              href="/contact"
+            <Link to="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white/10 transition"
             >
               Envoyer une demande
-            </a>
+            </Link>
           </div>
         </div>
       </section>
