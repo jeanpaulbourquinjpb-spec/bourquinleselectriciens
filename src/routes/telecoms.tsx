@@ -87,7 +87,7 @@ function TelecomsPage() {
           communication — pour les particuliers, les entreprises et les
           grandes infrastructures.
         </p>
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] px-4 py-2 text-sm font-medium">
+        <div className="cursor-default mt-6 inline-flex items-center gap-2 rounded-full bg-[color:var(--surface-muted)] px-4 py-2 text-sm font-medium focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:ring-0">
           <BadgeCheck className="w-4 h-4 text-brand" />
           Swisscom Business Gold Partner
         </div>
