@@ -117,7 +117,7 @@ function DomotiquePage() {
           <h2 className="text-3xl md:text-4xl text-center">Ce qui fait la différence</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {avantages.map((a) => (
-              <div key={a} className="card-soft text-center">
+              <div key={a} className="card-soft text-center cursor-default pointer-events-none outline-none">
                 <BadgeCheck className="w-8 h-8 text-brand mx-auto" />
                 <p className="mt-4 font-medium text-sm">{a}</p>
               </div>
