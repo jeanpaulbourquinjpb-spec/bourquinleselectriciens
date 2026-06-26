@@ -92,14 +92,13 @@ function TelecomsPage() {
           Swisscom Business Gold Partner
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a href="/#contact" className="btn-brand">
-            Demander un devis
-          </a>
-          <a href="tel:0228498333" className="btn-outline">
+          <a href="tel:0228498333" className="btn-brand">
             <Phone className="w-4 h-4" /> 022 849 83 33
           </a>
+          <Link to="/contact" className="btn-outline">Envoyer une demande</Link>
         </div>
       </section>
+
 
       {/* TÉLÉPHONIE */}
       <section className="py-20 bg-[color:var(--surface-muted)]">
