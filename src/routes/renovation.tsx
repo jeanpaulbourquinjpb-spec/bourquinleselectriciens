@@ -122,7 +122,7 @@ function RenovationPage() {
         </p>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {etapes.map((e) => (
-            <div key={e.title} className="card-soft text-center cursor-default pointer-events-none outline-none">
+            <div key={e.title} className="card-soft text-center">
               <e.icon className="w-8 h-8 text-brand mx-auto" />
               <h3 className="mt-4 text-xl">{e.title}</h3>
               <p className="mt-2 text-sm">{e.text}</p>
