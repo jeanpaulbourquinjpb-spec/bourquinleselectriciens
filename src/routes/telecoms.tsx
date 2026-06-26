@@ -176,17 +176,17 @@ function TelecomsPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <a
-              href="/#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-brand font-semibold hover:bg-white/90 transition"
-            >
-              Nous contacter
-            </a>
-            <a
               href="tel:0228498333"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white/10 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-brand font-semibold hover:bg-white/90 transition"
             >
               <Phone className="w-4 h-4" /> 022 849 83 33
             </a>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white/10 transition"
+            >
+              Envoyer une demande
+            </Link>
           </div>
         </div>
       </section>
