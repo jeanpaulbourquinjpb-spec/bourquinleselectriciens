@@ -145,10 +145,10 @@ function HomePage() {
 
           <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap items-start gap-3">
             <a
-              href="https://www.google.com/maps/place/?q=place_id:ChIJfS2J5zZljEcREXY9RXGNl_I"
+              href="https://search.google.com/local/writereview?placeid=ChIJfS2J5zZljEcREXY9RXGNl_I"
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-pointer inline-flex"
+              className="cursor-pointer inline-flex transition-opacity hover:opacity-80"
             >
               <GoogleRatingBadge />
             </a>
